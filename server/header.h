@@ -63,6 +63,11 @@ typedef struct train_s
     //判断是否要发送正文内容
     bool send_flag;
 
+    //标记位
+    //用于判断第一次交互时是不是注册行为
+    //默认0，1代表本次是注册行为
+    bool isRegister;
+
     //控制信息的字符数组
     char control_msg[1024];
 }train_t;

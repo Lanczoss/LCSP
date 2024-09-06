@@ -1,49 +1,118 @@
 #include "header.h"
 
+//自己通知自己退出
 int pipefd[2];
+void exit_func(int num)
+{
+    //SIGINT信号的处理函数
+    ssize_t rret = write(pipefd[1], "exit", 4);
+    if(rret == -1)
+    {
+        printf("write pipe error.\n");
+        exit(-1);
+    }
+}
 int main(void)
 {
+    //创建匿名管道，注册2号信号
+    int ret = pipe(pipefd);
+    ERROR_CHECK(ret, -1, "pipe");
     if(fork() != 0)
     {
+        close(pipefd[0]);
         //父进程接收信号
-
+        signal(SIGINT, exit_func);
+        //等待子进程退出
+        wait(NULL);
+        //子进程已经关闭
+        exit(0);
     }
     setpgid(0, 0);
     pool_t pool;
     //线程池
-    int ret = initThreads(&pool);
+    ret = initThreads(&pool);
+    ERROR_CHECK(ret, -1, "initThreads");
 
     //初始化socket
     int socket_fd;
     ret = initSocket(&socket_fd);
+    ERROR_CHECK(ret, -1, "initSocket");
 
     //初始化epoll
     int epoll_fd = epoll_create(1);
+    //socket_fd加入监听
     ret = addEpoll(epoll_fd, socket_fd);
+    ERROR_CHECK(ret, -1, "addEpoll socket_fd");
+    //pipefd管道读端加入监听
     ret = addEpoll(epoll_fd, pipefd[0]);
+    ERROR_CHECK(ret, -1, "addEpoll epoll_fd");
 
     while(1)
     {
         struct epoll_event event[10];
         //开始监听
         int epoll_num = epoll_wait(epoll_fd, event, 10, -1);
+        ERROR_CHECK(epoll_num, -1, "epoll wait");
 
         for(int i = 0; i < epoll_num; i++)
         {
             int fd = event[i].data.fd;
             if(fd == socket_fd)
             {
-                //监听socket_fd
+                //如果是监听到socket对象读端
+                //获取net_fd
                 int net_fd = accept(socket_fd, NULL, NULL);
+                ERROR_CHECK(net_fd, -1, "accept");
                 //放入队列
                 //记得加锁
-                enQueue(&pool.q, net_fd);
-                //唤醒
-
+                ret = pthread_mutex_lock(&pool.lock);
+                ERROR_CHECK(ret, -1, "get lock");
+                ret = enQueue(&pool.q, net_fd);
+                ERROR_CHECK(ret, -1, "enQueue");
+                //广播唤醒
+                ret = pthread_cond_broadcast(&pool.cond);
+                ERROR_CHECK(ret, -1, "cond broadcast");
+                //解锁
+                ret = pthread_mutex_unlock(&pool.lock);
+                ERROR_CHECK(ret, -1, "unlock");
             }
             if(fd == pipefd[0])
             {
+                //监听到管道读端
+                //准备退出
+                char buf[10] = {0};
+                ssize_t rret = read(pipefd[0], buf, sizeof(buf));
+                ERROR_CHECK(rret, -1, "read pipe");
+                //加锁
+                ret = pthread_mutex_lock(&pool.lock);
+                ERROR_CHECK(ret, -1, "get lock");
+                //修改退出标记位
+                pool.exit_flag = TRUE;
+                //唤醒解锁
+                ret = pthread_cond_broadcast(&pool.cond);
+                ERROR_CHECK(ret, -1, "cond broadcast");
+                ret = pthread_mutex_unlock(&pool.lock);
+                ERROR_CHECK(ret, -1, "unlock");
 
+                //等待子线程退出
+                for(int j = 0; j < 0; j++)
+                {
+                    ret = pthread_join(pool.pthread_list[j], NULL);
+                    ERROR_CHECK(ret, -1, "pthread join");
+                }
+
+                //清理队列
+                while(pool.q.head != NULL)
+                {
+                    int net_fd;
+                    deQueue(&pool.q, &net_fd);
+                    close(net_fd);
+                }
+                //清理主线程资源
+                close(socket_fd);
+                close(epoll_fd);
+                //主线程退出
+                pthread_exit(NULL);
             }
         }
     }
