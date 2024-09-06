@@ -133,7 +133,7 @@ int addEpoll(int epoll_fd, int fd);
 int doWorker(int net_fd);
 
 //分析协议
-int analysisProtocol(train_t *t, int net_fd);
+int analysisProtocol(train_t t, int net_fd);
 
 //路径拼接
 int pathConcat(train_t t, char *real_path);
