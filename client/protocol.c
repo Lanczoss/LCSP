@@ -1,29 +1,29 @@
 #include "header.h"
 
 //分析协议
-int analysisProtocol(train_t *t, int net_fd)
+int analysisProtocol(train_t t, int socket_fd)
 {
 
-    switch(t->command)
+    switch(t.command)
     {
     case LS:
-        lsCommand(*t, net_fd);
+        lsCommand(t, socket_fd);
         break;
     case CD:
-        cdCommand(*t, net_fd);
+        cdCommand(t, socket_fd);
         break;
     case PWD:
-        pwdCommand(*t, net_fd);
+        pwdCommand(t, socket_fd);
         break;
     case PUTS:
-        putsCommand(*t, net_fd);
+        putsCommand(t, socket_fd);
         break;
     case GETS:
-        getsCommand(*t, net_fd);
+        getsCommand(t, socket_fd);
         break;
     case REMOVE:
     case RM:
-        rmCommand(*t, net_fd);
+        rmCommand(t, socket_fd);
         break;
     default:
         printf("error:default\n");

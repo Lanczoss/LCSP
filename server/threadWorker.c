@@ -24,6 +24,9 @@ int doWorker(int net_fd)
     {
         //自定义协议
         train_t t;
+
+        // TODO:接受一次信息-》区分等下要分发给那个命令：
+
         //分析协议
         analysisProtocol(&t, net_fd);
 

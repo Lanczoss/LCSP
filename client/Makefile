@@ -1,14 +1,16 @@
+OUT:=client
 SRCS:=$(wildcard *.c)
-OUTS:=$(SRCS:%.c=%)
-CC:=gcc
+OBJS:=$(SRCS:%.c=%.o)
 COM_OP:=-Wall -g -pthread
-.PHONY:clean rebuild all
+CC:=gcc
 
-all:$(OUTS)
-%:%.c
-	$(CC) $^ -o $@ $(COM_OP)
+$(OUT):$(OBJS)
+	$(CC) $^ -o $@
+%.o:%.c
+	$(CC) -c $< -o $@ $(COM_OP)
 
+.PHONY:clean rebuild
 clean:
-	$(RM) $(OUTS)
-rebuild:clean all
+	$(RM) $(OUT) $(OBJS)
+rebuild:clean $(OUT)
 

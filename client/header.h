@@ -1,7 +1,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-//去除pthread和mysql头文件
+//去除epoll、pthread和mysql头文件
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,7 +25,6 @@
 #include <sys/socket.h>
 #include <netinet/ip.h>
 #include <netdb.h>
-#include <sys/epoll.h>
 #include <sys/sendfile.h>
 
 enum
@@ -107,4 +106,21 @@ int splitCommand(train_t *t, char *buf);
 //接收服务端发送的文件内容
 int recvFile(int socket_fd);
 
+//ls的命令
+int lsCommand(train_t t, int socket_fd);
+
+//cd的命令
+int cdCommand(train_t t, int socket_fd);
+
+//pwd的命令
+int pwdCommand(train_t t, int socket_fd);
+
+//puts的命令
+int putsCommand(train_t t, int socket_fd);
+
+//gets的命令
+int getsCommand(train_t t, int socket_fd);
+
+//rm的命令
+int rmCommand(train_t t, int socket_fd);
 #endif
