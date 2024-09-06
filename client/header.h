@@ -91,6 +91,9 @@ typedef struct train_s
         } \
     } while(0)
 
+//保存从服务器发来的用户实际路径
+#define USER_PATH "./";
+
 //读配置文件
 int getParameter(void *key, void *value);
 
