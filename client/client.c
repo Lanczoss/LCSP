@@ -22,22 +22,9 @@ int main(void)
         train_t t;
         splitCommand(&t, buf);
 
-        //发送自定义协议
-        send(socket_fd, &t, sizeof(t), MSG_NOSIGNAL);
-
-        //判断客户端是否要发送文件
-        if(t.send_flag == 1)
-        {
-            //客户端发送文件
-            sendFile(socket_fd);
-        }
-        else
-        {
-            //接收服务器自定义协议
-            bzero(&t, sizeof(t));
-            recv(socket_fd, &t, sizeof(t), MSG_WAITALL);
-            //处理接收的消息
-            analysisProtocol(t, socket_fd);
-        }
+        //接收服务器自定义协议
+        bzero(&t, sizeof(t));
+        //处理接收的消息
+        analysisProtocol(t, socket_fd);
     }
 }
