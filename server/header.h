@@ -156,4 +156,7 @@ int getsCommand(train_t t, int net_fd);
 //rm的命令
 int rmCommand(train_t t, int net_fd);
 
+// 子线程的入口函数
+void *threadMain(void *p);
+
 #endif
