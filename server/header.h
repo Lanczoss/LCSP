@@ -50,7 +50,7 @@ typedef struct train_s
     int command;
 
     //本次发送记录路径的长度
-    int msg_length;
+    int path_length;
 
     //本次发送内容/正文的长度
     int file_length;
@@ -137,6 +137,12 @@ int analysisProtocol(train_t *t, int net_fd);
 
 //路径拼接
 int pathConcat(train_t t, char *real_path);
+
+//从train自定义协议中取得参数
+//第一个参数指自定义协议
+//第二个参数指需要第几个参数
+//第三个参数指字符数组缓冲区
+int splitParameter(train_t t, int num, char *buf);
 
 //ls的命令
 int lsCommand(train_t t, int net_fd);
