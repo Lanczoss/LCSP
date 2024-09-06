@@ -9,15 +9,18 @@
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
+1.  git clone
+2.  家目录创建files文件夹
 3.  xxxx
 
-#### 使用说明
+#### 自定义协议说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  int command 是命令的枚举类型
+2.  int msg_length 是本次发送携带的控制信息长度，请记住服务端要进行拼接
+3.  int file_length 是假设本次要发送内容(send_flag == 1)时候，要发送的内容长度
+4.  int parameter_num 是本次控制信息的字符数组有多少段字符串(多少段控制信息)
+5.  bool send_flag 判断本次是否需要发送文件内容
+6.  char control_msg 发送的控制信息，标准格式：路径名，命令，命令所携带的参数
 
 #### 参与贡献
 
