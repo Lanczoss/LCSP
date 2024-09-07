@@ -28,14 +28,9 @@ int initSocket(int *socket_fd)
     sockaddr.sin_port = htons(atoi(port));
     sockaddr.sin_addr.s_addr = inet_addr(ip);
 
-    // 绑定端口
-    int ret_bind = bind(*socket_fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
-    ERROR_CHECK(ret_bind, -1, "bind");
-
-    // 监听端口
-    int ret_lis = listen(*socket_fd, 10);
-    ERROR_CHECK(ret_lis, -1, "listen");
-
+    // 建立连接
+    int ret_conn = connect(*socket_fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
+    ERROR_CHECK(ret_conn, -1, "connect");
 
     return 0;
 }
