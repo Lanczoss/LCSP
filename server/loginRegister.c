@@ -41,7 +41,7 @@ int loginRegisterSystem(train_t *t, int net_fd)
             //是注册行为
             //isRegister == 1
             //创建目录
-            if(doesHaveUser(*t) == 0)
+            if(doesHaveUser(*t) == -1)
             {
                 int ret = createUser(*t);
                 ERROR_CHECK(ret, -1, "createUser 创建目录失败");

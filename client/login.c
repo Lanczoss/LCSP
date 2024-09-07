@@ -7,18 +7,21 @@
 int loginSystem(train_t *t, int socket_fd)
 {
     //读取用户名
-    char user_name[512] = {0};
+    char user_path[1024] = {0};
     printf("Enter Username:");
-    ssize_t rret = read(STDIN_FILENO, user_name, sizeof(user_name) - 1);
+    fflush(stdout);
+    ssize_t rret = read(STDIN_FILENO, user_path, sizeof(user_path) - 1);
     ERROR_CHECK(rret, -1, "read username");
-    char user_path[1024] = {0}; 
-    sprintf(user_path, "%s%s", user_name, "/");
+    user_path[strlen(user_path) - 1] = '\0';
+    strcat(user_path, "/");
     //将路径名存入自定义协议中
     strcpy(t->control_msg, user_path);
+    t->path_length = strlen(user_path);
 
     //读取密码
     char password[1024] = {0};
     printf("Enter Password:");
+    fflush(stdout);
     rret = read(STDIN_FILENO, password, sizeof(password));
     ERROR_CHECK(rret, -1, "read password");
     //密码正文长度

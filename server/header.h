@@ -80,7 +80,7 @@ typedef struct train_s
 }train_t;
 
 //服务端基本路径
-#define BASE_PATH "~/files"
+#define BASE_PATH "../files"
 
 typedef struct pool_s
 {
