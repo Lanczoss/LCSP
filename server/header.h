@@ -40,7 +40,10 @@ enum
     PUTS,
     GETS,
     REMOVE,
-    RM
+    RM,
+    MKDIR,
+    ABNORMAL,
+    NORMAL,
 };
 
 //自定义协议头部信息
@@ -65,6 +68,12 @@ typedef struct train_s
 
     //控制信息的字符数组
     char control_msg[1024];
+
+    //错误标志
+    int error_flag;
+    
+    //当前层数
+    int current_layers;
 }train_t;
 
 //服务端基本路径
@@ -89,6 +98,12 @@ typedef struct pool_s
 
     //退出标记位
     int exit_flag;
+
+    // 错误标志位
+    int error_flag;
+    
+    // 当前层数
+    int current_layers;
 }pool_t;
 
 // 检查命令行参数数量是否符合预期
