@@ -37,7 +37,10 @@ enum
     PUTS,
     GETS,
     REMOVE,
-    RM
+    RM,
+    MKDIR,
+    NORMAL,
+    ABNORMAL,
 };
 
 //自定义协议头部信息
@@ -47,7 +50,7 @@ typedef struct train_s
     int command;
 
     //本次发送记录路径的长度
-    int msg_length;
+    int path_length;
 
     //本次发送内容/正文的长度
     int file_length;
@@ -64,6 +67,12 @@ typedef struct train_s
 
     //控制信息的字符数组
     char control_msg[1024];
+
+    // 异常标志位
+    int error_flag;
+
+    // 当前用户所在目录层数，初始为0
+    int current_layers;
 }train_t;
 
 // 检查命令行参数数量是否符合预期
@@ -107,20 +116,23 @@ int splitCommand(train_t *t, char *buf);
 int recvFile(int socket_fd);
 
 //ls的命令
-int lsCommand(train_t t, int socket_fd);
+int lsCommand(train_t *t, int socket_fd);
 
 //cd的命令
-int cdCommand(train_t t, int socket_fd);
+int cdCommand(train_t *t, int socket_fd);
 
 //pwd的命令
-int pwdCommand(train_t t, int socket_fd);
+int pwdCommand(train_t *t, int socket_fd);
 
 //puts的命令
-int putsCommand(train_t t, int socket_fd);
+int putsCommand(train_t *t, int socket_fd);
 
 //gets的命令
-int getsCommand(train_t t, int socket_fd);
+int getsCommand(train_t *t, int socket_fd);
 
 //rm的命令
-int rmCommand(train_t t, int socket_fd);
+int rmCommand(train_t *t, int socket_fd);
+
+//mkdir的命令
+int mkdirCommand(train_t *t, int socket_fd);
 #endif
