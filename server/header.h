@@ -40,7 +40,8 @@ enum
     PUTS,
     GETS,
     REMOVE,
-    RM
+    RM,
+    MKDIR
 };
 
 //自定义协议头部信息
