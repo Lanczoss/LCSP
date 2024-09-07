@@ -26,6 +26,7 @@
 #include <netinet/ip.h>
 #include <netdb.h>
 #include <sys/sendfile.h>
+#include "command.h"
 
 enum
 {
@@ -47,7 +48,7 @@ typedef struct train_s
     int command;
 
     //本次发送记录路径的长度
-    int msg_length;
+    int path_length;
 
     //本次发送内容/正文的长度
     int file_length;
@@ -116,7 +117,7 @@ int lsCommand(train_t t, int socket_fd);
 int cdCommand(train_t t, int socket_fd);
 
 //pwd的命令
-int pwdCommand(train_t t, int socket_fd);
+int pwdCommand(train_t t);
 
 //puts的命令
 int putsCommand(train_t t, int socket_fd);

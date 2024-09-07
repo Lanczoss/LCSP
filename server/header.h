@@ -29,6 +29,7 @@
 #include <sys/sendfile.h>
 #include <mysql/mysql.h>
 #include "queue.h"
+#include "command.h"
 
 enum
 {
