@@ -27,6 +27,7 @@
 #include <netinet/ip.h>
 #include <netdb.h>
 #include <sys/sendfile.h>
+#include <sys/utsname.h>
 
 enum
 {
@@ -77,6 +78,13 @@ typedef struct train_s
     //控制信息的字符数组
     char control_msg[1024];
 }train_t;
+
+// 定义日志级别的宏，简化日志记录的使用
+// __FILE__ 用于捕获源文件名，__LINE__ 用于捕获代码所在行
+#define LOG_INFOR(message)  write_log("INFO", __FILE__, __LINE__, message)
+#define LOG_ERROR(message) write_log("ERROR", __FILE__, __LINE__, message)
+#define LOG_WARN(message)  write_log("WARNING", __FILE__, __LINE__, message)
+#define ERROR_CHECK(ret, error_flag, msg) \
 
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
@@ -155,4 +163,17 @@ int loginSystem(train_t *t, int socket_fd);
 //将用户名和密码发送至服务器处接收
 //这里密码输入什么都能注册成功
 int registerSystem(train_t *t, int socket_fd);
+
+// 日志记录
+// 第一个参数，日志级别
+// 第二个参数，源代码文件名
+// 第三个参数：源代码行号 
+// 第四个参数：日志消息
+/* usage: 4writeLog("client_log", "输入错误");*/
+void writeLog(const char * level,const char *file, int line,const char * message);
+
+// 日志关闭函数声明，确保在程序结束时关闭日志文件
+void close_log();
+
+
 #endif
