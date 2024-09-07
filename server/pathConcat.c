@@ -20,7 +20,7 @@ int pathConcat(train_t t, char *real_path){
     }
 
     strncpy(real_path, base_path, 1024 - 1);
-    real_path[1024] = '\0';
+    real_path[1024 -1] = '\0';  //确保real_path以'\0'结尾。
     
     return 0;
 }
