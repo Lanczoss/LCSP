@@ -69,6 +69,11 @@ typedef struct train_s
     //默认0，1代表本次是注册行为
     bool isRegister;
 
+    //标记位
+    //用于标记用户是否登录失败
+    //默认0登录成功，1代表登录失败
+    bool isLoginFailed;
+
     //控制信息的字符数组
     char control_msg[1024];
 }train_t;
@@ -145,4 +150,9 @@ int interface(train_t *t, int socket_fd);
 //这里密码输入什么都能登录成功
 int loginSystem(train_t *t, int socket_fd);
 
+//注册动作函数
+//第一版第二版
+//将用户名和密码发送至服务器处接收
+//这里密码输入什么都能注册成功
+int registerSystem(train_t *t, int socket_fd);
 #endif

@@ -18,11 +18,11 @@ int interface(train_t *t, int socket_fd)
            );
     //打印登录选项
     printf("Welcome to Cloud Storage Service!\n\n");
-    printf("(Y) 登录  (R) 注册  (E)退出\n");
     //获取选项
     while(1)
     {
-        printf(">");
+        bzero(t, sizeof(train_t));
+        printf("(Y) 登录  (R) 注册  (E)退出 > ");
         fflush(stdout);
         char option[512] = {0};
         ssize_t rret = read(STDIN_FILENO, option, sizeof(option) - 1);
@@ -33,18 +33,35 @@ int interface(train_t *t, int socket_fd)
         case 'Y':
             //登录
            ret = loginSystem(t, socket_fd);
-           ERROR_CHECK(ret, -1, "loginSystem");
+           if(t->isLoginFailed == 1)
+           {
+                //登录失败再来一次
+                printf("用户名或密码不正确，请重新输入。\n\n");
+                continue;
+           }
+           //登录成功
+           printf("登录成功\n\n");
            break;
         case 'r':
         case 'R':
-           //注册先只做登录
-           //ret = registerSystem(t, socket_fd);
+           //注册
+           ret = registerSystem(t, socket_fd);
            //ERROR_CHECK(ret, -1, "registerSystem");
-           break;
+           if(t->isLoginFailed == 1)
+           {
+               //注册失败
+               printf("该用户名已存在。\n\n");
+               continue;
+           }
+           //注册成功也需要继续循环
+           printf("注册成功\n\n");
+           t->isRegister = 0;
+           continue;
         case 'e':
         case 'E':
            //退出
-           break;
+           printf("网盘正在退出……\n\n");
+           return -1;
         default:
            printf("选项输入错误，请重试\n");
         }

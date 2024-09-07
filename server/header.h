@@ -69,6 +69,11 @@ typedef struct train_s
     //默认0，1代表本次是注册行为
     bool isRegister;
 
+    //标记位
+    //用于标记用户是否登录失败
+    //默认0登录成功，1代表登录失败
+    bool isLoginFailed;
+
     //控制信息的字符数组
     char control_msg[1024];
 }train_t;
@@ -170,5 +175,19 @@ int rmCommand(train_t t, int net_fd);
 
 // 子线程的入口函数
 void *threadMain(void *p);
+
+//根据路径名判断是否有用户名这个目录
+int doesHaveUser(train_t t);
+
+//登录/注册动作函数
+//第一版第二版
+//将从客户端发来的用户名和密码进行验证
+//如果是登录行为，密码输入不正确，要求重试
+//如果是注册行为，用户名已经存在，则失败
+int loginRegisterSystem(train_t *t,  int net_fd);
+
+//注册时尝试创建用户根目录的函数
+//第一版先遍历目录
+int createUser(train_t t);
 
 #endif
