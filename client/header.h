@@ -27,6 +27,7 @@
 #include <netinet/ip.h>
 #include <netdb.h>
 #include <sys/sendfile.h>
+#include "command.h"
 #include <sys/utsname.h>
 
 enum
@@ -135,7 +136,7 @@ int lsCommand(train_t t, int socket_fd);
 int cdCommand(train_t t, int socket_fd);
 
 //pwd的命令
-int pwdCommand(train_t t, int socket_fd);
+int pwdCommand(train_t t);
 
 //puts的命令
 int putsCommand(train_t t, int socket_fd);

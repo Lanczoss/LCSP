@@ -29,6 +29,7 @@
 #include <sys/sendfile.h>
 #include <mysql/mysql.h>
 #include "queue.h"
+#include "command.h"
 #include <sys/utsname.h>    // uname()需要用到的头文件
 
 enum
