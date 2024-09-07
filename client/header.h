@@ -84,7 +84,6 @@ typedef struct train_s
 #define LOG_INFOR(message)  write_log("INFO", __FILE__, __LINE__, message)
 #define LOG_ERROR(message) write_log("ERROR", __FILE__, __LINE__, message)
 #define LOG_WARN(message)  write_log("WARNING", __FILE__, __LINE__, message)
-#define ERROR_CHECK(ret, error_flag, msg) \
 
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \

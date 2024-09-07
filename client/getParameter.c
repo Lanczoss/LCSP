@@ -1,6 +1,6 @@
 #include "header.h"
 
-int getparameter(void *key, void *value){
+int getParameter(void *key, void *value){
 
     FILE * file = fopen("config.ini", "r");
     while(1){
