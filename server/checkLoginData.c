@@ -26,6 +26,10 @@ int doesHaveUser(train_t t)
 //注册时尝试创建用户根目录的函数
 int createUser(train_t t)
 {
-    int ret = mkdir(t.control_msg, 0777);
+    char user_path[2048] = {0};
+    strcpy(user_path, BASE_PATH);
+    strcat(user_path, "/");
+    strcat(user_path, t.control_msg);
+    int ret = mkdir(user_path, 0777);
     return ret;
 }

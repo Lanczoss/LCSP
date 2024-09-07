@@ -58,7 +58,7 @@ int loginRegisterSystem(train_t *t, int net_fd)
         //这里自定义协议里存有路径名
         rret = send(net_fd, t, sizeof(train_t), MSG_NOSIGNAL);
         ERROR_CHECK(rret, -1, "对端关闭");
-        if(t->isLoginFailed == 0)
+        if(t->isLoginFailed == 0 && t->isRegister == 0)
         {
             //登录成功可以退出循环
             return 0;

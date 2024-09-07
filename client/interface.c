@@ -41,7 +41,7 @@ int interface(train_t *t, int socket_fd)
            }
            //登录成功
            printf("登录成功\n\n");
-           break;
+           return 0;
         case 'r':
         case 'R':
            //注册
