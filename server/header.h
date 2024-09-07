@@ -104,9 +104,9 @@ typedef struct pool_s
 }pool_t;
 
 // 定义日志级别的宏
-#define LOG_INFO(message) write_log("INFO", __FILE__,__LINE__,message)
-#define LOG_ERROR(message) write_log("ERROR", __FILE__, __LINE__, message)
-#define LOG_WARN(message) write_lof("WARNING", __FILE__, __LINE__, message)
+#define LOG_INFO(message) writeLog("INFO", __FILE__,__LINE__,message)
+#define LOG_ERROR(message) writeLog("ERROR", __FILE__, __LINE__, message)
+#define LOG_WARN(message) writeLog("WARNING", __FILE__, __LINE__, message)
 
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
@@ -192,7 +192,7 @@ void *threadMain(void *p);
 void writeLog(const char * level,const char *file, int line,const char * message);
 
 // 日志关闭函数声明，确保在程序结束时关闭日志文件
-void close_log();
+void closeLog();
 //
 //根据路径名判断是否有用户名这个目录
 int doesHaveUser(train_t t);

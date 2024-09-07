@@ -81,9 +81,9 @@ typedef struct train_s
 
 // 定义日志级别的宏，简化日志记录的使用
 // __FILE__ 用于捕获源文件名，__LINE__ 用于捕获代码所在行
-#define LOG_INFOR(message)  write_log("INFO", __FILE__, __LINE__, message)
-#define LOG_ERROR(message) write_log("ERROR", __FILE__, __LINE__, message)
-#define LOG_WARN(message)  write_log("WARNING", __FILE__, __LINE__, message)
+#define LOG_INFOR(message)  writeLog("INFO", __FILE__, __LINE__, message)
+#define LOG_ERROR(message) writeLog("ERROR", __FILE__, __LINE__, message)
+#define LOG_WARN(message)  writeLog("WARNING", __FILE__, __LINE__, message)
 
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
@@ -172,7 +172,7 @@ int registerSystem(train_t *t, int socket_fd);
 void writeLog(const char * level,const char *file, int line,const char * message);
 
 // 日志关闭函数声明，确保在程序结束时关闭日志文件
-void close_log();
+void closeLog();
 
 
 #endif

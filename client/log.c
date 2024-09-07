@@ -8,7 +8,7 @@ static FILE *log_file = NULL;
 // 获取主机名
 // 第一个参数：获取主机名
 // 第二个参数：主机名的大小
-void get_hostname(char *hostname, size_t size)
+void getHostname(char *hostname, size_t size)
 {
     // 系统调用函数uname()需要用到的结构体 uname()函数是用于返回系统的信息
     struct utsname sys_info;
@@ -24,7 +24,7 @@ void get_hostname(char *hostname, size_t size)
 // 获取当前时间的格式化字符串
 // 第一个参数：存储当前字符串的数组
 // 第二个参数：第一个参数的大小
-void get_current_time(char *buffer, size_t size)
+void getCurrentTime(char *buffer, size_t size)
 {
     // uname的结构体
     // 当前的时间
@@ -54,11 +54,11 @@ void writeLog(const char * level,const char *file, int line,const char * message
         }
         // 获取当前时间
         char time_str[26];
-        get_current_time(time_str, sizeof(time_str));
+        getCurrentTime(time_str, sizeof(time_str));
 
         // 获取主机名
         char hostname[64];
-        get_hostname(hostname, sizeof(hostname));
+        getHostname(hostname, sizeof(hostname));
 
         // 获取当前进程ID和进程名
         pid_t pid = getpid();
@@ -80,7 +80,7 @@ void writeLog(const char * level,const char *file, int line,const char * message
 }
 
 // 在程序结束时，关闭日志文件
-void close_log()
+void closeLog()
 {
     if(log_file != NULL)
     {

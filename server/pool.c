@@ -7,6 +7,7 @@ int initThreads(pool_t *pool)
 {
     // 从配置文件读取线程数量  
     // TODO:配置文件的测试格式eg:port=8080 err_eg:port = 8080
+    // 暂时支持4个线程
     char num[16];  
     bzero(num, sizeof(num));  
     getParameter((void *)"thread_num", (void *)num);  
