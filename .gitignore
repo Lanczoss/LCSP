@@ -1,3 +1,11 @@
+# you ignore
+test.c
+*.clion.source.upload.marker
+CMakeLists.txt
+c_test.c
+s_test.c
+cmake-build-debug/
+
 config.ini
 # Prerequisites
 *.d
