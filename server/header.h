@@ -29,6 +29,7 @@
 #include <sys/sendfile.h>
 #include <mysql/mysql.h>
 #include "queue.h"
+#include <sys/utsname.h>    // uname()需要用到的头文件
 
 enum
 {
@@ -91,6 +92,11 @@ typedef struct pool_s
     int exit_flag;
 }pool_t;
 
+// 定义日志级别的宏
+#define LOG_INFO(message) write_log("INFO", __FILE__,__LINE__,message)
+#define LOG_ERROR(message) write_log("ERROR", __FILE__, __LINE__, message)
+#define LOG_WARN(message) write_lof("WARNING", __FILE__, __LINE__, message)
+
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
     do { \
@@ -101,6 +107,7 @@ typedef struct pool_s
     } while (0)
 
 // 检查返回值是否是错误标记,若是则打印msg和错误信息
+// 将错误信息打印到日志文件中
 #define ERROR_CHECK(ret, error_flag, msg) \
     do { \
         if ((ret) == (error_flag)) { \
@@ -164,5 +171,16 @@ int rmCommand(train_t t, int net_fd);
 
 // 子线程的入口函数
 void *threadMain(void *p);
+
+// 日志记录
+// 第一个参数，日志级别
+// 第二个参数，源代码文件名
+// 第三个参数：源代码行号 
+// 第四个参数：日志消息
+/* usage: 4writeLog("client_log", "输入错误");*/
+void writeLog(const char * level,const char *file, int line,const char * message);
+
+// 日志关闭函数声明，确保在程序结束时关闭日志文件
+void close_log();
 
 #endif
