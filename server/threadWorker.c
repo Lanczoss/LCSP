@@ -42,17 +42,16 @@ int doWorker(int net_fd)
     //自定义协议
     train_t t;
     bzero(&t, sizeof(t));
-    //先接收第一次的登录信息或者注册信息;
-    ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
-    ERROR_CHECK(rret, -1, "recv login msg");
 
-    //接收密码
-    char password[1024] = {0};
-    rret = recv(net_fd, password, t.file_length, MSG_WAITALL);
-    ERROR_CHECK(rret, -1, "recv password");
+    //登录/注册逻辑函数
+    //返回值为-1时说明是注册失败直接退出
+    int ret = loginRegisterSystem(&t, net_fd);
+    if(ret == -1)
+    {
+        //注册失败
+        return 0;
+    }
 
-    //TODO:判断是否是注册行为 回复客户端是否登录成功
-    
     //到这里开始用户成功登录
     while(1)
     {
@@ -62,4 +61,5 @@ int doWorker(int net_fd)
         //分析协议
         analysisProtocol(&t, net_fd);
     }
+    return 0;
 }

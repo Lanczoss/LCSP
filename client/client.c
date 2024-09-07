@@ -13,8 +13,12 @@ int main(void)
     //录入用户第一次操作时的自定义协议
     //并将初始用户名加入到路径名中
     ret = interface(&t, socket_fd);
-    ERROR_CHECK(ret, -1, "showInterface");
-
+    if(ret == -1)
+    {
+        //函数出错或者退出
+        close(socket_fd);
+        exit(0);
+    }
     //到这里开始服务器已经接受了用户的登录
     //此时自定义协议里有路径名及路径名长度
 
@@ -25,7 +29,7 @@ int main(void)
         strncpy(user_path, t.control_msg, t.path_length);
 
         //打印输入框
-        printf("%s >", user_path);
+        printf("Cloud %s> ", user_path);
         fflush(stdout);
 
         //存储标准输入的缓冲区
@@ -49,7 +53,11 @@ int main(void)
         //这里出来的自定义协议有基本的控制信息
         //处理接收的消息
         ret = analysisProtocol(&t, socket_fd);
-        ERROR_CHECK(ret, -1, "analysisProtocol");
+        if(ret == -1)
+        {
+            close(socket_fd);
+            exit(0);
+        }
     }
     close(socket_fd);
 }
