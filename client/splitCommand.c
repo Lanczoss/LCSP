@@ -8,7 +8,7 @@ int getEnum(char *str){
     case 'l':return LS;
     case 'c':return CD;
     case 'r':return (str[1] == 'm') ? RM:REMOVE;
-    case 'm':break; 
+    case 'm':return MKDIR; 
     case 'p':return (str[1 ]== 'u') ? PUTS:PWD;
     case 'g':return GETS;
     default :
