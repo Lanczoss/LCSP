@@ -65,6 +65,7 @@ int doWorker(int net_fd)
         int ret = analysisProtocol(t, net_fd);
         if(ret == -1)
         {
+            //用户输入了exit
             return -1;
         }
     }
