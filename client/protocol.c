@@ -21,6 +21,11 @@ int analysisProtocol(train_t *t, int socket_fd)
         //getsCommand(t, socket_fd);
         break;
     case REMOVE:
+        printf("暂时未完成！\n");
+        return 0;
+    case MKDIR:
+        mkdirCommand(t, socket_fd);
+        return 0;
     case RM:
         //rmCommand(t, socket_fd);
         break;
