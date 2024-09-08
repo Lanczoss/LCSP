@@ -4,6 +4,7 @@
 int analysisProtocol(train_t t, int net_fd)
 {
 
+    printf("num :%d\n",t.command);
     switch(t.command)
     {
     case LS:
