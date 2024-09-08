@@ -16,6 +16,7 @@ int cdCommand(train_t *t, int socket_fd){
         return 0;
     }
     memcpy(t,&tmp_t,sizeof(tmp_t));
+    printf("msg:%s\n",t->control_msg);
     return 0;
 }
 

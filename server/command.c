@@ -4,6 +4,10 @@
 #include "command.h"
 
 int cdCommand(train_t t, int net_fd){
+    puts("in cd command");
+
+    printf("cd num = %d\n",t.parameter_num);
+
     if (t.parameter_num != 1){
         t.error_flag = ABNORMAL;
         strcpy(t.control_msg,"输入参数有误\n");
@@ -25,7 +29,7 @@ int cdCommand(train_t t, int net_fd){
     char real_path[1024] = {0};
     pathConcat(t,real_path);
     if (real_path[strlen(real_path) - 1] == '/'){
-        virtual_path[strlen(real_path) - 1] = 0;
+        real_path[strlen(real_path) - 1] = 0;
     }
 
     // 读取当前层数
@@ -35,8 +39,11 @@ int cdCommand(train_t t, int net_fd){
     char parameter[1024] = {0};
     splitParameter(t,t.parameter_num,parameter);
 
+    // 将参数最后一个空格换行符去除
+    parameter[strlen(parameter) - 1] = 0;
+
     // 判断参数最后是否有/，没有就补
-    if (parameter[strlen(parameter - 1) != '/']){
+    if (parameter[strlen(parameter) - 1] != '/'){
         parameter[strlen(parameter)] = '/'; 
     }
 
@@ -56,6 +63,12 @@ int cdCommand(train_t t, int net_fd){
         strcat(real_path,virtual_path);
         current_layers = 0;
     }
+    
+    printf("virtual_path = %s\n",virtual_path);
+    printf("real_path = %s\"\n",real_path);
+    printf("parameter = %s\n",parameter);
+    printf("current_layers = %d\n",t.current_layers);
+    printf("num = %d\n",t.parameter_num);
 
     // 从参数中分割单个参数 
     int pcount = 0;
@@ -77,6 +90,7 @@ int cdCommand(train_t t, int net_fd){
                         memcpy(t.control_msg, virtual_path, sizeof(virtual_path));
                         t.error_flag = NORMAL;
                         t.current_layers = current_layers;
+                        t.path_length = strlen(t.control_msg);
                         int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
                         if (ret == -1){
                             LOG_ERROR("send:对端关闭");
@@ -85,12 +99,15 @@ int cdCommand(train_t t, int net_fd){
                     }
                     else{
                         strcpy(t.control_msg,"输入有误\n");
-                        t.error_flag = ABNORMAL;
+                        t.error_flag = NORMAL;
+                        strcat(virtual_path,"/");
+                        memcpy(t.control_msg,virtual_path,sizeof(virtual_path));
+                        t.path_length = strlen(virtual_path);
                         int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
                         if (ret == -1){
                             LOG_ERROR("send:对端关闭");
                         }
-                        return -1;
+                        return 0;
                     }
                 }
                 pcount++;
@@ -142,6 +159,7 @@ int cdCommand(train_t t, int net_fd){
     memcpy(t.control_msg, virtual_path, sizeof(virtual_path));
     t.error_flag = NORMAL;
     t.current_layers = current_layers;
+    t.path_length = strlen(t.control_msg);
     int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
     if (ret == -1){
         LOG_ERROR("send:对端关闭");
