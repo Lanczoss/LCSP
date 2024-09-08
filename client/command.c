@@ -1,0 +1,21 @@
+#include "header.h"
+
+// 客户端cd命令请求函数
+// 第一个参数：自定义协议头部
+// 第二个参数：与服务端通信的sokcet_fd
+// 返回值：0为正常，-1为异常表示用户退出
+int cdCommand(train_t *t, int socket_fd){
+    train_t tmp_t;
+    int ret = recv(socket_fd,&tmp_t,sizeof(tmp_t),MSG_WAITALL);
+    if (ret == 0){
+        LOG_INFOR("recv:用户退出");
+        return -1;
+    }
+    if (tmp_t.error_flag == NORMAL){
+        printf("%s\n",tmp_t.control_msg);
+        return 0;
+    }
+    memcpy(t,&tmp_t,sizeof(tmp_t));
+    return 0;
+}
+

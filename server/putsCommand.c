@@ -55,7 +55,7 @@ int putsCommand(train_t t,int net_fd){
     //接收文件
     char buf[1024] = {0};
     ssize_t recv_num;
-    while ((recv_num = recv(net_fd, buf, sizeof(buf), 0)) > 0) {
+    while ((recv_num = recv(net_fd, buf, sizeof(buf), MSG_DONTROUTE)) > 0) {
         printf("接收到 %ld 字节\n", recv_num);
         ssize_t write_file_num = write(open_file_fd, buf, recv_num);
         if (write_file_num < 0) {
