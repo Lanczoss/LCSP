@@ -1,10 +1,28 @@
 #include "header.h"
 
+//判断配置文件config是否存在
+int checkConfig(void)
+{
+    FILE *fp = fopen("config.ini", "r");
+    if(fp == NULL)
+    {
+        printf("config.ini不存在，服务正在退出\n");
+        return -1;
+    }
+    fclose(fp);
+    return 0;
+}
+
 int main(void)
 {
+    int ret = checkConfig();
+    if(ret == -1)
+    {
+        exit(1);
+    }
     //建立socket连接
     int socket_fd;
-    int ret = initSocket(&socket_fd);
+    ret = initSocket(&socket_fd);
     ERROR_CHECK(ret, -1, "initSocket");
     //自定义协议
     train_t t;

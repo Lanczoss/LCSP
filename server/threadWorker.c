@@ -30,12 +30,7 @@ void *threadMain(void *p)
         THREAD_ERROR_CHECK(ret, "unlock");
 
         //工作
-        ret = doWorker(net_fd);
-        if(ret == -1)
-        {
-            //从doWorker出来的-1是对端关闭
-            printf("客户端关闭\n");
-        }
+        doWorker(net_fd);
         close(net_fd);
     }
     return NULL;
@@ -49,9 +44,9 @@ int doWorker(int net_fd)
 
     //登录/注册逻辑函数
     int ret = loginRegisterSystem(&t, net_fd);
-    if(ret == 0)
+    if(ret == -1)
     {
-        //对端关闭
+        printf("对端关闭\n"); 
         return -1;
     }
 
@@ -62,6 +57,7 @@ int doWorker(int net_fd)
         ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
         if(rret == 0)
         {
+            printf("对端关闭\n"); 
             return -1;
         }
         //分析协议

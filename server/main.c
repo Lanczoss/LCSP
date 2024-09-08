@@ -1,5 +1,38 @@
 #include "header.h"
 
+//创建目录files或者判断是否有files
+int createBaseFiles(void)
+{
+    printf("检测是否有../files文件夹\n");
+    DIR *dir = opendir(BASE_PATH);
+    if(dir == NULL)
+    {
+        //没有此文件夹
+        printf("不存在，正在创建\n");
+        int ret = mkdir(BASE_PATH, 0777);
+        if(ret == -1)
+        {
+            return -1;
+        }
+    }
+    printf("检测完成，正在启动服务\n");
+    closedir(dir);
+    return 0;
+}
+
+//判断配置文件config是否存在
+int checkConfig(void)
+{
+    FILE *fp = fopen("config.ini", "r");
+    if(fp == NULL)
+    {
+        printf("config.ini不存在，服务正在退出\n");
+        return -1;
+    }
+    fclose(fp);
+    return 0;
+}
+
 //自己通知自己退出
 int pipefd[2];
 void exit_func(int num)
@@ -14,8 +47,20 @@ void exit_func(int num)
 }
 int main(void)
 {
+    //创建目录files或者判断是否有files
+    int ret = createBaseFiles();
+    if(ret == -1)
+    {
+        printf("创建基本文件夹files失败");
+        exit(-1);
+    }
+    ret = checkConfig();
+    if(ret == -1)
+    {
+        exit(1);
+    }
     //创建匿名管道，注册2号信号
-    int ret = pipe(pipefd);
+    ret = pipe(pipefd);
     ERROR_CHECK(ret, -1, "pipe");
     if(fork() != 0)
     {
@@ -87,7 +132,7 @@ int main(void)
                 ret = pthread_mutex_lock(&pool.lock);
                 ERROR_CHECK(ret, -1, "get lock");
                 //修改退出标记位
-                pool.exit_flag = TRUE;
+                pool.exit_flag = -1;
                 //唤醒解锁
                 ret = pthread_cond_broadcast(&pool.cond);
                 ERROR_CHECK(ret, -1, "cond broadcast");

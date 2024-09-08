@@ -147,7 +147,7 @@ int cdCommand(train_t *t, int socket_fd);
 int pwdCommand(train_t t);
 
 //puts的命令
-int putsCommand(train_t *t, int socket_fd);
+int putsCommand(train_t t, int socket_fd);
 
 //gets的命令
 int getsCommand(train_t *t, int socket_fd);

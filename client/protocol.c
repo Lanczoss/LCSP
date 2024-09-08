@@ -15,7 +15,7 @@ int analysisProtocol(train_t *t, int socket_fd)
         pwdCommand(*t);
         break;
     case PUTS:
-        putsCommand(t, socket_fd);
+        putsCommand(*t, socket_fd);
         break;
     case GETS:
         getsCommand(t, socket_fd);

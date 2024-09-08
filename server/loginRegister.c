@@ -12,12 +12,22 @@ int loginRegisterSystem(train_t *t, int net_fd)
         bzero(t, sizeof(train_t));
         //先接收一次的登录信息或者注册信息;
         ssize_t rret = recv(net_fd, t, sizeof(train_t), MSG_WAITALL);
-        ERROR_CHECK(rret, -1, "对端关闭");
+        ERROR_CHECK(rret, -1, "recv");
+        if(rret == 0)
+        {
+            printf("对端关闭\n"); 
+            return -1;
+        }
 
         //接收密码
         char password[1024] = {0};
         rret = recv(net_fd, password, t->file_length, MSG_WAITALL);
-        ERROR_CHECK(rret, -1, "对端关闭");
+        ERROR_CHECK(rret, -1, "recv");
+        if(rret == 0)
+        {
+            printf("对端关闭\n"); 
+            return -1;
+        }
 
         //判断是否是注册行为 回复客户端是否登录成功
         if(t->isRegister == 0)

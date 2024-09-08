@@ -149,6 +149,9 @@ typedef struct pool_s
         } \
     } while(0)
 
+//创建目录files或者判断是否有files
+int createBaseFiles(void);
+
 //读配置文件
 int getParameter(void *key, void *value);
 
