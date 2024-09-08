@@ -31,7 +31,11 @@ void *threadMain(void *p)
 
         //工作
         ret = doWorker(net_fd);
-        THREAD_ERROR_CHECK(ret, "doWorker");
+        if(ret == -1)
+        {
+            //从doWorker出来的-1是对端关闭
+            printf("客户端关闭\n");
+        }
         close(net_fd);
     }
     return NULL;
@@ -44,26 +48,24 @@ int doWorker(int net_fd)
     bzero(&t, sizeof(t));
 
     //登录/注册逻辑函数
-    //返回值为-1时说明是注册失败直接退出
     int ret = loginRegisterSystem(&t, net_fd);
-    if(ret == -1)
+    if(ret == 0)
     {
-        //注册失败
-        return 0;
+        //对端关闭
+        return -1;
     }
 
     //到这里开始用户成功登录
     while(1)
     {
-        // TODO:接受一次信息-》区分等下要分发给那个命令：
+        // 接受一次信息-》区分等下要分发给那个命令：
         ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
-        THREAD_ERROR_CHECK(rret, "recv");
+        if(rret == 0)
+        {
+            return -1;
+        }
         //分析协议
         analysisProtocol(t, net_fd);
-
-        //
-
-
     }
     return 0;
 }

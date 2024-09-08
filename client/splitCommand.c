@@ -37,7 +37,8 @@ int splitCommand(train_t *t, char *buf){
 
     //切割从标准输入输入的命令
     char *parma;
-    parma = strtok(str, " ");
+    //将str改成NULL
+    parma = strtok(NULL, " ");
     t->command = getEnum(parma);
 
     //判断有几个参数

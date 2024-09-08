@@ -44,8 +44,6 @@ int initThreads(pool_t *pool)
     {
         pthread_create(&pool->pthread_list[i], NULL, threadMain, pool);
     }
-    // 释放空间
-    free(pool->pthread_list);
     return 0;
 }
 

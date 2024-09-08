@@ -17,7 +17,6 @@ int registerSystem(train_t *t, int socket_fd)
     //将路径名存入自定义协议中
     strcpy(t->control_msg, user_path);
     t->path_length = strlen(user_path);
-
     char password[1024] = {0};
     while(1)
     {

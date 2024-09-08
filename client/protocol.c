@@ -3,7 +3,6 @@
 //分析协议
 int analysisProtocol(train_t *t, int socket_fd)
 {
-
     switch(t->command)
     {
     case LS:

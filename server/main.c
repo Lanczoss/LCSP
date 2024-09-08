@@ -108,6 +108,8 @@ int main(void)
                     deQueue(&pool.q, &net_fd);
                     close(net_fd);
                 }
+                //清理存储线程id的链表
+                free(pool.pthread_list);
                 //清理主线程资源
                 close(socket_fd);
                 close(epoll_fd);
