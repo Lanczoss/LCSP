@@ -29,7 +29,6 @@
 #include <sys/sendfile.h>
 #include <mysql/mysql.h>
 #include "queue.h"
-#include "command.h"
 #include <sys/utsname.h>    // uname()需要用到的头文件
 
 enum
@@ -197,6 +196,9 @@ int getsCommand(train_t t, int net_fd);
 
 //rm的命令
 int rmCommand(train_t t, int net_fd);
+
+//创建文件夹
+int mkdirCommand(train_t t, int net_fd);
 
 // 子线程的入口函数
 void *threadMain(void *p);

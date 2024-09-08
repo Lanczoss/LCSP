@@ -4,33 +4,8 @@
 //通过控制命令得到对应的枚举类型
 //str:传入的控制命令 eg:cd,ls
 int getEnum(char *str){
-
-    if (strcmp(str, "ls") == 0) {
-        return LS;
-    } else if (strcmp(str, "cd") == 0) {
-        return CD;
-    } else if (strcmp(str, "rm") == 0) {
-        return RM;
-    } else if (strcmp(str, "remove") == 0) {
-        return REMOVE;
-    } else if (strcmp(str, "mkdir") == 0) {
-        return MKDIR;
-    } else if (strcmp(str, "puts") == 0) {
-        return PUTS;
-    } else if (strcmp(str, "pwd") == 0) {
-        return PWD;
-    } else if (strcmp(str, "gets") == 0) {
-        return GETS;
-    } else {
-        printf("命令输入错误\n");
-        return FALSE;
-    }
-
-
-    /*switch(str[0]){
-    case 'l':
-
-        return LS;
+    switch(str[0]){
+    case 'l':return LS;
     case 'c':return CD;
     case 'r':return (str[1] == 'm') ? RM:REMOVE;
     case 'm':return MKDIR; 
@@ -40,8 +15,7 @@ int getEnum(char *str){
              printf("命令输入错误");
              return -1;
              break;
-    }*/
-
+    }
     return 0;
 }
 
@@ -51,7 +25,7 @@ int getEnum(char *str){
 int splitCommand(train_t *t, char *buf){
     
     bzero(t->control_msg,sizeof(t->control_msg));
-    bzero(&t->parameter_num,sizeof(t->parameter_num));
+    printf("buf:%s \n",buf);
     char str[1024] = { 0 };
     strcpy(str,buf);
 
@@ -61,11 +35,6 @@ int splitCommand(train_t *t, char *buf){
 
     //将路径存放到自定义协议
     strncpy(t->control_msg, path, strlen(path));
-    //判断最后一位字符是不是'/'
-    //if(t->control_msg[strlen(t->control_msg) - 1] != '/'){
-    //    //不是则手动添加
-    //    strcat(t->control_msg, "/");
-    //}
     t->control_msg[strlen(t->control_msg)] = ' ';
 
     //切割从标准输入输入的命令
@@ -81,7 +50,7 @@ int splitCommand(train_t *t, char *buf){
         t->control_msg[strlen(t->control_msg)] = ' ';
     }
 
-    printf("t.control_msg:%s \n",t->control_msg);
+    printf("t-control_msg:%s\n",t->control_msg);
     return 0;
 }
 

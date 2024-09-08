@@ -3,7 +3,6 @@
 //分析协议
 int analysisProtocol(train_t t, int net_fd)
 {
-    printf("num :%d\n",t.command);
     switch(t.command)
     {
     case LS:
@@ -16,12 +15,18 @@ int analysisProtocol(train_t t, int net_fd)
         //pwdCommand(t, net_fd);
         return 0;
     case PUTS:
+        printf("进函数美\n");
         putsCommand(t, net_fd);
+        printf("出函数了\n");
         return 0;
     case GETS:
         //getsCommand(t, net_fd);
         //return 0;
     case REMOVE:
+        printf("函数暂时未完成！\n");
+        return 0;
+    case MKDIR:
+        mkdirCommand(t, net_fd);
     case RM:
         //rmCommand(t, net_fd);
         return 0;
