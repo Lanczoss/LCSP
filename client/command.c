@@ -34,6 +34,15 @@ int putsCommand(train_t t, int socket_fd){
     char path_name[256]={0};
     //如果第二个参数为非文件开头则需要拼接路径,否则不需要拼接
     extractParameters(t.control_msg,2,path_name);   //此时path_name保存的是第二个参数字符串
+    
+    // 去掉换行符
+    size_t len = strcspn(path_name, "\n");
+    if (len < strlen(path_name)) {
+        path_name[len] = '\0'; // 将换行符替换为字符串终止符
+    }
+    printf("path_name:#%s#\n",path_name);
+    printf("path_name_len:%ld \n",strlen(path_name));
+
     if(path_name[0]!='/'&&path_name[0]!='.'){
         char temp[256]={0};
         //获取当前的服务器的路径(这里无法确定服务器路径最后是否带/,默认带/)
@@ -56,13 +65,13 @@ int putsCommand(train_t t, int socket_fd){
         printf("文件不存在！\n");
         return -1;
     }
-//    printf("command函数第39行-----成功打开%s下的文件\n",path_name);
+    printf("command函数第39行-----成功打开%s下的文件\n",path_name);
 
     //发送结构体
     ssize_t send_t=send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
     ERROR_CHECK(send_t,-1,"send train_t");
 
-//    printf("command函数第45行-----发送的结构体中的字符串:%s\n",t.control_msg);
+    printf("command函数第45行-----发送的结构体中的字符串:%s\n",t.control_msg);
 
     //发送文件
     struct stat s;

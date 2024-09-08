@@ -1,4 +1,6 @@
 #include "header.h"
+#include <asm-generic/errno-base.h>
+#include <complex.h>
 #include "command.h"
 
 int cdCommand(train_t t, int net_fd){
@@ -215,9 +217,9 @@ int putsCommand(train_t t,int net_fd){
     //提取文件路径名(eg path /a/b/c.txt 提取结果为/a/b/c.txt)
     char path_name[256]={0};
     //如果第二个参数为非文件开头则需要拼接路径,否则不需要拼接
-    extractParameters(t.control_msg,2,path_name);   //此时path_name保存的是第二个参数字符串
-//    printf("command函数第16行-----此时提取到的第二个参数:%s\n",path_name);
-//    printf("服务器结构体里面的字符串:%s\n",t.control_msg);
+    extractParameters(t.control_msg,3,path_name);   //此时path_name保存的是第二个参数字符串
+    printf("command函数第16行-----此时提取到的第二个参数:%s\n",path_name);
+    printf("服务器结构体里面的字符串:%s\n",t.control_msg);
     if(path_name[0]!='/'&&path_name[0]!='.'){
         char temp[256]={0};
         //获取当前的服务器的路径(这里无法确定服务器路径最后是否带/,默认带/)
@@ -227,16 +229,31 @@ int putsCommand(train_t t,int net_fd){
         pathConcat(t,temp);
         //将文件名拼接给path_name
         strcat(temp,path_name);
-//        printf("command函数第27行-----将第二个参数拼接到path的路径名:%s\n",temp);
+        printf("command函数第27行-----将第二个参数拼接到path的路径名:%s\n",temp);
         strcpy(path_name,temp);
     }
 
-//    printf("command函数第31行-----服务器保存文件路径:%s\n",path_name);
+    // 去掉换行符
+    size_t len = strcspn(path_name, "\n");
+    if (len < strlen(path_name)) {
+        path_name[len] = '\0'; // 将换行符替换为字符串终止符
+    }
+
+    printf("command函数第31行-----服务器保存文件路径:%s\n",path_name);
 
     //新建文件
-    int open_file_fd=open(path_name,O_WRONLY|O_CREAT|O_APPEND,0666);
+    char *file_name;
+    extractFilename(path_name,&file_name);
+    printf("file_name :#%s# \n",file_name);
+    printf("path_name:#%s#\n",path_name);
+
+    strcat(path_name,file_name);
+
+    int open_file_fd=open(path_name,O_RDWR|O_CREAT|O_APPEND,0666);
     ERROR_CHECK(open_file_fd,-1,"open new file");
 
+    printf("文件已打开\n");
+    
     //接收文件
     char buf[1024]={0};
     ssize_t recv_num;
@@ -245,7 +262,7 @@ int putsCommand(train_t t,int net_fd){
         ERROR_CHECK(write_file_num,-1,"write new file");
     }
 
-//    printf("服务器成功收到文件:%s\n",path_name);
+    printf("服务器成功收到文件:%s\n",path_name);
     close(open_file_fd);
     return 0;
 }
