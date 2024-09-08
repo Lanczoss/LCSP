@@ -27,7 +27,6 @@
 #include <netinet/ip.h>
 #include <netdb.h>
 #include <sys/sendfile.h>
-#include "command.h"
 #include <sys/utsname.h>
 
 enum

@@ -29,7 +29,6 @@
 #include <sys/sendfile.h>
 #include <mysql/mysql.h>
 #include "queue.h"
-#include "command.h"
 #include <sys/utsname.h>    // uname()需要用到的头文件
 
 enum
@@ -89,7 +88,7 @@ typedef struct train_s
 }train_t;
 
 //服务端基本路径
-#define BASE_PATH "../files"
+#define BASE_PATH "../files/"
 
 typedef struct pool_s
 {

@@ -19,8 +19,12 @@ int pathConcat(train_t t, char *real_path){
         strncat(base_path,vir_path,sizeof(base_path)-strlen(base_path)-1);
     }
 
+    //const char * temp = base_path;
+    
     strncpy(real_path, base_path, 1024 - 1);
+    //strncpy(real_path, temp, 1024 - 1);
     real_path[1024 -1] = '\0';  //确保real_path以'\0'结尾。
+    printf("real_path:#%s#\n",real_path);
     
     return 0;
 }

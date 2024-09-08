@@ -9,7 +9,7 @@ int analysisProtocol(train_t *t, int socket_fd)
         //lsCommand(t, socket_fd);
         break;
     case CD:
-        cdCommand(t, socket_fd);
+        //cdCommand(t, socket_fd);
         break;
     case PWD:
         pwdCommand(*t);
