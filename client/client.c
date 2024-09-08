@@ -72,7 +72,8 @@ int main(void)
         //处理接收的消息
         
         //发送命令
-        send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+        rret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+        ERROR_CHECK(rret, -1, "send");
 
         ret = analysisProtocol(&t, socket_fd);
         if(ret == -1)
