@@ -4,10 +4,6 @@
 #include "command.h"
 
 int cdCommand(train_t t, int net_fd){
-    puts("in cd command");
-
-    printf("cd num = %d\n",t.parameter_num);
-
     if (t.parameter_num != 1){
         t.error_flag = ABNORMAL;
         strcpy(t.control_msg,"输入参数有误\n");
@@ -63,13 +59,6 @@ int cdCommand(train_t t, int net_fd){
         strcat(real_path,virtual_path);
         current_layers = 0;
     }
-    
-    printf("virtual_path = %s\n",virtual_path);
-    printf("real_path = %s\"\n",real_path);
-    printf("parameter = %s\n",parameter);
-    printf("current_layers = %d\n",t.current_layers);
-    printf("num = %d\n",t.parameter_num);
-
     // 从参数中分割单个参数 
     int pcount = 0;
     int flag_read = 0;
