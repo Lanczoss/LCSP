@@ -66,6 +66,7 @@ int doWorker(int net_fd)
         int ret = analysisProtocol(t, net_fd);
         if(ret == -1)
         {
+            //用户输入了exit
             printf("对端关闭\n"); 
             return -1;
         }
