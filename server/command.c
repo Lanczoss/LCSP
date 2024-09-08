@@ -6,7 +6,10 @@ int cdCommand(train_t t, int net_fd){
         t.error_flag = ABNORMAL;
         strcpy(t.control_msg,"输入参数有误\n");
         int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
-        ERROR_CHECK(ret,-1,"send");
+        if (ret == -1){
+            LOG_ERROR("send:对端关闭");
+        }
+        return -1;
     }
 
     // 读取虚拟路径
@@ -35,7 +38,7 @@ int cdCommand(train_t t, int net_fd){
         parameter[strlen(parameter)] = '/'; 
     }
 
-    // 判断是否需要在根目录下寻找
+    // 判断是否需要在根目录下寻找,若在根目录下寻找则需要重构虚拟路径与真实路径
     if(parameter[0] == '/'){
         int flag = 0;
         for (size_t i = 0;i < strlen(virtual_path);i++){
@@ -52,11 +55,10 @@ int cdCommand(train_t t, int net_fd){
         current_layers = 0;
     }
 
-    // 处理参数
+    // 从参数中分割单个参数 
     int pcount = 0;
     int flag_read = 0;
     while(parameter[pcount] != 0){
-        // 从参数中分割单个参数 
         char tmp_parameter[1024] = {0};
         int tpcount = 0;
         int flag = 0;
@@ -74,14 +76,18 @@ int cdCommand(train_t t, int net_fd){
                         t.error_flag = NORMAL;
                         t.current_layers = current_layers;
                         int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
-                        ERROR_CHECK(ret, -1, "send");
+                        if (ret == -1){
+                            LOG_ERROR("send:对端关闭");
+                        }
                         return 0;
                     }
                     else{
                         strcpy(t.control_msg,"输入有误\n");
                         t.error_flag = ABNORMAL;
                         int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
-                        ERROR_CHECK(ret, -1, "send");
+                        if (ret == -1){
+                            LOG_ERROR("send:对端关闭");
+                        }
                         return -1;
                     }
                 }
@@ -104,7 +110,9 @@ int cdCommand(train_t t, int net_fd){
                 t.error_flag = ABNORMAL;
                 strcpy(t.control_msg,"输入有误");
                 int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
-                ERROR_CHECK(ret,-1,"send");
+                if (ret == -1){
+                    LOG_ERROR("send:对端关闭");
+                }
                 return -1;
             }
         }
@@ -115,7 +123,9 @@ int cdCommand(train_t t, int net_fd){
                 t.error_flag = ABNORMAL;
                 strcpy(t.control_msg ,"输入有误");
                 int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
-                ERROR_CHECK(ret,-1,"send");
+                if(ret == -1){
+                    LOG_ERROR("对端关闭");
+                }
                 return -1;
             }
             current_layers++;
@@ -131,11 +141,16 @@ int cdCommand(train_t t, int net_fd){
     t.error_flag = NORMAL;
     t.current_layers = current_layers;
     int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
-    ERROR_CHECK(ret, -1, "send");
+    if (ret == -1){
+        LOG_ERROR("send:对端关闭");
+    }
     return 0;
 }
 
 // 回退路径函数
+// 第一个参数：虚拟路径
+// 第二个参数：真实路径
+// 返回值：0为正常，其他为异常
 int rollbackPath(char *virtual_path, char *real_path){
     for (int i = strlen(virtual_path) - 1; i >= 0; i--){
         if (virtual_path[i] == '/'){
@@ -157,11 +172,17 @@ int rollbackPath(char *virtual_path, char *real_path){
 }
 
 // 判断寻找的目录或者文件是否存在
+// 第一个参数：你要寻找的路径
+// 第二个参数：文件名或者文件夹的名称
+// 第三个参数：标志位
 // flag为1表示找文件夹
 // flag为0表示找文件
+// 返回值：true表示目标路径下，存在文件夹或者文件
 bool isExistFileOrDir(char *path, char *name, int flag){
     DIR *pdir = opendir(path);
-    ERROR_CHECK(pdir,NULL,"open");
+    if (pdir == NULL){
+        LOG_ERROR("opendir:打开目录流");
+    }
     struct dirent *pdirent;
     while((pdirent = readdir(pdir)) != NULL){
         if (flag == 0){
@@ -175,11 +196,12 @@ bool isExistFileOrDir(char *path, char *name, int flag){
             }
         }
     }
-    closedir(pdir);
+    int ret = closedir(pdir);
+    if (ret == -1){
+        LOG_ERROR("closedir:关闭目录流");
+    }
     return false;
 }
-
-#include "header.h"
 
 /**
   ******************************************************************************
