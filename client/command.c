@@ -50,6 +50,12 @@ int putsCommand(train_t t, int socket_fd){
 
 //    printf("command函数第31行-----所传文件的文件路径:%s\n",path_name);
 
+    // 去掉换行符
+    size_t len = strcspn(path_name, "\n");
+    if (len < strlen(path_name)){
+        path_name[len] = '\0'; // 将换行符替换为字符串终止符
+    }
+
     //判断上传文件是否存在
     int open_file_fd=open(path_name,O_RDWR);
     if(open_file_fd==-1){
@@ -70,6 +76,7 @@ int putsCommand(train_t t, int socket_fd){
     ssize_t sendfile_t=sendfile(socket_fd,open_file_fd,NULL,s.st_size);
     ERROR_CHECK(sendfile_t,-1,"sendfile file");
 
+    printf("文件发送完毕！\n");
     close(open_file_fd);
     return 0;
 }

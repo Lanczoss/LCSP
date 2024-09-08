@@ -233,6 +233,16 @@ int putsCommand(train_t t,int net_fd){
 
 //    printf("command函数第31行-----服务器保存文件路径:%s\n",path_name);
 
+    strcat(BASE_PATH,path_name);
+
+    // 去掉换行符
+    size_t len = strcspn(path_name, "\n");
+    if (len < strlen(path_name)){
+        path_name[len] = '\0'; // 将换行符替换为字符串终止符
+    }
+
+
+
     //新建文件
     int open_file_fd=open(path_name,O_WRONLY|O_CREAT|O_APPEND,0666);
     ERROR_CHECK(open_file_fd,-1,"open new file");
