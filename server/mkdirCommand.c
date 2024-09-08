@@ -17,8 +17,6 @@ int mkdirCommand(train_t t, int socket_fd){
     if (len > 0 && real_path[len - 1] == '\n') {
         real_path[len - 1] = '\0';
     }
-    printf("real_path:#%s#\n",real_path);
-
     
     //创建文件夹
     int ret = mkdir(real_path,0777);

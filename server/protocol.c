@@ -3,7 +3,6 @@
 //分析协议
 int analysisProtocol(train_t t, int net_fd)
 {
-    printf("t.command:num :%d\n",t.command);
     switch(t.command)
     {
     case LS:

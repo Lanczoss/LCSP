@@ -26,7 +26,6 @@ int splitCommand(train_t *t, char *buf){
     
     bzero(t->control_msg,sizeof(t->control_msg));
     bzero(&t->parameter_num,sizeof(t->parameter_num));
-    printf("buf:%s \n",buf);
     char str[1024] = { 0 };
     strcpy(str,buf);
 
@@ -49,10 +48,8 @@ int splitCommand(train_t *t, char *buf){
         t->parameter_num++;
         strncat(t->control_msg,parma,strlen(parma));
         t->control_msg[strlen(t->control_msg)] = ' ';
-        printf("parma:%s\n",parma);
     }
 
-    printf("t-control_msg:%s\n",t->control_msg);
     return 0;
 }
 
