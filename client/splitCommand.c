@@ -23,16 +23,20 @@ int getEnum(char *str){
 //train_t:需要初始化的协议
 //buf：存放命令的buf数组
 int splitCommand(train_t *t, char *buf){
-
+    
+    bzero(t->control_msg,sizeof(t->control_msg));
+    printf("buf:%s \n",buf);
     char str[1024] = { 0 };
     strcpy(str,buf);
 
     //切割出文件路径
     char *path;
     path = strtok(str," ");
-    
+    printf("path:%s \n",path);
+
+    printf("t->control_msg:%s\n",t->control_msg);
     //将路径存放到自定义协议
-    strncat(t->control_msg, path, strlen(path));
+    strncpy(t->control_msg, path, strlen(path));
     t->control_msg[strlen(t->control_msg)] = ' ';
 
     //切割从标准输入输入的命令
@@ -44,10 +48,12 @@ int splitCommand(train_t *t, char *buf){
     //判断有几个参数
     while((parma = strtok(NULL, " ")) != NULL){
         t->parameter_num++;
-        strncpy(t->control_msg,parma,strlen(parma));
+        strncat(t->control_msg,parma,strlen(parma));
         t->control_msg[strlen(t->control_msg)] = ' ';
+        printf("参数 : %s \n",parma);
     }
 
+    printf("t-control_msg:%s\n",t->control_msg);
     return 0;
 }
 

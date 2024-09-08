@@ -6,7 +6,7 @@ int analysisProtocol(train_t *t, int socket_fd)
     switch(t->command)
     {
     case LS:
-        lsCommand(t, socket_fd);
+        //lsCommand(t, socket_fd);
         break;
     case CD:
         cdCommand(t, socket_fd);
@@ -18,11 +18,11 @@ int analysisProtocol(train_t *t, int socket_fd)
         putsCommand(*t, socket_fd);
         break;
     case GETS:
-        getsCommand(t, socket_fd);
+        //getsCommand(t, socket_fd);
         break;
     case REMOVE:
     case RM:
-        rmCommand(t, socket_fd);
+        //rmCommand(t, socket_fd);
         break;
     default:
         printf("error:default\n");
