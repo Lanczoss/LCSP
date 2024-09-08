@@ -1,7 +1,6 @@
 #ifndef BAIDU_COMMAND_H
 #define BAIDU_COMMAND_H
 
-#include "header.h"
 
 //提取一个字符串最后的文件名 eg: /a/b/c.txt -> c.txt
 int extractFilename(const char *arg, char **file_name);
