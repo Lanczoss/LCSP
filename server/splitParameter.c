@@ -22,6 +22,7 @@ int splitParameter(train_t t, int num, char *buf){
     for(int i = 0;i < num;i++){
         parma = strtok(NULL, " ");
         ERROR_CHECK(parma, NULL, "strtok");
+        printf("parma:%s\n",parma);
     }
     
     strcpy(buf,parma);

@@ -7,7 +7,6 @@ s_test.c
 cmake-build-debug/
 
 main
-client
 config.ini
 # Prerequisites
 *.d
@@ -61,3 +60,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+files/

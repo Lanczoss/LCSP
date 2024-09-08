@@ -70,6 +70,11 @@ int main(void)
         ERROR_CHECK(ret, -1, "splitCommand");
         //这里出来的自定义协议有基本的控制信息
         //处理接收的消息
+        
+        //发送命令
+        rret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+        ERROR_CHECK(rret, -1, "send");
+
         ret = analysisProtocol(&t, socket_fd);
         if(ret == -1)
         {

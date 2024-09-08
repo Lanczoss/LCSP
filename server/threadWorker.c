@@ -53,16 +53,22 @@ int doWorker(int net_fd)
     //到这里开始用户成功登录
     while(1)
     {
+        bzero(&t,sizeof(t));
         // 接受一次信息-》区分等下要分发给那个命令：
         ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
-        printf("%d\n",t.command);
         if(rret == 0)
         {
             printf("对端关闭\n"); 
             return -1;
         }
         //分析协议
-        analysisProtocol(t, net_fd);
+        printf("开始分析协议\n");
+        int ret = analysisProtocol(t, net_fd);
+        if(ret == -1)
+        {
+            printf("对端关闭\n"); 
+            return -1;
+        }
     }
     return 0;
 }
