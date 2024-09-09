@@ -77,6 +77,9 @@ typedef struct train_s
     //默认0登录成功，1代表登录失败
     bool isLoginFailed;
 
+    //用户id
+    int uid;
+
     //错误标志
     int error_flag;
     
