@@ -137,7 +137,7 @@ int splitCommand(train_t *t, char *buf);
 int recvFile(int socket_fd);
 
 //ls的命令
-int lsCommand(train_t *t, int socket_fd);
+int lsCommand(train_t t, int socket_fd);
 
 //cd的命令
 int cdCommand(train_t *t, int socket_fd);
@@ -149,7 +149,7 @@ int pwdCommand(train_t t);
 int putsCommand(train_t t, int socket_fd);
 
 //gets的命令
-int getsCommand(train_t *t, int socket_fd);
+int getsCommand(train_t t, int socket_fd);
 
 //rm的命令
 int rmCommand(train_t *t, int socket_fd);

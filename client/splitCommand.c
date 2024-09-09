@@ -28,19 +28,19 @@ int getEnum(char *str){
 
 
     /*switch(str[0]){
-    case 'l':
+      case 'l':
 
-        return LS;
-    case 'c':return CD;
-    case 'r':return (str[1] == 'm') ? RM:REMOVE;
-    case 'm':return MKDIR; 
-    case 'p':return (str[1 ]== 'u') ? PUTS:PWD;
-    case 'g':return GETS;
-    default :
-             printf("命令输入错误");
-             return -1;
-             break;
-    }*/
+      return LS;
+      case 'c':return CD;
+      case 'r':return (str[1] == 'm') ? RM:REMOVE;
+      case 'm':return MKDIR; 
+      case 'p':return (str[1 ]== 'u') ? PUTS:PWD;
+      case 'g':return GETS;
+      default :
+      printf("命令输入错误");
+      return -1;
+      break;
+      }*/
 
     return 0;
 }
@@ -49,7 +49,7 @@ int getEnum(char *str){
 //train_t:需要初始化的协议
 //buf：存放命令的buf数组
 int splitCommand(train_t *t, char *buf){
-    
+
     bzero(t->control_msg,sizeof(t->control_msg));
     bzero(&t->parameter_num,sizeof(t->parameter_num));
     char str[1024] = { 0 };
@@ -72,6 +72,11 @@ int splitCommand(train_t *t, char *buf){
     char *parma;
     //将str改成NULL
     parma = strtok(NULL, " ");
+    //去掉换行符
+    ssize_t len = strcspn(parma, "\n");
+    if(len < strlen(parma)){
+        parma[len] = '\0';             
+    }
     t->command = getEnum(parma);
 
     //判断有几个参数
