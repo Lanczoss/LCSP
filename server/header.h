@@ -202,10 +202,10 @@ int initSocket(int *socket_fd);
 int addEpoll(int epoll_fd, int fd);
 
 //子线程工作函数
-int doWorker(int net_fd);
+int doWorker(MYSQL *mysql, int net_fd);
 
 //分析协议
-int analysisProtocol(train_t t, int net_fd);
+int analysisProtocol(train_t t, int net_fd, MYSQL *mysql);
 
 //路径拼接
 int pathConcat(train_t t, char *real_path);
@@ -252,14 +252,14 @@ int writeLog(FILE *log_file, const char *level, const char *file, int line, cons
 void closeLog();
 
 //根据路径名验证数据库中用户信息
-int checkUserMsg(train_t t);
+int checkUserMsg(train_t t, MYSQL *mysql);
 
 //登录/注册动作函数
 //第一版第二版
 //将从客户端发来的用户名和密码进行验证
 //如果是登录行为，密码输入不正确，要求重试
 //如果是注册行为，用户名已经存在，则失败
-int loginRegisterSystem(train_t *t,  int net_fd);
+int loginRegisterSystem(train_t *t,  int net_fd, MYSQL *mysql);
 
 //子线程连接数据库函数
 int connectMysql(MYSQL *mysql);
