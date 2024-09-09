@@ -45,7 +45,7 @@ void writeLog(const char * level,const char *file, int line,const char * message
         {
             // TODO：打开日志文件记得关闭
             // 默认打开日志文件，只在第一次打开
-            log_file = fopen("system_log.txt", "a");
+            log_file = fopen("system.log", "a");
             if(log_file == NULL)
             {
                 perror("无法打开文件");
