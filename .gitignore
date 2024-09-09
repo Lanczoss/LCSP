@@ -6,8 +6,8 @@ c_test.c
 s_test.c
 cmake-build-debug/
 
-client_log.txt
-system_log.txt
+client/client
+*.txt
 main
 config.ini
 # Prerequisites
