@@ -30,6 +30,7 @@
 #include <mysql/mysql.h>
 #include "queue.h"
 #include <sys/utsname.h>    // uname()需要用到的头文件
+#include <errno.h>
 
 enum
 {
@@ -120,10 +121,43 @@ typedef struct pool_s
     int current_layers;
 }pool_t;
 
+extern FILE *log_info_file;
+extern FILE *log_error_file;
 // 定义日志级别的宏
-#define LOG_INFO(message) writeLog("INFO", __FILE__,__LINE__,message)
-#define LOG_ERROR(message) writeLog("ERROR", __FILE__, __LINE__, message)
-#define LOG_WARN(message) writeLog("WARNING", __FILE__, __LINE__, message)
+// 使用示例:LOG_INFO("正确信息");  LOG_PERROR("错误信息");
+// 日志级别宏
+#define LOG_INFO(message) \
+    do { \
+        if(log_info_file == NULL){ \
+            log_info_file = fopen("info.log", "a"); \
+            if(log_info_file == NULL){ \
+                perror("无法打开 info.log"); \
+            } \
+        } \
+        if(log_info_file != NULL){ \
+            writeLog(log_info_file, "INFO", __FILE__, __LINE__, message); \
+        } \
+    } while(0)
+
+#define LOG_ERROR(message) \
+    do { \
+        if(log_error_file == NULL){ \
+            log_error_file = fopen("error.log", "a"); \
+            if(log_error_file == NULL){ \
+                perror("无法打开 error.log"); \
+            } \
+        } \
+        if(log_error_file != NULL){ \
+            writeLog(log_error_file, "ERROR", __FILE__, __LINE__, message); \
+        } \
+    } while(0)
+
+#define LOG_PERROR(message) \
+    do { \
+        char error_msg[256]; \
+        snprintf(error_msg, sizeof(error_msg), "%s: %s", message, strerror(errno)); \
+        LOG_ERROR(error_msg); \
+    } while(0)
 
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
@@ -206,13 +240,13 @@ int mkdirCommand(train_t t, int net_fd);
 // 子线程的入口函数
 void *threadMain(void *p);
 
-// 日志记录
-// 第一个参数，日志级别
-// 第二个参数，源代码文件名
-// 第三个参数：源代码行号 
-// 第四个参数：日志消息
-/* usage: 4writeLog("client_log", "输入错误");*/
-void writeLog(const char * level,const char *file, int line,const char * message);
+// 日志记录函数
+// 第一个参数：日志文件指针，用于指定日志文件(log_info_file 或 log_error_file)
+// 第二个参数，日志级别(如"INFO"或"ERROR")
+// 第三个参数，源代码文件名,通常通过'__FILE__'宏传递
+// 第四个参数：源代码行号，通常通过'__LINE__'宏传递
+// 第五个参数：日志消息,记录的具体内容
+int writeLog(FILE *log_file, const char *level, const char *file, int line, const char *message);
 
 // 日志关闭函数声明，确保在程序结束时关闭日志文件
 void closeLog();

@@ -4,10 +4,10 @@
 int createBaseFiles(void)
 {
     LOG_INFO("检测是否有../files文件夹");
+    LOG_PERROR("测试LOG_PERROR");
     DIR *dir = opendir(BASE_PATH);
     if(dir == NULL)
     {
-        LOG_WARN("不存在，正在创建");
         int ret = mkdir(BASE_PATH, 0777);
         if(ret == -1)
         {
@@ -37,7 +37,6 @@ int checkConfig(void)
 int pipefd[2];
 void exit_func(int num)
 {
-    LOG_WARN("收到信号SIGINT，进行信号处理");
     //SIGINT信号的处理函数
     ssize_t rret = write(pipefd[1], "exit", 4);
     LOG_INFO("写入管道成功");
