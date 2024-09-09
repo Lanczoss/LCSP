@@ -227,5 +227,7 @@ int checkUserMsg(train_t t);
 //如果是注册行为，用户名已经存在，则失败
 int loginRegisterSystem(train_t *t,  int net_fd);
 
+//子线程连接数据库函数
+int connectMysql(MYSQL *mysql);
 
 #endif
