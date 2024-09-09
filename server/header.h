@@ -43,8 +43,8 @@ enum
     REMOVE,
     RM,
     MKDIR,
-    ABNORMAL,
     NORMAL,
+    ABNORMAL
 };
 
 //自定义协议头部信息
