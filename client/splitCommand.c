@@ -86,7 +86,6 @@ int splitCommand(train_t *t, char *buf){
         t->control_msg[strlen(t->control_msg)] = ' ';
     }
 
-    printf("t.control_msg:%s \n",t->control_msg);
     return 0;
 }
 

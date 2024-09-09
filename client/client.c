@@ -1,5 +1,4 @@
 #include "header.h"
-
 //判断配置文件config是否存在
 int checkConfig(void)
 {

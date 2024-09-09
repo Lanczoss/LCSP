@@ -30,7 +30,7 @@ int analysisProtocol(train_t *t, int socket_fd)
         //rmCommand(t, socket_fd);
         break;
     default:
-        printf("error:default\n");
+        printf("没有此命令.\n");
         break;
     }
     return 0;

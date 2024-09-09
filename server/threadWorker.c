@@ -62,7 +62,6 @@ int doWorker(int net_fd)
             return -1;
         }
         //分析协议
-        printf("开始分析协议\n");
         int ret = analysisProtocol(t, net_fd);
         if(ret == -1)
         {

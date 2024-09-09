@@ -19,9 +19,9 @@ int putsCommand(train_t t, int net_fd) {
     char user_path[256] = {0};
     if (extractParameters(t.control_msg, 1, user_path, sizeof(user_path)) == 0 && strlen(user_path) > 0) {
         strncat(serve_path, user_path, sizeof(serve_path) - strlen(serve_path) - 1);
-        printf("拼接的服务端本地路径: %s\n", serve_path);
+        //printf("拼接的服务端本地路径: %s\n", serve_path);
     } else {
-        printf("无需拼接服务端本地路径: %s\n", serve_path);
+        //printf("无需拼接服务端本地路径: %s\n", serve_path);
     }
 
     // 获取文件名
@@ -49,7 +49,7 @@ int putsCommand(train_t t, int net_fd) {
     size_t len = strcspn(serve_path, "\n");
     serve_path[len] = '\0'; // 确保以 '\0' 结尾
 
-    printf("打开文件的路径名: %s\n", serve_path);
+    //printf("打开文件的路径名: %s\n", serve_path);
 
     // 新建文件
     int open_file_fd = open(serve_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
@@ -68,11 +68,11 @@ int putsCommand(train_t t, int net_fd) {
             perror("recv failed");
             break;
         } else if (recv_num == 0) {
-            printf("客户端关闭了连接\n");
+            //printf("客户端关闭了连接\n");
             break;
         }
 
-        printf("接收到 %ld 字节\n", recv_num);
+        //printf("接收到 %ld 字节\n", recv_num);
         ssize_t write_file_num = write(open_file_fd, buf, recv_num);
         if (write_file_num < 0) {
             perror("write failed");

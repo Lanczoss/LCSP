@@ -6,9 +6,7 @@ int analysisProtocol(train_t t, int net_fd)
     switch(t.command)
     {
     case LS:
-        printf("进入ls\n");
         lsCommand(t, net_fd);
-        printf("退出ls\n");
         return 0;
     case CD:
         cdCommand(t, net_fd);
@@ -17,14 +15,10 @@ int analysisProtocol(train_t t, int net_fd)
         //pwdCommand(t, net_fd);
         return 0;
     case PUTS:
-        printf("进函数美\n");
         putsCommand(t, net_fd);
-        printf("出函数了\n");
         return 0;
     case GETS:
-        printf("进入gets\n");
         getsCommand(t, net_fd);
-        printf("退出gets\n");
         return 0;
     case REMOVE:
         printf("函数暂时未完成！\n");
@@ -35,7 +29,7 @@ int analysisProtocol(train_t t, int net_fd)
         //rmCommand(t, net_fd);
         return 0;
     default:
-        printf("error:default\n");
+        printf("没有此命令.\n");
         return 0;
     }
     return 0;

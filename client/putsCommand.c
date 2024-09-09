@@ -11,13 +11,13 @@
 **/
 int putsCommand(train_t t, int socket_fd) {
 
-    printf("进入客户端没有\n");
+    //printf("进入客户端没有\n");
 
     // 获取绝对路径
     char client_path[2048] = {0};
     getcwd(client_path, sizeof(client_path));
 
-    printf("绝对路径%s\n",client_path);
+    //printf("绝对路径%s\n",client_path);
 
     // 获取用户路径
     char user_path[256] = {0};
@@ -31,7 +31,7 @@ int putsCommand(train_t t, int socket_fd) {
 //        strcat(client_path, user_path);
 //    }
 
-    printf("客户端本地路径：%s\n", client_path);
+    //printf("客户端本地路径：%s\n", client_path);
 
     // 获取文件名并处理路径
     char path_name[256] = {0};
@@ -53,7 +53,7 @@ int putsCommand(train_t t, int socket_fd) {
         client_path[len] = '\0'; // 将换行符替换为字符串终止符
     }
 
-    printf("打开文件的路径名:%s\n", client_path);
+    //printf("打开文件的路径名:%s\n", client_path);
 
     // 判断上传文件是否存在
     int open_file_fd = open(client_path, O_RDONLY);
@@ -61,7 +61,7 @@ int putsCommand(train_t t, int socket_fd) {
         perror("open file error");
         return -1;
     }
-    printf("成功打开 %s 下的文件\n", client_path);
+    //printf("成功打开 %s 下的文件\n", client_path);
 
     // 发送结构体
     ssize_t send_t = send(socket_fd, &t, sizeof(t), MSG_NOSIGNAL);
@@ -71,7 +71,7 @@ int putsCommand(train_t t, int socket_fd) {
         return -1;
     }
 
-    printf("发送的结构体中的字符串: %s\n", t.control_msg);
+    //printf("发送的结构体中的字符串: %s\n", t.control_msg);
 
     // 发送文件
     struct stat file_stat;
