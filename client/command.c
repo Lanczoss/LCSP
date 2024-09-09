@@ -8,7 +8,7 @@ int cdCommand(train_t *t, int socket_fd){
     train_t tmp_t;
     int ret = recv(socket_fd,&tmp_t,sizeof(tmp_t),MSG_WAITALL);
     if (ret == 0){
-        LOG_INFOR("recv:用户退出");
+        LOG_INFO("recv:用户退出");
         return -1;
     }
     if (tmp_t.error_flag == NORMAL){
