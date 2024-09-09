@@ -1,7 +1,7 @@
 #include "header.h"
 
 //分析协议
-int analysisProtocol(train_t t, int net_fd)
+int analysisProtocol(train_t t, int net_fd, MYSQL *mysql)
 {
     switch(t.command)
     {

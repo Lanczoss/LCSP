@@ -3,11 +3,25 @@
 void *threadMain(void *p)
 {
     pool_t *pool = (pool_t*)p;
+    int ret = pthread_mutex_lock(&pool->lock);
+    //连接数据库
+    MYSQL mysql;
+    ret = connectMysql(&mysql);
+    if(ret == -1)
+    {
+        ret = pthread_mutex_unlock(&pool->lock);
+        THREAD_ERROR_CHECK(ret, "unlock");
+        printf("子线程连接数据库失败，请确保config.ini配置正确\n");
+        mysql_close(&mysql);
+        return NULL;
+    }
+    ret = pthread_mutex_unlock(&pool->lock);
+    THREAD_ERROR_CHECK(ret, "unlock");
     //子线程主函数
     while(1)
     {
         //记得加锁
-        int ret = pthread_mutex_lock(&pool->lock);
+        ret = pthread_mutex_lock(&pool->lock);
         THREAD_ERROR_CHECK(ret, "lock");
         //避免假唤醒
         while(pool->q.head == NULL && pool->exit_flag == 0)
@@ -20,6 +34,8 @@ void *threadMain(void *p)
             //子线程准备退出
             ret = pthread_mutex_unlock(&pool->lock);
             THREAD_ERROR_CHECK(ret, "unlock");
+            //关闭数据库连接
+            mysql_close(&mysql);
             pthread_exit(NULL);
         }
         //到这里说明有任务
@@ -30,20 +46,20 @@ void *threadMain(void *p)
         THREAD_ERROR_CHECK(ret, "unlock");
 
         //工作
-        doWorker(net_fd);
+        doWorker(&mysql, net_fd);
         close(net_fd);
     }
     return NULL;
 }
 
-int doWorker(int net_fd)
+int doWorker(MYSQL *mysql, int net_fd)
 {
     //自定义协议
     train_t t;
     bzero(&t, sizeof(t));
 
     //登录/注册逻辑函数
-    int ret = loginRegisterSystem(&t, net_fd);
+    int ret = loginRegisterSystem(&t, net_fd, mysql);
     if(ret == -1)
     {
         printf("对端关闭\n"); 
@@ -62,7 +78,7 @@ int doWorker(int net_fd)
             return -1;
         }
         //分析协议
-        int ret = analysisProtocol(t, net_fd);
+        int ret = analysisProtocol(t, net_fd, mysql);
         if(ret == -1)
         {
             //用户输入了exit
