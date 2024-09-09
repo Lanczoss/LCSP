@@ -1,11 +1,11 @@
 OUT:=main
 SRCS:=$(wildcard *.c)
 OBJS:=$(SRCS:%.c=%.o)
-COM_OP:=-Wall -g -pthread -lmysqlclient
+COM_OP:=-Wall -g -lpthread -lmysqlclient
 CC:=gcc
 
 $(OUT):$(OBJS)
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@	$(COM_OP)
 %.o:%.c
 	$(CC) -c $< -o $@ $(COM_OP)
 
