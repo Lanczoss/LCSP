@@ -9,17 +9,19 @@ int interface(train_t *t, int socket_fd)
     //获取选项
     while(1)
     {
+        LOG_INFO("展示登录界面");
         bzero(t, sizeof(train_t));
         printf("(Y) 登录  (R) 注册  (E)退出 > ");
         fflush(stdout);
         char option[512] = {0};
+        LOG_INFO("等待键盘输入");
         ssize_t rret = read(STDIN_FILENO, option, sizeof(option) - 1);
         ERROR_CHECK(rret, -1, "read");
         switch(option[0])
         {
         case 'y':
         case 'Y':
-            //登录
+            LOG_INFO("用户登录");
             ret = loginSystem(t, socket_fd);
             if(ret != 0)
             {
@@ -31,7 +33,6 @@ int interface(train_t *t, int socket_fd)
                 printf("用户名或密码不正确，请重新输入。\n\n");
                 continue;
             }
-            //登录成功
             printf("登录成功\n\n");
             //打印系统信息
             struct utsname sys_msg;
@@ -49,7 +50,7 @@ int interface(train_t *t, int socket_fd)
             return 0;
         case 'r':
         case 'R':
-            //注册
+            LOG_INFO("用户注册");
             ret = registerSystem(t, socket_fd);
             if(ret != 0)
             {

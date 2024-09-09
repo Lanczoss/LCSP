@@ -77,19 +77,19 @@ typedef struct train_s
     //默认0登录成功，1代表登录失败
     bool isLoginFailed;
 
-    //控制信息的字符数组
-    char control_msg[1024];
-
     // 异常标志位
     int error_flag;
 
     // 当前用户所在目录层数，初始为0
     int current_layers;
+
+    //控制信息的字符数组
+    char control_msg[1024];
 }train_t;
 
 // 定义日志级别的宏，简化日志记录的使用
 // __FILE__ 用于捕获源文件名，__LINE__ 用于捕获代码所在行
-#define LOG_INFOR(message)  writeLog("INFO", __FILE__, __LINE__, message)
+#define LOG_INFO(message)  writeLog("INFO", __FILE__, __LINE__, message)
 #define LOG_ERROR(message) writeLog("ERROR", __FILE__, __LINE__, message)
 #define LOG_WARN(message)  writeLog("WARNING", __FILE__, __LINE__, message)
 

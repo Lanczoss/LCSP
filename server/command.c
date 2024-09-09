@@ -77,6 +77,9 @@ int cdCommand(train_t t, int net_fd){
                     if (flag_read != 0){
                         bzero(t.control_msg,sizeof(t.control_msg));
                         memcpy(t.control_msg, virtual_path, sizeof(virtual_path));
+                        if (current_layers == 0 && strlen(t.control_msg) != '/'){
+                            strcat(t.control_msg,"/");
+                        }
                         t.error_flag = NORMAL;
                         t.current_layers = current_layers;
                         t.path_length = strlen(t.control_msg);
@@ -146,6 +149,9 @@ int cdCommand(train_t t, int net_fd){
     // 将拼接好的路径发送给客户端
     bzero(t.control_msg,sizeof(t.control_msg));
     memcpy(t.control_msg, virtual_path, sizeof(virtual_path));
+    if (current_layers == 0 && strlen(t.control_msg) != '/'){
+        strcat(t.control_msg,"/");
+    }
     t.error_flag = NORMAL;
     t.current_layers = current_layers;
     t.path_length = strlen(t.control_msg);
