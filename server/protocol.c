@@ -26,7 +26,7 @@ int analysisProtocol(train_t t, int net_fd)
     case MKDIR:
         mkdirCommand(t, net_fd);
     case RM:
-        //rmCommand(t, net_fd);
+        rmCommand(t, net_fd);
         return 0;
     default:
         printf("没有此命令.\n");
