@@ -77,14 +77,14 @@ typedef struct train_s
     //默认0登录成功，1代表登录失败
     bool isLoginFailed;
 
-    //控制信息的字符数组
-    char control_msg[1024];
-
     //错误标志
     int error_flag;
     
     //当前层数
     int current_layers;
+
+    //控制信息的字符数组
+    char control_msg[1024];
 }train_t;
 
 //服务端基本路径

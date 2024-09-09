@@ -6,7 +6,7 @@ int checkConfig(void)
     FILE *fp = fopen("config.ini", "r");
     if(fp == NULL)
     {
-        printf("config.ini不存在，服务正在退出\n");
+        LOG_ERROR("config.ini不存在，服务正在退出");
         return -1;
     }
     fclose(fp);
@@ -24,6 +24,7 @@ int main(void)
     int socket_fd;
     ret = initSocket(&socket_fd);
     ERROR_CHECK(ret, -1, "initSocket");
+    LOG_INFO("socket建立成功");
     //自定义协议
     train_t t;
     bzero(&t, sizeof(t));
@@ -54,6 +55,7 @@ int main(void)
         char stdin_buf[1024] = {0};
         ssize_t rret = read(STDIN_FILENO, stdin_buf, 1024);
         ERROR_CHECK(rret, -1, "read stdin");
+        LOG_INFO("检测到键盘输入");
 
         //将路径名 命令 参数以buf送进splitCommand
         char buf[2048] = {0};
@@ -70,6 +72,8 @@ int main(void)
         ERROR_CHECK(ret, -1, "splitCommand");
         //这里出来的自定义协议有基本的控制信息
         //处理接收的消息
+
+        LOG_INFO("拆分结束，发送");
         
         //发送命令
         rret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
