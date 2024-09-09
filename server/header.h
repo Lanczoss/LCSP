@@ -216,9 +216,9 @@ void writeLog(const char * level,const char *file, int line,const char * message
 
 // 日志关闭函数声明，确保在程序结束时关闭日志文件
 void closeLog();
-//
-//根据路径名判断是否有用户名这个目录
-int doesHaveUser(train_t t);
+
+//根据路径名验证数据库中用户信息
+int checkUserMsg(train_t t);
 
 //登录/注册动作函数
 //第一版第二版
@@ -227,8 +227,5 @@ int doesHaveUser(train_t t);
 //如果是注册行为，用户名已经存在，则失败
 int loginRegisterSystem(train_t *t,  int net_fd);
 
-//注册时尝试创建用户根目录的函数
-//第一版先遍历目录
-int createUser(train_t t);
 
 #endif
