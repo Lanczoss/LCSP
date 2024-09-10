@@ -7,7 +7,7 @@
 int pathConcat(train_t t, char *real_path){
 
     //初始化数组和几倍呢路径
-    char base_path[1024] = BASE_PATH;
+    char base_path[1024] = { 0 };
     char vir_path[1024] = { 0 };
 
     //TO DO:修改代码，不要删除原来的客户端路径

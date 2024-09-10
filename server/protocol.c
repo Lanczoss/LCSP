@@ -24,14 +24,14 @@ int analysisProtocol(train_t t, int net_fd, MYSQL *mysql)
         printf("函数暂时未完成！\n");
         return 0;
     case MKDIR:
-        mkdirCommand(t, net_fd);
-        return 0;
+        mkdirCommand(t, net_fd, mysql);
+        break;
     case RM:
-        rmCommand(t, net_fd);
-        return 0;
+        rmCommand(t, net_fd,mysql);
+        break;;
     default:
         printf("没有此命令.\n");
-        return 0;
+        break;
     }
     return 0;
 }

@@ -233,10 +233,10 @@ int putsCommand(train_t t, int net_fd);
 int getsCommand(train_t t, int net_fd);
 
 //rm的命令
-int rmCommand(train_t t, int net_fd);
+int rmCommand(train_t t, int net_fd,MYSQL*mysql);
 
 //创建文件夹
-int mkdirCommand(train_t t, int net_fd);
+int mkdirCommand(train_t t, int net_fd, MYSQL *mysql);
 
 // 子线程的入口函数
 void *threadMain(void *p);
@@ -291,4 +291,7 @@ char *getNowTimeMysql(char *buf);
 //根据用户名从数据库中获取uid的函数
 int getUidMysql(const char *user_name, MYSQL *mysql);
 
+int insertDir(train_t t, char * real_path, char* filename,MYSQL*mysql);
+
+int deleteFile(char * file_path, MYSQL*mysql);
 #endif
