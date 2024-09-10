@@ -27,8 +27,10 @@ bool isExistDir(MYSQL *mysql, train_t t, char *virtual_path, char *parameter){
     printf("st: %s\n",select_statement);
     int ret = mysql_query(mysql,select_statement);
     if (ret != 0){
-        sprintf(error_statement,"%s:%s","mysql_query",mysql_error(mysql));
-        LOG_PERROR(error_statement);
+        strcat(error_statement,"mysql_query");
+        strcat(error_statement,":");
+        strcat(error_statement,mysql_error(mysql));
+        printf("%s\n",error_statement);
     }
     MYSQL_RES *res = mysql_store_result(mysql);
     if (res == NULL){
