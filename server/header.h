@@ -221,7 +221,7 @@ int splitParameter(train_t t, int num, char *buf);
 int lsCommand(train_t t, int net_fd);
 
 //cd的命令
-int cdCommand(train_t t, int net_fd);
+int cdCommand(train_t t, int net_fd, MYSQL *sql);
 
 //pwd的命令
 int pwdCommand(train_t t, int net_fd);
@@ -230,7 +230,7 @@ int pwdCommand(train_t t, int net_fd);
 int putsCommand(train_t t, int net_fd);
 
 //gets的命令
-int getsCommand(train_t t, int net_fd);
+int getsCommand(train_t t, int net_fd, MYSQL *sql);
 
 //rm的命令
 int rmCommand(train_t t, int net_fd);

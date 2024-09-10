@@ -9,7 +9,7 @@ int analysisProtocol(train_t t, int net_fd, MYSQL *mysql)
         lsCommand(t, net_fd);
         return 0;
     case CD:
-        cdCommand(t, net_fd);
+        cdCommand(t, net_fd, mysql);
         return 0;
     case PWD:
         //pwdCommand(t, net_fd);
@@ -18,7 +18,7 @@ int analysisProtocol(train_t t, int net_fd, MYSQL *mysql)
         putsCommand(t, net_fd);
         return 0;
     case GETS:
-        getsCommand(t, net_fd);
+        // getsCommand(t, net_fd);
         return 0;
     case REMOVE:
         printf("函数暂时未完成！\n");
