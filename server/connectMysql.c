@@ -4,7 +4,10 @@
 int connectMysql(MYSQL **mysql)
 {
     *mysql = mysql_init(NULL);
-    printf("%s\n", mysql_error(*mysql));
+    if(mysql == NULL)
+    {
+        printf("%s\n", mysql_error(*mysql));
+    }
 
     //读取配置文件信息
     char user[1024] = {0};
@@ -23,9 +26,9 @@ int connectMysql(MYSQL **mysql)
     
     //尝试连接数据库
     MYSQL *mret = mysql_real_connect(*mysql, "localhost", user, password, database, 0, NULL, 0);
-    printf("%s\n", mysql_error(*mysql));
     if(mret == NULL)
     {
+        printf("%s\n", mysql_error(*mysql));
         return -1;
     }
     printf("database connected.\n");

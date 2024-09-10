@@ -30,12 +30,12 @@ int getHashValue(char *buf, char *salt, const char *password)
       perror("计算失败 \n");
       return 0;
     }
-    printf("password = %s\n", password);
-    printf("salt = %s\n", salt);
-    printf("encrypted = %s\n", encrypted);
+    //printf("password = %s\n", password);
+    //printf("salt = %s\n", salt);
+    //printf("encrypted = %s\n", encrypted);
     strcpy(buf, encrypted);
 
     //打印
-    printf("password = %s\n", buf);
+    //printf("password = %s\n", buf);
     return 0;
 }
