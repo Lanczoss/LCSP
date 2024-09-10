@@ -11,11 +11,10 @@ int deleteFile(char * file_path, MYSQL* mysql){
     }
 
     MYSQL_RES *res;
-    MYSQL_ROW row;
 
     char sql[4096] = { 0 };
     snprintf(sql,sizeof(sql),
-             "UPDATE files set flag = 1 where file_path = '%s'",
+             "UPDATE files set delete_flag = 1 where file_path = '%s'",
              file_path);
     printf("sql:#%s#\n",sql);
     
