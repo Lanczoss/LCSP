@@ -125,7 +125,7 @@ typedef struct pool_s
 extern FILE *log_info_file;
 extern FILE *log_error_file;
 // 定义日志级别的宏
-// 使用示例:LOG_INFO("正确信息");  LOG_PERROR("错误信息");
+// 使用示例:LOG_INFO("正确信息");  LOG_PERROR("错误信息"); LOG_MYSQL_ERROR(mysql);
 // 日志级别宏
 #define LOG_INFO(message) \
     do { \
@@ -159,6 +159,21 @@ extern FILE *log_error_file;
         snprintf(error_msg, sizeof(error_msg), "%s: %s", message, strerror(errno)); \
         LOG_ERROR(error_msg); \
     } while(0)
+
+// 定义LOG_MYSQL_ERROR宏，专门用于检测和记录MySQL的错误
+// 使用strlen(mysql_err) > 0是为了避免日志中出现大量的空字符
+// mysql_error在没有出错时返回空字符
+// 定义LOG_MYSQL_ERROR宏，专门用于检测和记录MySQL的错误
+#define LOG_MYSQL_ERROR(mysql) \
+    do { \
+        const char *mysql_err = mysql_error(mysql); \
+        if (mysql_err && strlen(mysql_err) > 0) { \
+            char error_msg[512]; \
+            snprintf(error_msg, sizeof(error_msg), "MySQL Error: %s", mysql_err); \
+            LOG_ERROR(error_msg); \
+        } \
+    } while (0)
+
 
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \

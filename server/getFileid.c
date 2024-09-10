@@ -13,7 +13,6 @@ int getFileid(train_t t){
     MYSQL_ROW row;
 
     conn = mysql_init(NULL);
-    
     //获取连接数据库参数
     char user[1024]  = { 0 };
     int ret = getParameter((void *)"user",(void *)user);
