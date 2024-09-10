@@ -1,6 +1,4 @@
 #include "header.h"
-#include <asm-generic/errno-base.h>
-#include <complex.h>
 #include "command.h"
 
 int cdCommand(train_t t, int net_fd){
