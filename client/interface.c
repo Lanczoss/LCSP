@@ -15,7 +15,6 @@ int interface(train_t *t, int socket_fd)
         printf("(Y) 登录  (R) 注册  (E)退出 > ");
         fflush(stdout);
         char option[512] = {0};
-        LOG_INFO("等待键盘输入");
         ssize_t rret = read(STDIN_FILENO, option, sizeof(option) - 1);
         ERROR_CHECK(rret, -1, "read");
         switch(option[0])
