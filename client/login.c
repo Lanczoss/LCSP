@@ -1,4 +1,5 @@
 #include "header.h"
+#include <termios.h>
 
 //登录动作函数
 //第一版第二版
@@ -18,12 +19,28 @@ int loginSystem(train_t *t, int socket_fd)
     strcpy(t->control_msg, user_path);
     t->path_length = strlen(user_path);
 
+    //不展示密码
+    struct termios oldt, newt;
+
+    // 获取当前终端设置
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+
+    // 关闭回显功能
+    newt.c_lflag &= ~(ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     //读取密码
     char password[1024] = {0};
     printf("Enter Password:");
     fflush(stdout);
     rret = read(STDIN_FILENO, password, sizeof(password));
     ERROR_CHECK(rret, -1, "read password");
+    // 恢复原来的终端设置
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    printf("\n");
+    //去除换行符
+    password[strlen(password) - 1] = '\0';
+    
     //密码正文长度
     t->file_length = strlen(password);
 
@@ -39,9 +56,6 @@ int loginSystem(train_t *t, int socket_fd)
     bzero(t, sizeof(train_t));
     rret = recv(socket_fd, t, sizeof(train_t), MSG_WAITALL);
     ERROR_CHECK(rret, -1, "服务器关闭");
-
-    //将路径长度放入自定义协议中
-    t->path_length = strlen(user_path);
     return 0;
 }
 

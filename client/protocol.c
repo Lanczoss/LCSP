@@ -27,7 +27,7 @@ int analysisProtocol(train_t *t, int socket_fd)
         mkdirCommand(t, socket_fd);
         break;
     case RM:
-        rmCommand(t, socket_fd);
+        rmCommand(*t, socket_fd);
         break;
     default:
         printf("没有此命令.\n");

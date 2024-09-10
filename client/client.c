@@ -5,7 +5,7 @@ int checkConfig(void)
     FILE *fp = fopen("config.ini", "r");
     if(fp == NULL)
     {
-        LOG_ERROR("config.ini不存在，服务正在退出");
+        LOG_PERROR("config.ini不存在，服务正在退出");
         return -1;
     }
     fclose(fp);
@@ -39,6 +39,7 @@ int main(void)
     }
     //到这里开始服务器已经接受了用户的登录
     //此时自定义协议里有路径名及路径名长度
+    printf("登录成功时 t->control_msg = %s\nt->path_length = %d\n", t.control_msg, t.path_length);
 
     while(1)
     {

@@ -1,7 +1,7 @@
 OUT:=main
 SRCS:=$(wildcard *.c)
 OBJS:=$(SRCS:%.c=%.o)
-COM_OP:=-Wall -g -lpthread -lmysqlclient
+COM_OP:=-Wall -g -lpthread -lmysqlclient -lcrypt
 CC:=gcc
 
 $(OUT):$(OBJS)

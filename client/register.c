@@ -1,4 +1,5 @@
 #include "header.h"
+#include <termios.h>
 
 //注册动作函数
 //第一版第二版
@@ -18,6 +19,16 @@ int registerSystem(train_t *t, int socket_fd)
     strcpy(t->control_msg, user_path);
     t->path_length = strlen(user_path);
     char password[1024] = {0};
+    //不展示密码
+    struct termios oldt, newt;
+
+    // 获取当前终端设置
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+
+    // 关闭回显功能
+    newt.c_lflag &= ~(ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     while(1)
     {
         bzero(password, sizeof(password));
@@ -26,6 +37,7 @@ int registerSystem(train_t *t, int socket_fd)
         fflush(stdout);
         rret = read(STDIN_FILENO, password, sizeof(password));
         ERROR_CHECK(rret, -1, "EOF");
+        printf("\n");
         //对比用的密码数组
         char compare_password[1024] = {0};
         printf("Retype Password:");
@@ -34,6 +46,11 @@ int registerSystem(train_t *t, int socket_fd)
         ERROR_CHECK(rret, -1, "EOF");
         if(strcmp(password, compare_password) == 0)
         {
+            // 恢复原来的终端设置
+            tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+            printf("\n");
+            //去除换行符
+            password[strlen(password) - 1] = '\0';
             //密码正确
             break;
         }

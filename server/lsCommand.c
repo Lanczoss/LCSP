@@ -26,53 +26,6 @@ int removeLineBreak(char *real_path){
     return 0;
 }
 
-int getsCommand(train_t t, int net_fd){
-    char real_path[1024] = { 0 };
-
-    // 获得文件的绝对路径
-    pathConcat(t, real_path);
-    
-
-    // 拼接文件的真实路径
-    char src[1024] = { 0 };
-    strcpy(src,t.control_msg);
-    getFilePath(src, real_path);
-
-    // 去掉路径中的换行符
-    removeLineBreak(real_path);
-     
-    // 打开文件
-
-    int file_fd = open(real_path, O_RDWR);
-
-    if(file_fd == -1){
-        // 文件不存在，直接返回错误信息
-        // TODO 修改错误标志
-        t.error_flag = 1;
-        send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
-        return -1;
-    }
-
-    send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
-
-    // 发送文件
-    // 获取文件大小
-    struct stat st;
-    memset(&st, 0, sizeof(st));
-    fstat(file_fd, &st);
-
-    // 先发文件大小给客户端
-    send(net_fd, &st.st_size, sizeof(off_t), MSG_NOSIGNAL);
-
-    // 使用sendfile:零拷贝
-    sendfile(net_fd, file_fd, NULL, st.st_size);
-
-    close(file_fd);
-
-    return 0;
-}
-
-
 int lsCommand(train_t t, int net_fd){
 
     char real_path[1024] = { 0 };

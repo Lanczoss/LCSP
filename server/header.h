@@ -31,6 +31,7 @@
 #include "queue.h"
 #include <sys/utsname.h>    // uname()需要用到的头文件
 #include <errno.h>
+#include <crypt.h>
 
 enum
 {
@@ -173,7 +174,7 @@ extern FILE *log_error_file;
 #define ERROR_CHECK(ret, error_flag, msg) \
     do { \
         if ((ret) == (error_flag)) { \
-            perror(msg); \
+            LOG_PERROR(msg); \
             return -1; \
         } \
     } while (0)
@@ -202,10 +203,10 @@ int initSocket(int *socket_fd);
 int addEpoll(int epoll_fd, int fd);
 
 //子线程工作函数
-int doWorker(int net_fd);
+int doWorker(MYSQL *mysql, int net_fd);
 
 //分析协议
-int analysisProtocol(train_t t, int net_fd);
+int analysisProtocol(train_t t, int net_fd, MYSQL *mysql);
 
 //路径拼接
 int pathConcat(train_t t, char *real_path);
@@ -220,7 +221,7 @@ int splitParameter(train_t t, int num, char *buf);
 int lsCommand(train_t t, int net_fd);
 
 //cd的命令
-int cdCommand(train_t t, int net_fd);
+int cdCommand(train_t t, int net_fd, MYSQL *sql);
 
 //pwd的命令
 int pwdCommand(train_t t, int net_fd);
@@ -229,13 +230,13 @@ int pwdCommand(train_t t, int net_fd);
 int putsCommand(train_t t, int net_fd);
 
 //gets的命令
-int getsCommand(train_t t, int net_fd);
+int getsCommand(train_t t, int net_fd, MYSQL *sql);
 
 //rm的命令
-int rmCommand(train_t t, int net_fd);
+int rmCommand(train_t t, int net_fd,MYSQL*mysql);
 
 //创建文件夹
-int mkdirCommand(train_t t, int net_fd);
+int mkdirCommand(train_t t, int net_fd, MYSQL *mysql);
 
 // 子线程的入口函数
 void *threadMain(void *p);
@@ -252,22 +253,43 @@ int writeLog(FILE *log_file, const char *level, const char *file, int line, cons
 void closeLog();
 
 //根据路径名验证数据库中用户信息
-int checkUserMsg(train_t t);
+int checkUserMsg(const char *user_name, MYSQL *mysql);
 
 //登录/注册动作函数
-//第一版第二版
+//第三版
 //将从客户端发来的用户名和密码进行验证
 //如果是登录行为，密码输入不正确，要求重试
 //如果是注册行为，用户名已经存在，则失败
-int loginRegisterSystem(train_t *t,  int net_fd);
+int loginRegisterSystem(train_t *t,  int net_fd, MYSQL *mysql);
 
 //子线程连接数据库函数
-int connectMysql(MYSQL *mysql);
+int connectMysql(MYSQL  **mysql);
 
-//在数据库中插入一条数据创建文件目录
-//train_t：需要使用到uid
-//real_path:父目录的路径
-//filename：插入的文件目录名
-int insertDir(train_t t,char * real_path,char *dirname);
+//验证密码
+//需要查找对应用户的盐值来获取hash值
+int checkPassword(const char *user_name, const char *password, MYSQL *mysql);
 
+//将得到的用户名和密码插入到users表中
+//密码需要盐值加密
+//密码还需要hash值
+int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysql);
+
+//定义盐值长度和sha512标识
+#define SALT_PREFIX "$6$"
+#define SALT_LENGTH 8
+//获取散列的函数
+//需要传入一个指向buf的空间
+//一个盐值
+//一个明文密码
+int getHashValue(char *buf, char *salt, const char *password);
+
+//根据用户名从数据库中获取uid的函数
+int getUidMysql(const char *user_name, MYSQL *mysql);
+//创建文件夹目录
+int insertDir(train_t t, char * real_path, char* filename,MYSQL*mysql);
+//删除文件
+int deleteFile(train_t t, char * file_path, MYSQL*mysql);
+
+
+int getFileId(train_t t, MYSQL * mysql);
 #endif
