@@ -1,4 +1,6 @@
 #include "header.h"
+#include <mysql/mysql.h>
+
 int mkdirCommand(train_t t, int socket_fd) {
 
     // 获取真实路径
@@ -14,6 +16,7 @@ int mkdirCommand(train_t t, int socket_fd) {
         filename[filename_len - 1] = '\0';
     }
 
+
     // 拼接文件夹路径并添加路径分隔符
     if (real_path[strlen(real_path) - 1] != '/') {
         strcat(real_path, "/");  // 确保路径最后有分隔符
@@ -28,9 +31,20 @@ int mkdirCommand(train_t t, int socket_fd) {
         real_path[len - 1] = '\0';
     }
 
-    // 创建文件夹
-    int ret = mkdir(real_path, 0777);
-    ERROR_CHECK(ret, -1, "mkdir");
+    //文件路径
+    printf("real_path:#%s#\n",real_path);
+    printf("filename:#%s#\n",filename);
+
+    //往数据库插入一条数据
+    if( insertDir(t,real_path,filename) != 0){
+        // 创建文件夹
+        int ret = mkdir(real_path, 0777);
+        ERROR_CHECK(ret, -1, "mkdir");
+
+    }else{
+        printf("创建目录失败!\n");
+    }
 
     return 0;
 }
+

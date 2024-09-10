@@ -155,7 +155,7 @@ int putsCommand(train_t t, int socket_fd);
 int getsCommand(train_t t, int socket_fd);
 
 //rm的命令
-int rmCommand(train_t *t, int socket_fd);
+int rmCommand(train_t t, int socket_fd);
 
 //mkdir的命令
 int mkdirCommand(train_t *t, int socket_fd);

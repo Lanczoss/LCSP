@@ -264,4 +264,10 @@ int loginRegisterSystem(train_t *t,  int net_fd);
 //子线程连接数据库函数
 int connectMysql(MYSQL *mysql);
 
+//在数据库中插入一条数据创建文件目录
+//train_t：需要使用到uid
+//real_path:父目录的路径
+//filename：插入的文件目录名
+int insertDir(train_t t,char * real_path,char *dirname);
+
 #endif
