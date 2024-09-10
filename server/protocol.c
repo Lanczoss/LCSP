@@ -25,6 +25,7 @@ int analysisProtocol(train_t t, int net_fd, MYSQL *mysql)
         return 0;
     case MKDIR:
         mkdirCommand(t, net_fd);
+        return 0;
     case RM:
         rmCommand(t, net_fd);
         return 0;
