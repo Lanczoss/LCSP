@@ -24,6 +24,9 @@ int loginSystem(train_t *t, int socket_fd)
     fflush(stdout);
     rret = read(STDIN_FILENO, password, sizeof(password));
     ERROR_CHECK(rret, -1, "read password");
+    //去除换行符
+    password[strlen(password) - 1] = '\0';
+    
     //密码正文长度
     t->file_length = strlen(password);
 
@@ -39,9 +42,6 @@ int loginSystem(train_t *t, int socket_fd)
     bzero(t, sizeof(train_t));
     rret = recv(socket_fd, t, sizeof(train_t), MSG_WAITALL);
     ERROR_CHECK(rret, -1, "服务器关闭");
-
-    //将路径长度放入自定义协议中
-    t->path_length = strlen(user_path);
     return 0;
 }
 

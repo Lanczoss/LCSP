@@ -31,6 +31,7 @@
 #include "queue.h"
 #include <sys/utsname.h>    // uname()需要用到的头文件
 #include <errno.h>
+#include <crypt.h>
 
 enum
 {
@@ -252,16 +253,42 @@ int writeLog(FILE *log_file, const char *level, const char *file, int line, cons
 void closeLog();
 
 //根据路径名验证数据库中用户信息
-int checkUserMsg(train_t t, MYSQL *mysql);
+int checkUserMsg(const char *user_name, MYSQL *mysql);
 
 //登录/注册动作函数
-//第一版第二版
+//第三版
 //将从客户端发来的用户名和密码进行验证
 //如果是登录行为，密码输入不正确，要求重试
 //如果是注册行为，用户名已经存在，则失败
 int loginRegisterSystem(train_t *t,  int net_fd, MYSQL *mysql);
 
 //子线程连接数据库函数
-int connectMysql(MYSQL *mysql);
+int connectMysql(MYSQL  **mysql);
+
+//验证密码
+//需要查找对应用户的盐值来获取hash值
+int checkPassword(const char *user_name, const char *password, MYSQL *mysql);
+
+//将得到的用户名和密码插入到users表中
+//密码需要盐值加密
+//密码还需要hash值
+int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysql);
+
+//定义盐值长度和sha512标识
+#define SALT_PREFIX "$6$"
+#define SALT_LENGTH 8
+//获取散列的函数
+//需要传入一个指向buf的空间
+//一个盐值
+//一个明文密码
+int getHashValue(char *buf, char *salt, const char *password);
+
+//获取mysql数据库用的现在的datetime
+//需要传入一个指向buf的空间
+//返回值为指向buf空间的指针
+char *getNowTimeMysql(char *buf);
+
+//根据用户名从数据库中获取uid的函数
+int getUidMysql(const char *user_name, MYSQL *mysql);
 
 #endif

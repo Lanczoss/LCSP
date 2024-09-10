@@ -11,6 +11,7 @@ int interface(train_t *t, int socket_fd)
     {
         LOG_INFO("展示登录界面");
         bzero(t, sizeof(train_t));
+        t->isLoginFailed = 1;
         printf("(Y) 登录  (R) 注册  (E)退出 > ");
         fflush(stdout);
         char option[512] = {0};

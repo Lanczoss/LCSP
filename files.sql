@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `files`;
 CREATE TABLE `files`  (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '索引ID',
   `file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '文件名',
-  `uid` int (255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户ID',
+  `uid` int NULL DEFAULT NULL COMMENT '用户ID',
   `pid` int NULL DEFAULT NULL COMMENT '父目录的ID',
   `file_path` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '文件路径',
   `file_type` int NULL DEFAULT NULL COMMENT '文件类型, 1表示文件夹，2表示文件',

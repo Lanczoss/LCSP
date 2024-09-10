@@ -34,6 +34,8 @@ int registerSystem(train_t *t, int socket_fd)
         ERROR_CHECK(rret, -1, "EOF");
         if(strcmp(password, compare_password) == 0)
         {
+            //去除换行符
+            password[strlen(password) - 1] = '\0';
             //密码正确
             break;
         }
