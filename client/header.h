@@ -42,7 +42,7 @@ enum
     RM,
     MKDIR,
     NORMAL,
-    ABNORMAL,
+    ABNORMAL
 };
 
 //自定义协议头部信息
@@ -184,4 +184,7 @@ void writeLog(const char * level,const char *file, int line,const char * message
 
 // 日志关闭函数声明，确保在程序结束时关闭日志文件
 void closeLog();
+
+// 分割参数
+int splitParameter(train_t t, int num, char *buf);
 #endif
