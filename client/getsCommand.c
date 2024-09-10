@@ -54,7 +54,7 @@ int getsCommand(train_t t, int socket_fd){
     // 客户端参数检错
     struct stat st;
     ret = stat(parameter,&st);
-    if (ret == -1){
+    if (ret == -1 || S_ISDIR(st.st_mode) == 0){
         t.error_flag = ABNORMAL;
         int ret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
         if (ret == -1){
@@ -64,37 +64,31 @@ int getsCommand(train_t t, int socket_fd){
         printf("客户端输入的路径或文件不存在\n");
         return -1;
     }
-    
+
+    // 客户端端路径一定是一个文件夹
     int file_fd; 
-    if (S_ISDIR(st.st_mode)) {
-        t.error_flag = NORMAL;
-        int ret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
-        ERROR_CHECK(ret,-1,"send");
+    t.error_flag = NORMAL;
+    ret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+    ERROR_CHECK(ret,-1,"send");
 
-        // 拼接路径
-        //// 取出文件名
-        char name[1024] = {0};
-        char parameter_name[1024] = {0};
-        splitParameter(t,1,parameter_name);
-        get_filename(parameter_name,name);
+    // 拼接路径
+    //// 取出文件名
+    char name[1024] = {0};
+    char parameter_name[1024] = {0};
+    splitParameter(t,1,parameter_name);
+    get_filename(parameter_name,name);
 
-        if (parameter[strlen(parameter) - 1] == '/'){
-            strcat(parameter,name);
-        }
-
-        strcat(parameter,"/");
+    if (parameter[strlen(parameter) - 1] == '/'){
         strcat(parameter,name);
-        printf("open dir: %s\n",parameter);
-        // 创建文件对象
-        file_fd = open(parameter,O_RDWR | O_CREAT | O_APPEND,0666);
-        ERROR_CHECK(file_fd,-1,"open");
-    } else if (S_ISREG(st.st_mode)) {
-        t.error_flag = NORMAL;
-        int ret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
-        ERROR_CHECK(ret,-1,"send");
-        file_fd = open(parameter,O_RDWR | O_CREAT | O_APPEND,0666);
-        ERROR_CHECK(ret,-1,"open");
     }
+
+    strcat(parameter,"/");
+    strcat(parameter,name);
+    printf("open dir: %s\n",parameter);
+    // 创建文件对象
+    file_fd = open(parameter,O_RDWR | O_CREAT | O_APPEND,0666);
+    ERROR_CHECK(file_fd,-1,"open");
+
 
     // 接收服务端文件是否存在
     ret = recv(socket_fd,&t,sizeof(t),MSG_WAITALL);
@@ -140,7 +134,7 @@ int getsCommand(train_t t, int socket_fd){
         printf("对端关闭\n");
         return -1;
     }
-    
+
     printf("chash_val: %s\n", chash_val);
     printf("c num : %ld\n",strlen(chash_val));
     printf("shash_val: %s\n", shash_val);
@@ -173,7 +167,7 @@ int getsCommand(train_t t, int socket_fd){
         printf("对端关闭\n");
         return -1;
     }
-    
+
     printf("file_size = %d\n",file_size);
 
     // 计算客户端当前文件大小
