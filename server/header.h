@@ -283,11 +283,6 @@ int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysq
 //一个明文密码
 int getHashValue(char *buf, char *salt, const char *password);
 
-//获取mysql数据库用的现在的datetime
-//需要传入一个指向buf的空间
-//返回值为指向buf空间的指针
-char *getNowTimeMysql(char *buf);
-
 //根据用户名从数据库中获取uid的函数
 int getUidMysql(const char *user_name, MYSQL *mysql);
 
