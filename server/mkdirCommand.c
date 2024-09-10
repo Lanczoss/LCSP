@@ -6,8 +6,6 @@ int mkdirCommand(train_t t, int socket_fd,MYSQL* mysql) {
     char real_path[1024] = { 0 };
     pathConcat(t, real_path);
 
-
-
     // 拼接文件夹路径并添加路径分隔符
     /*
        if (real_path[strlen(real_path) - 1] != '/') {
@@ -48,6 +46,7 @@ int mkdirCommand(train_t t, int socket_fd,MYSQL* mysql) {
         splitParameter(t, (i+1), filename);
         // 去掉 filename 中的换行符
         size_t filename_len = strlen(filename);
+        
         if (filename_len > 0 && filename[filename_len - 1] == '\n') {
             filename[filename_len - 1] = '\0';
         }

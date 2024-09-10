@@ -3,8 +3,8 @@ int getFileId(train_t t, MYSQL *mysql){
 
     MYSQL_ROW row;
     MYSQL_RES *result;
-    char query[256] = { 0 };   // 存储sql查询
-    char file_path[256] = { 0 };  // 存储用户提供的file_path
+    char query[2048] = { 0 };   // 存储sql查询
+    char file_path[1024] = { 0 };  // 存储用户提供的file_path
     int uid;              // 用户ID
     int file_id = -1;     // 最终找到的文件或目录的ID
 
