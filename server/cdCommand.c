@@ -23,7 +23,8 @@ int rollbackPath(char *virtual_path){
 bool isExistDir(MYSQL *mysql, train_t t, char *virtual_path, char *parameter){
     char select_statement[1024] = {0};
     char error_statement[1024] = {0};
-    sprintf(select_statement,"select * from  where uid = %d, file_type = %d, file_path = %s/%s",t.uid,1,virtual_path,parameter);
+    sprintf(select_statement,"select * from files where uid = %d and file_type = %d and file_path = '%s/%s'",t.uid,1,virtual_path,parameter);
+    printf("st: %s\n",select_statement);
     int ret = mysql_query(mysql,select_statement);
     if (ret != 0){
         sprintf(error_statement,"%s:%s","mysql_query",mysql_error(mysql));
@@ -53,6 +54,8 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
     // 检错返回值
     int ret;
 
+    printf("t.parameter_num = %d\n",t.parameter_num);
+
     // cd参数必须要保证为1个或者0个
     if (!(t.parameter_num == 1 || t.parameter_num == 0)){
         t.error_flag = ABNORMAL;
@@ -62,10 +65,17 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
         return -1;
     }
 
+    // 读取参数
+    char parameter[1024] = {0};
+    splitParameter(t,t.parameter_num,parameter);
+
     // 检测cd参数是否为0个，若为0个直接返回家目录
     char virtual_path[1024] = {0};
-    if (t.parameter_num == 0){
-        strcpy(virtual_path,"/");
+    if (t.parameter_num == 0 || (t.parameter_num == 1 && strcmp(parameter,"\n") == 0)){
+        bzero(t.control_msg,sizeof(t.command));
+        strcpy(t.control_msg,"/");
+        t.current_layers = 0;
+        t.file_length = strlen(t.control_msg);
         t.error_flag = NORMAL;
         ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
         ERROR_CHECK(ret,-1,"send");
@@ -83,10 +93,6 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
     // 读取当前层数
     int current_layers = t.current_layers;
 
-    // 读取参数
-    char parameter[1024] = {0};
-    splitParameter(t,t.parameter_num,parameter);
-
     // 将参数最后一个换行符去除
     parameter[strlen(parameter) - 1] = 0;
 
@@ -98,7 +104,6 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
     // 判断是否需要在根目录下寻找,若在根目录下寻找则需要重构虚拟路径
     if(parameter[0] == '/'){
         bzero(virtual_path,sizeof(virtual_path));
-        strcpy(virtual_path,"/");
         current_layers = 0;
     }
 
@@ -131,10 +136,11 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
                         return 0;
                     }
                     else{
+                        puts("139");
                         t.error_flag = NORMAL;
                         bzero(t.control_msg,sizeof(t.control_msg));
                         strcat(t.control_msg,"/");
-                        t.path_length = strlen(virtual_path);
+                        t.path_length = strlen(t.control_msg);
                         t.current_layers = 0;
                         int ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
                         ERROR_CHECK(ret,-1,"send");
