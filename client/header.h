@@ -109,7 +109,7 @@ typedef struct train_s
 #define ERROR_CHECK(ret, error_flag, msg) \
     do { \
         if ((ret) == (error_flag)) { \
-            perror(msg); \
+            LOG_ERROR(msg); \
             return -1; \
         } \
     } while (0)
