@@ -3,8 +3,6 @@
 //创建目录files或者判断是否有files
 int createBaseFiles(void)
 {
-    LOG_INFO("检测是否有../files文件夹");
-    LOG_PERROR("测试LOG_PERROR");
     DIR *dir = opendir(BASE_PATH);
     if(dir == NULL)
     {

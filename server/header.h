@@ -174,7 +174,7 @@ extern FILE *log_error_file;
 #define ERROR_CHECK(ret, error_flag, msg) \
     do { \
         if ((ret) == (error_flag)) { \
-            perror(msg); \
+            LOG_PERROR(msg); \
             return -1; \
         } \
     } while (0)
@@ -221,7 +221,7 @@ int splitParameter(train_t t, int num, char *buf);
 int lsCommand(train_t t, int net_fd);
 
 //cd的命令
-int cdCommand(train_t t, int net_fd);
+int cdCommand(train_t t, int net_fd, MYSQL *sql);
 
 //pwd的命令
 int pwdCommand(train_t t, int net_fd);
@@ -230,7 +230,7 @@ int pwdCommand(train_t t, int net_fd);
 int putsCommand(train_t t, int net_fd);
 
 //gets的命令
-int getsCommand(train_t t, int net_fd);
+int getsCommand(train_t t, int net_fd, MYSQL *sql);
 
 //rm的命令
 int rmCommand(train_t t, int net_fd,MYSQL*mysql);
@@ -282,11 +282,6 @@ int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysq
 //一个盐值
 //一个明文密码
 int getHashValue(char *buf, char *salt, const char *password);
-
-//获取mysql数据库用的现在的datetime
-//需要传入一个指向buf的空间
-//返回值为指向buf空间的指针
-char *getNowTimeMysql(char *buf);
 
 //根据用户名从数据库中获取uid的函数
 int getUidMysql(const char *user_name, MYSQL *mysql);

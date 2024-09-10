@@ -59,30 +59,24 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
     while((row = mysql_fetch_row(res)) != NULL)
     {
         strcpy(salt, row[0]);
-    //根据盐值计算散列
-    char *encrypted = crypt(password, salt);
-    if (encrypted == NULL) {
-        perror("计算失败 \n");
-        return 0;
-    }
-    printf("password = %s\n", password);
-    printf("salt = %s\n", salt);
-    printf("encrypted = %s\n", encrypted);
-    strcpy(encrypted_password, SALT_PREFIX);
-    strcat(encrypted_password, salt);
-    strcat(encrypted_password, "$");
-    strcat(encrypted_password, encrypted);
+        //根据盐值计算散列
+        char *encrypted = crypt(password, salt);
+        if (encrypted == NULL) {
+            perror("计算失败 \n");
+            return 0;
+        }
+        strcpy(encrypted_password, encrypted);
 
-    //根据用户名获取散列值
-    if(strcmp(row[1], encrypted_password) == 0)
-    {
-        //密码正确
+        //根据用户名获取散列值
+        if(strcmp(row[1], encrypted_password) == 0)
+        {
+            //密码正确
+            mysql_free_result(res);
+            return 0;
+        }
+        //密码错误
         mysql_free_result(res);
-        return 0;
-    }
-    //密码错误
-    mysql_free_result(res);
-    return -1;
+        return -1;
     }
     return -1;
 }
