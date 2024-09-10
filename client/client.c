@@ -5,7 +5,7 @@ int checkConfig(void)
     FILE *fp = fopen("config.ini", "r");
     if(fp == NULL)
     {
-        LOG_ERROR("config.ini不存在，服务正在退出");
+        LOG_PERROR("config.ini不存在，服务正在退出");
         return -1;
     }
     fclose(fp);
