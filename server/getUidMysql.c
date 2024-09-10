@@ -1,7 +1,7 @@
 #include "header.h"
 
 //根据用户名从数据库中获取uid的函数
-int getUidMysql(char *user_name, MYSQL *mysql)
+int getUidMysql(const char *user_name, MYSQL *mysql)
 {
     char tmp[60] = {0};
     //根据用户名获取uid

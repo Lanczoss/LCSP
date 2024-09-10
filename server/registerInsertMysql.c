@@ -13,10 +13,22 @@ int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysq
     //向数据库中插入盐值和encrypted_pwd
     char tmp[1024] = {0};
     char datetime[64] = {0};
+    //向users表插入注册信息
     sprintf(tmp, "insert into users (user_id, user_name, salt, passwd, create_time, update_time) values (NULL, '%s', '%s', '%s', '%s', '%s')",
             user_name,
             salt,
             encrypted_pwd,
+            getNowTimeMysql(datetime),
+            getNowTimeMysql(datetime)
+        );
+    mysql_query(mysql, tmp);
+    printf("%s\n", mysql_error(mysql));
+    printf("%s\n", tmp);
+
+    bzero(tmp, sizeof(tmp));
+    //向files表插入注册信息
+    sprintf(tmp, "insert into files (id, file_name, uid, pid, file_path, file_type, hash, create_time, update_time) values (NULL, '/', %d, -1, '/', 1, NULL, '%s', '%s')",
+            getUidMysql(user_name, mysql),
             getNowTimeMysql(datetime),
             getNowTimeMysql(datetime)
         );

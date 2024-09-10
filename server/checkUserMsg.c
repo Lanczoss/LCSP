@@ -47,7 +47,7 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
     char encrypted_password[256] = {0};
 
     //根据用户名获取盐值
-    sprintf(tmp, "select salt from users where user_name='%s'", user_name);
+    sprintf(tmp, "select salt, passwd from users where user_name='%s'", user_name);
     mysql_query(mysql, tmp);
     printf("%s\n", mysql_error(mysql));
     MYSQL_RES *res = mysql_store_result(mysql);
@@ -59,8 +59,6 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
     while((row = mysql_fetch_row(res)) != NULL)
     {
         strcpy(salt, row[0]);
-    }
-    mysql_free_result(res);
     //根据盐值计算散列
     char *encrypted = crypt(password, salt);
     if (encrypted == NULL) {
@@ -75,27 +73,17 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
     strcat(encrypted_password, "$");
     strcat(encrypted_password, encrypted);
 
-    bzero(tmp, sizeof(tmp));
     //根据用户名获取散列值
-    sprintf(tmp, "select passwd from users where user_name='%s'", user_name);
-    mysql_query(mysql, tmp);
-    printf("%s\n", mysql_error(mysql));
-    res = mysql_store_result(mysql);
-    if(res == NULL)
+    if(strcmp(row[1], encrypted_password) == 0)
     {
-        printf("%s\n", mysql_error(mysql));
-    }
-    while((row = mysql_fetch_row(res)) != NULL)
-    {
-        if(strcmp(row[0], encrypted_password) == 0)
-        {
-            //密码正确
-            mysql_free_result(res);
-            return 0;
-        }
+        //密码正确
+        mysql_free_result(res);
+        return 0;
     }
     //密码错误
     mysql_free_result(res);
+    return -1;
+    }
     return -1;
 }
 

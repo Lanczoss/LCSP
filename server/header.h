@@ -289,6 +289,6 @@ int getHashValue(char *buf, char *salt, const char *password);
 char *getNowTimeMysql(char *buf);
 
 //根据用户名从数据库中获取uid的函数
-int getUidMysql(char *user_name, MYSQL *mysql);
+int getUidMysql(const char *user_name, MYSQL *mysql);
 
 #endif
