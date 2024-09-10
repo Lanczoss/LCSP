@@ -4,16 +4,17 @@ void *threadMain(void *p)
 {
     pool_t *pool = (pool_t*)p;
     int ret = pthread_mutex_lock(&pool->lock);
+    THREAD_ERROR_CHECK(ret, "lock");
     //连接数据库
-    MYSQL mysql;
+    MYSQL *mysql;
     ret = connectMysql(&mysql);
     if(ret == -1)
     {
         ret = pthread_mutex_unlock(&pool->lock);
         THREAD_ERROR_CHECK(ret, "unlock");
         printf("子线程连接数据库失败，请确保config.ini配置正确\n");
-        mysql_close(&mysql);
-        return NULL;
+        mysql_close(mysql);
+        pthread_exit(NULL);
     }
     ret = pthread_mutex_unlock(&pool->lock);
     THREAD_ERROR_CHECK(ret, "unlock");
@@ -35,7 +36,8 @@ void *threadMain(void *p)
             ret = pthread_mutex_unlock(&pool->lock);
             THREAD_ERROR_CHECK(ret, "unlock");
             //关闭数据库连接
-            mysql_close(&mysql);
+            mysql_close(mysql);
+            mysql_thread_end();
             pthread_exit(NULL);
         }
         //到这里说明有任务
@@ -46,7 +48,7 @@ void *threadMain(void *p)
         THREAD_ERROR_CHECK(ret, "unlock");
 
         //工作
-        doWorker(&mysql, net_fd);
+        doWorker(mysql, net_fd);
         close(net_fd);
     }
     return NULL;

@@ -1,0 +1,28 @@
+#include "header.h"
+
+//将得到的用户名、盐值和密码插入到users表中
+//明文密码需要盐值加密
+//明文密码还需要hash值
+int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysql)
+{
+    //保存类似"$6$EcGQ/umB$KkxG5RZFxRR2TYY0..."的信息
+    char encrypted_pwd[512] = {0};
+    //保存盐值
+    char salt[32] = {0};
+    getHashValue(encrypted_pwd, salt, password);
+    //向数据库中插入盐值和encrypted_pwd
+    char tmp[1024] = {0};
+    char datetime[64] = {0};
+    sprintf(tmp, "insert into users (user_id, user_name, salt, passwd, create_time, update_time) values (NULL, '%s', '%s', '%s', '%s', '%s')",
+            user_name,
+            salt,
+            encrypted_pwd,
+            getNowTimeMysql(datetime),
+            getNowTimeMysql(datetime)
+        );
+    mysql_query(mysql, tmp);
+    printf("%s\n", mysql_error(mysql));
+    printf("%s\n", tmp);
+    printf("插入成功\n");
+    return 0;
+}
