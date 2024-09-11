@@ -33,6 +33,9 @@ int analysisProtocol(train_t *t, int socket_fd)
         t->isLoginFailed = 1;
         printf("\n");
         break;
+    case RENAME:
+        reName(*t, socket_fd);
+        break;
     default:
         printf("没有此命令.\n");
         break;
