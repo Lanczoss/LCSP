@@ -4,16 +4,17 @@ void *threadMain(void *p)
 {
     pool_t *pool = (pool_t*)p;
     int ret = pthread_mutex_lock(&pool->lock);
+    THREAD_ERROR_CHECK(ret, "lock");
     //连接数据库
-    MYSQL mysql;
+    MYSQL *mysql;
     ret = connectMysql(&mysql);
     if(ret == -1)
     {
         ret = pthread_mutex_unlock(&pool->lock);
         THREAD_ERROR_CHECK(ret, "unlock");
-        printf("子线程连接数据库失败，请确保config.ini配置正确\n");
-        mysql_close(&mysql);
-        return NULL;
+        printf("Can't connect MySQL, please make sure config.ini correct.\n");
+        mysql_close(mysql);
+        pthread_exit(NULL);
     }
     ret = pthread_mutex_unlock(&pool->lock);
     THREAD_ERROR_CHECK(ret, "unlock");
@@ -35,7 +36,8 @@ void *threadMain(void *p)
             ret = pthread_mutex_unlock(&pool->lock);
             THREAD_ERROR_CHECK(ret, "unlock");
             //关闭数据库连接
-            mysql_close(&mysql);
+            mysql_close(mysql);
+            mysql_thread_end();
             pthread_exit(NULL);
         }
         //到这里说明有任务
@@ -46,7 +48,8 @@ void *threadMain(void *p)
         THREAD_ERROR_CHECK(ret, "unlock");
 
         //工作
-        doWorker(&mysql, net_fd);
+        ret = doWorker(mysql, net_fd);
+        THREAD_ERROR_CHECK(ret, "One client disconnected. Check the log.");
         close(net_fd);
     }
     return NULL;
@@ -57,32 +60,32 @@ int doWorker(MYSQL *mysql, int net_fd)
     //自定义协议
     train_t t;
     bzero(&t, sizeof(t));
+    t.isLoginFailed = 1;
 
-    //登录/注册逻辑函数
-    int ret = loginRegisterSystem(&t, net_fd, mysql);
-    if(ret == -1)
-    {
-        printf("对端关闭\n"); 
-        return -1;
-    }
-
-    //到这里开始用户成功登录
     while(1)
     {
-        bzero(&t,sizeof(t));
+        if(t.isLoginFailed == 1)
+        {
+            //登录/注册逻辑函数
+            int ret = loginRegisterSystem(&t, net_fd, mysql);
+            if(ret == -1)
+            {
+                return -1;
+            }
+        }
+        LOG_INFO("One client login success.");
+        //到这里开始用户成功登录
         // 接受一次信息-》区分等下要分发给那个命令：
         ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
         if(rret == 0)
         {
-            printf("对端关闭\n"); 
             return -1;
         }
         //分析协议
-        int ret = analysisProtocol(t, net_fd, mysql);
+        int ret = analysisProtocol(&t, net_fd, mysql);
         if(ret == -1)
         {
             //用户输入了exit
-            printf("对端关闭\n"); 
             return -1;
         }
     }

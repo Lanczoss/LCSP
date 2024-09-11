@@ -65,7 +65,6 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
     MYSQL_BIND result[1];
     int id = getFileId(t, mysql); // 参数通过getfileid获得文件的索引id
 
-
     // 对id做一下错误判断
     // id如果为-1，说明表中没有这条数据
     // 那就更别提以该id为pid的文件或文件夹了
@@ -171,13 +170,9 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
 
     // 清理资源
     mysql_stmt_close(stmt);
-
-
-    // 错误处理 返回-1
     return 0;
-
-
 }
+
 int lsCommand(train_t t, int net_fd, MYSQL *mysql){
 
     // 参数大于1，修改错误标志返回给客户端
@@ -248,7 +243,7 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
         return 0;
     }
 
-    // 到这里说明参数与路径完全不相同，且以斜杠开头
+    // 到这里说明参数不以路径开头且不相同，且以斜杠开头
     // 直接将参数拼接到路径里，再去查表
     // 未查到说明拼接目录下无内容，或者当前目录下没有该目录或者文件
 

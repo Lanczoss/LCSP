@@ -31,6 +31,7 @@
 #include "queue.h"
 #include <sys/utsname.h>    // uname()需要用到的头文件
 #include <errno.h>
+#include <crypt.h>
 
 enum
 {
@@ -46,6 +47,7 @@ enum
     MKDIR,
     ABNORMAL,
     NORMAL,
+    EXIT
 };
 
 //自定义协议头部信息
@@ -124,7 +126,11 @@ typedef struct pool_s
 extern FILE *log_info_file;
 extern FILE *log_error_file;
 // 定义日志级别的宏
-// 使用示例:LOG_INFO("正确信息");  LOG_PERROR("错误信息");
+// 使用示例:LOG_INFO("正确信息");打印到info.log
+// 例如打开文件：ERROR_CHECK(file_fd, -1, "open"),  记录到error.log
+// LOG_MYSQL_ERROR(mysql);  检查mysql 记录到error.log
+// CHECK_MYSQL_RESULT(result);  检查 MYSQL_RES 是否为 NULL 并记录错误 记录到error.log
+// CHECK_NUM_ROWS(rows);    检查行数是否为 0 并记录信息 记录到error.log
 // 日志级别宏
 #define LOG_INFO(message) \
     do { \
@@ -159,6 +165,38 @@ extern FILE *log_error_file;
         LOG_ERROR(error_msg); \
     } while(0)
 
+// 定义LOG_MYSQL_ERROR宏，专门用于检测和记录MySQL的错误
+// 使用strlen(mysql_err) > 0是为了避免日志中出现大量的空字符
+// mysql_error在没有出错时返回空字符
+// 定义LOG_MYSQL_ERROR宏，专门用于检测和记录MySQL的错误
+#define LOG_MYSQL_ERROR(mysql) \
+    do { \
+        const char *mysql_err = mysql_error(mysql); \
+        if (mysql_err && strlen(mysql_err) > 0) { \
+            char error_msg[512]; \
+            snprintf(error_msg, sizeof(error_msg), "MySQL Error: %s", mysql_err); \
+            LOG_ERROR(error_msg); \
+        } \
+    } while (0)
+// 检查 MYSQL_RES 是否为 NULL 并记录错误  
+#define CHECK_MYSQL_RESULT(result) \
+    do { \
+        if ((result) == NULL) { \
+            LOG_ERROR("mysql_store_result() 返回 NULL"); \
+            LOG_MYSQL_ERROR(mysql); \
+        } \
+    } while (0)  
+
+// 检查行数是否为 0 并记录信息  
+#define CHECK_NUM_ROWS(num_rows) \
+    do { \
+        if ((num_rows) == 0) { \
+            LOG_ERROR("未找到任何行。"); \
+        } else { \
+            printf("行数: %lu\n", (unsigned long)(num_rows)); \
+        } \
+    } while (0)
+
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
     do { \
@@ -173,7 +211,7 @@ extern FILE *log_error_file;
 #define ERROR_CHECK(ret, error_flag, msg) \
     do { \
         if ((ret) == (error_flag)) { \
-            perror(msg); \
+            LOG_PERROR(msg); \
             return -1; \
         } \
     } while (0)
@@ -181,7 +219,7 @@ extern FILE *log_error_file;
 #define THREAD_ERROR_CHECK(ret, msg) \
     do{ \
         if((ret) != 0) { \
-            fprintf(stderr, "%s:%s\n", msg, strerror(ret)); \
+            LOG_PERROR(msg); \
         } \
     } while(0)
 
@@ -205,7 +243,7 @@ int addEpoll(int epoll_fd, int fd);
 int doWorker(MYSQL *mysql, int net_fd);
 
 //分析协议
-int analysisProtocol(train_t t, int net_fd, MYSQL *mysql);
+int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql);
 
 //路径拼接
 int pathConcat(train_t t, char *real_path);
@@ -220,7 +258,7 @@ int splitParameter(train_t t, int num, char *buf);
 int lsCommand(train_t t, int net_fd, MYSQL *mysql);
 
 //cd的命令
-int cdCommand(train_t t, int net_fd);
+int cdCommand(train_t t, int net_fd, MYSQL *sql);
 
 //pwd的命令
 int pwdCommand(train_t t, int net_fd);
@@ -229,13 +267,13 @@ int pwdCommand(train_t t, int net_fd);
 int putsCommand(train_t t, int net_fd);
 
 //gets的命令
-int getsCommand(train_t t, int net_fd);
+int getsCommand(train_t t, int net_fd, MYSQL *sql);
 
 //rm的命令
-int rmCommand(train_t t, int net_fd);
+int rmCommand(train_t t, int net_fd,MYSQL*mysql);
 
 //创建文件夹
-int mkdirCommand(train_t t, int net_fd);
+int mkdirCommand(train_t t, int net_fd, MYSQL *mysql);
 
 // 子线程的入口函数
 void *threadMain(void *p);
@@ -252,16 +290,43 @@ int writeLog(FILE *log_file, const char *level, const char *file, int line, cons
 void closeLog();
 
 //根据路径名验证数据库中用户信息
-int checkUserMsg(train_t t, MYSQL *mysql);
+int checkUserMsg(const char *user_name, MYSQL *mysql);
 
 //登录/注册动作函数
-//第一版第二版
+//第三版
 //将从客户端发来的用户名和密码进行验证
 //如果是登录行为，密码输入不正确，要求重试
 //如果是注册行为，用户名已经存在，则失败
 int loginRegisterSystem(train_t *t,  int net_fd, MYSQL *mysql);
 
 //子线程连接数据库函数
-int connectMysql(MYSQL *mysql);
+int connectMysql(MYSQL  **mysql);
+
+//验证密码
+//需要查找对应用户的盐值来获取hash值
+int checkPassword(const char *user_name, const char *password, MYSQL *mysql);
+
+//将得到的用户名和密码插入到users表中
+//密码需要盐值加密
+//密码还需要hash值
+int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysql);
+
+//定义盐值长度和sha512标识
+#define SALT_PREFIX "$6$"
+#define SALT_LENGTH 8
+//获取散列的函数
+//需要传入一个指向buf的空间
+//一个盐值
+//一个明文密码
+int getHashValue(char *buf, char *salt, const char *password);
+
+//根据用户名从数据库中获取uid的函数
+int getUidMysql(const char *user_name, MYSQL *mysql);
+//创建文件夹目录
+int insertDir(train_t t, char * real_path, char* filename,MYSQL*mysql);
+//删除文件
+int deleteFile(train_t t, char * file_path, MYSQL*mysql);
+
+int getFileId(train_t t, MYSQL * mysql);
 
 #endif

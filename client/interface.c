@@ -1,5 +1,37 @@
 #include "header.h"
 
+void printInterface(void)
+{
+    printf(" ________  ___       ________  ___  ___  ________     \n");
+    printf("|\\   ____\\|\\  \\     |\\   __  \\|\\  \\|\\  \\|\\   ___ \\    \n");
+    printf("\\ \\  \\___|\\ \\  \\    \\ \\  \\|\\  \\ \\  \\ \\  \\ \\  \\_\\ \\   \n");
+    printf(" \\ \\  \\    \\ \\  \\    \\ \\  \\ \\  \\ \\  \\ \\  \\ \\  \\ \\ \\  \n");
+    printf("  \\ \\  \\____\\ \\  \\____\\ \\  \\ \\  \\ \\  \\ \\  \\ \\  \\_\\ \\ \n");
+    printf("   \\ \\_______\\ \\_______\\ \\_______\\ \\_______\\ \\_______\\\n");
+    printf("    \\|_______|\\|_______|\\|_______|\\|_______|\\|_______|\n");
+    printf("                                                       \n");
+    
+    //打印系统信息
+    struct utsname sys_msg;
+    uname(&sys_msg);
+    printf("\n\n%s %s %s %s %s\n\n", 
+        sys_msg.sysname,
+        sys_msg.nodename,
+        sys_msg.release,
+        sys_msg.version,
+        sys_msg.machine
+    );
+    //打印登录选项
+    printf("Welcome to Cloud Storage Service!\n\n");
+    printf("Type 'exit' or 'quit' to sign out. \n\n");
+}
+
+void loginFunc(int num)
+{
+    printf("\n(Y) 登录  (R) 注册  (E)退出 > ");
+    fflush(stdout);
+}
+
 //客户端的用户操作界面
 //录入用户第一次操作时的自定义协议
 //并将初始用户名加入到路径名中
@@ -9,19 +41,20 @@ int interface(train_t *t, int socket_fd)
     //获取选项
     while(1)
     {
-        LOG_INFO("展示登录界面");
+        signal(SIGINT, loginFunc);
+        LOG_INFO("Show login options.");
         bzero(t, sizeof(train_t));
+        t->isLoginFailed = 1;
         printf("(Y) 登录  (R) 注册  (E)退出 > ");
         fflush(stdout);
         char option[512] = {0};
-        LOG_INFO("等待键盘输入");
         ssize_t rret = read(STDIN_FILENO, option, sizeof(option) - 1);
         ERROR_CHECK(rret, -1, "read");
         switch(option[0])
         {
         case 'y':
         case 'Y':
-            LOG_INFO("用户登录");
+            LOG_INFO("Login");
             ret = loginSystem(t, socket_fd);
             if(ret != 0)
             {
@@ -34,23 +67,12 @@ int interface(train_t *t, int socket_fd)
                 continue;
             }
             printf("登录成功\n\n");
-            //打印系统信息
-            struct utsname sys_msg;
-            ret = uname(&sys_msg);
-            ERROR_CHECK(ret, -1, "uname");
-            printf("\n\n%s %s %s %s %s\n\n", 
-                sys_msg.sysname,
-                sys_msg.nodename,
-                sys_msg.release,
-                sys_msg.version,
-                sys_msg.machine
-            );
-            //打印登录选项
-            printf("Welcome to Cloud Storage Service!\n\n");
+            //打印用户界面
+            printInterface();
             return 0;
         case 'r':
         case 'R':
-            LOG_INFO("用户注册");
+            LOG_INFO("Register");
             ret = registerSystem(t, socket_fd);
             if(ret != 0)
             {

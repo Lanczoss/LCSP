@@ -21,6 +21,10 @@ int getEnum(char *str){
         return PWD;
     } else if (strcmp(str, "gets") == 0) {
         return GETS;
+    } else if (strcmp(str, "exit") == 0) {
+        return EXIT;
+    } else if (strcmp(str, "quit") == 0) {
+        return EXIT;
     } else {
         printf("命令输入错误\n");
         return FALSE;
