@@ -15,7 +15,7 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
         //pwdCommand(t, net_fd);
         return 0;
     case PUTS:
-        putsCommand(*t, net_fd);
+        putsCommand(*t, net_fd,mysql);
         return 0;
     case GETS:
         // getsCommand(t, net_fd);

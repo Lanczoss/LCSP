@@ -265,7 +265,7 @@ int cdCommand(train_t t, int net_fd, MYSQL *sql);
 int pwdCommand(train_t t, int net_fd);
 
 //puts的命令
-int putsCommand(train_t t, int net_fd);
+int putsCommand(train_t t, int net_fd,MYSQL *mysql);
 
 //gets的命令
 int getsCommand(train_t t, int net_fd, MYSQL *sql);
