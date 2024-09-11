@@ -15,12 +15,12 @@ int getFileId(train_t t, MYSQL *mysql){
 
     splitParameter(t, 0, file_path);
     // TODO:打印调试信息
-    printf("uid: %d, file_path: %s\n", uid, file_path);
 
     //使用 snprintf 拼接查询语句，查找用户文件目录id
 
     snprintf(query, sizeof(query),
              "select id from files where uid = %d and file_path = '%s'",uid, file_path);
+    
     // 执行查询语句以查询根目录
     if(mysql_query(mysql, query)){
         fprintf(stderr, "Query filed : %s \n ", mysql_error(mysql));
@@ -52,7 +52,7 @@ int getFileId(train_t t, MYSQL *mysql){
 
     // 释放查询结果集
     mysql_free_result(result);
-
+    
     // 返回查找到的文件ID或-1(未找到)
     return file_id;
 

@@ -47,7 +47,8 @@ enum
     MKDIR,
     ABNORMAL,
     NORMAL,
-    EXIT
+    EXIT,
+    RENAME
 };
 
 //自定义协议头部信息
@@ -255,7 +256,7 @@ int pathConcat(train_t t, char *real_path);
 int splitParameter(train_t t, int num, char *buf);
 
 //ls的命令
-int lsCommand(train_t t, int net_fd);
+int lsCommand(train_t t, int net_fd, MYSQL *mysql);
 
 //cd的命令
 int cdCommand(train_t t, int net_fd, MYSQL *sql);
@@ -274,6 +275,9 @@ int rmCommand(train_t t, int net_fd,MYSQL*mysql);
 
 //创建文件夹
 int mkdirCommand(train_t t, int net_fd, MYSQL *mysql);
+
+//重命名文件
+int reName(train_t t, int net_fd, MYSQL*mysql);
 
 // 子线程的入口函数
 void *threadMain(void *p);

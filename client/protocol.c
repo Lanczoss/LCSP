@@ -18,7 +18,7 @@ int analysisProtocol(train_t *t, int socket_fd)
         putsCommand(*t, socket_fd);
         break;
     case GETS:
-        getsCommand(*t, socket_fd);
+        //getsCommand(*t, socket_fd);
         break;
     case REMOVE:
         printf("暂时未完成！\n");
@@ -33,6 +33,9 @@ int analysisProtocol(train_t *t, int socket_fd)
         //t->isLoginFailed = 1;
         //printf("\n");
         return -1;
+        break;
+    case RENAME:
+        reName(*t, socket_fd);
         break;
     default:
         printf("没有此命令.\n");
