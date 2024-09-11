@@ -1,132 +1,270 @@
 #include "header.h"
 
 
-int getFilePath(char *src, char *file_name){
-    char *token;
+int getFileId(train_t t, MYSQL *mysql){
+    MYSQL_ROW row;
+    MYSQL_RES *result;
+    char query[2048] = { 0 };   // 存储sql查询
+    char file_path[1024] = { 0 };  // 存储用户提供的file_path
+    int uid;              // 用户ID
+    int file_id = -1;     // 最终找到的文件或目录的ID
 
-    // 获取第一个子字符串
-    token = strtok(src, " ");
+    // 从train_t 获取pid和file_path
+    uid = t.uid;
 
-    // 将第二个字符串拼接形成文件路径
-    token = strtok(NULL, " ");
-    strncat(file_name, token, strlen(token));
+    // 拼接真实路径
 
-    return 0;
-}
+    splitParameter(t, 0, file_path);
+    // TODO:打印调试信息
+    printf("uid: %d, file_path: %s\n", uid, file_path);
 
-int removeLineBreak(char *real_path){
-    // 找到换行符的位置
-    size_t len = strcspn(real_path, "\n");
+    //使用 snprintf 拼接查询语句，查找用户文件目录id
 
-    // 如果找到了换行符，len 小于路径名的长度
-    if (len < strlen(real_path)) {
-        real_path[len] = '\0'; // 将换行符替换为字符串终止符
-    }
-
-    return 0;
-}
-
-int getsCommand(train_t t, int net_fd){
-    char real_path[1024] = { 0 };
-
-    // 获得文件的绝对路径
-    pathConcat(t, real_path);
-    
-
-    // 拼接文件的真实路径
-    char src[1024] = { 0 };
-    strcpy(src,t.control_msg);
-    getFilePath(src, real_path);
-
-    // 去掉路径中的换行符
-    removeLineBreak(real_path);
-     
-    // 打开文件
-
-    int file_fd = open(real_path, O_RDWR);
-
-    if(file_fd == -1){
-        // 文件不存在，直接返回错误信息
-        // TODO 修改错误标志
-        t.error_flag = 1;
-        send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
+    snprintf(query, sizeof(query),
+             "select id from files where uid = %d and file_path = '%s'",uid, file_path);
+    // 执行查询语句以查询根目录
+    if(mysql_query(mysql, query)){
+        fprintf(stderr, "Query filed : %s \n ", mysql_error(mysql));
         return -1;
     }
 
-    send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
+    // 处理查询结果
+    result = mysql_store_result(mysql);
+    if (result == NULL) {
+        fprintf(stderr, "Failed to get resultult set: %s\n", mysql_error(mysql));
+        mysql_close(mysql);
+        return -1;
+    }
 
-    // 发送文件
-    // 获取文件大小
-    struct stat st;
-    memset(&st, 0, sizeof(st));
-    fstat(file_fd, &st);
+    // 验证行数
+    my_ulonglong num_rows = mysql_num_rows(result);
+    if(num_rows == 0){
+        printf("未找到任何行 \n");
+    }else{
+        printf("行数: %lu\n", num_rows);
+    }
 
-    // 先发文件大小给客户端
-    send(net_fd, &st.st_size, sizeof(off_t), MSG_NOSIGNAL);
+    // 获取列数
+    if((row = mysql_fetch_row(result)) != NULL){
+        file_id = atoi((row[0]));
+    }else{
+        printf("没有匹配的uid=%d\n",uid);
+    }
 
-    // 使用sendfile:零拷贝
-    sendfile(net_fd, file_fd, NULL, st.st_size);
+    // 释放查询结果集
+    mysql_free_result(result);
 
-    close(file_fd);
+    // 返回查找到的文件ID或-1(未找到)
+    return file_id;
 
-    return 0;
 }
 
-
-int lsCommand(train_t t, int net_fd){
-
-    char real_path[1024] = { 0 };
-    pathConcat(t, real_path);
-
-
-    // 将路径拼接在命令后构成在服务端运行的完整命令
-    char cmd[1024] = "ls ";
-    if(t.parameter_num == 1){
-        char src[1024] = { 0 };
-        strcpy(src, t.control_msg);
-        getFilePath(src, real_path);
-        strncat(cmd, real_path, strlen(real_path));
-
-    }
-    strncat(cmd, real_path, strlen(real_path));
+int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
+    MYSQL_STMT *stmt;
+    MYSQL_BIND bind[1];
+    MYSQL_BIND result[1];
+    int id = getFileId(t, mysql); // 参数通过getfileid获得文件的索引id
 
 
-    removeLineBreak(real_path);
-    
-    DIR *ret_open = opendir(real_path);
-    
-    
-    if(ret_open == NULL){
-        t.error_flag = 1;
+    // 对id做一下错误判断
+    // id如果为-1，说明表中没有这条数据
+    // 那就更别提以该id为pid的文件或文件夹了
+    if(id == -1){
+        // 错误标志为设为 2
+        // 说明表中无该路径的记录
+        t.error_flag = 2;
+
         send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
-        closedir(ret_open);
+        // 清理资源
+        mysql_stmt_close(stmt);
+
         return -1;
+    }
+
+    // 多send一次
+    send(net_fd, &t, sizeof(t), MSG_NOSIGNAL);
+
+
+    char res[256] = { 0 }; // 结果集
+    bool isNull;
+    const char *query = "select file_name from files where pid = ?";
+
+
+    // 设置字符编码格式为utf8mb4
+    mysql_set_character_set(mysql, "utf8mb4");
+
+
+    // 初始化预处理语句
+    stmt = mysql_stmt_init(mysql);
+
+    // 准备SQL查询
+    mysql_stmt_prepare(stmt, query, strlen(query));
+
+    // 绑定参数
+    memset(bind, 0, sizeof(bind));
+    bind[0].buffer_type = MYSQL_TYPE_LONG;
+    bind[0].buffer = &id;
+    bind[0].is_null = 0;
+    bind[0].length = 0;
+    mysql_stmt_bind_param(stmt, bind);
+
+    // 执行查询
+    mysql_stmt_execute(stmt);
+
+
+    //存储结果集
+    mysql_stmt_store_result(stmt);
+
+    // 绑定结果
+    memset(result, 0, sizeof(result));
+    result[0].buffer_type = MYSQL_TYPE_STRING;
+    result[0].buffer = res;
+    result[0].buffer_length = sizeof(res);
+    result[0].is_null = &isNull; 
+
+    mysql_stmt_bind_result(stmt,result);
+
+
+    // 获取结果集的行数
+    int row_count;
+    row_count = mysql_stmt_num_rows(stmt);
+
+    if(row_count == 0){
+
+        printf("未查询到任何数据\n");
+        // ls 0参时未查到，说明该目录下无任何文件或文件夹
+        // 错误标志设为3
+        t.error_flag = 3;
+        send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
+        // 清理资源
+        mysql_stmt_close(stmt);
+        return 0;
 
     }
-    closedir(ret_open);
+
+    // 发送信息,查到数据
     send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
 
-    FILE *fp;
+    // 取回结果
     char buffer[1024] = { 0 };
-    char send_msg[1024] = { 0 };
-    // 打开popen管道,执行命令
-    fp = popen(cmd, "r");
+    int len = 0;
+    int blank_space = 0;
+    while(mysql_stmt_fetch(stmt) == 0){
 
-
-    // 将命令的输出读取到send_msg里
-    while(fgets(buffer, sizeof(buffer), fp) != NULL){
-        strncat(send_msg, buffer, strlen(buffer));
+        printf("#%ld#", strlen(res));
+        res[strlen(res)] = '\0';
+        printf("file_name:%s\n",res);
+        strncat(buffer, res, strlen(res));
+        len += strlen(res);
+        buffer[len + blank_space] = 32;
+        blank_space++;
     }
 
-    pclose(fp);
+    printf("%s\n", buffer);
+    //TODO 发送内容到客户端
 
-    // 发送传输文件大小
-    off_t size = strlen(send_msg) + 1;
+    int file_size = strlen(buffer);
+    // 先发文件大小，再发内容
+    send(net_fd, &file_size, sizeof(int), MSG_NOSIGNAL);
 
-    send(net_fd, &size, sizeof(off_t), MSG_NOSIGNAL);
+    send(net_fd, buffer, file_size, MSG_NOSIGNAL);
 
-    // 发送ls执行后的输出结果
-    send(net_fd, send_msg, size, MSG_NOSIGNAL);
+    // 清理资源
+    mysql_stmt_close(stmt);
+
+
+    // 错误处理 返回-1
+    return 0;
+
+
+}
+int lsCommand(train_t t, int net_fd, MYSQL *mysql){
+
+    // 参数大于1，修改错误标志返回给客户端
+    if(t.parameter_num > 1){
+        // 错误标志设为1
+        t.error_flag = 1;
+        send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
+        return 0;
+    }
+
+    // ls 直接打印用户当前所在路径下的内容
+    if(t.parameter_num == 0){
+        // ls后无参ls一定查表成功
+        pwdCurrent(t, net_fd, mysql);
+        return 0;
+
+    }
+    // ls后有一个参数
+    char path[256] = { 0 };
+    char para[256] = { 0 };
+
+    // 获得客户端目前路径
+    strncpy(path, t.control_msg, t.path_length);
+    // 获得第一个参数
+    splitParameter(t, 1, para); 
+
+    // 如果参数不以斜杠开头，添加一个斜杠
+    if(para[0] != '/'){
+        size_t len = strlen(para);
+        memmove(para + 1, para, len + 1);
+        para[0] = '/';
+    }
+
+    // 比较客户端目前路径和参数
+    if(strcmp(path, para) == 0){
+        //相等说明等价于ls
+        pwdCurrent(t, net_fd, mysql);
+        return 0;
+    }
+
+    // 检查参数是否是以当前路径开头
+    if(strncmp(para, path, t.path_length) == 0){
+        // 进入才查表
+        train_t new_t;
+        bzero(&new_t, sizeof(new_t));
+
+        // 初始化
+        new_t.command = LS;
+        new_t.path_length = strlen(para);
+        new_t.uid = t.uid;
+        strncpy(new_t.control_msg, para, strlen(para));
+
+        // 这时再去ls, 去获得路径的id不一定成功，需错误处理
+        pwdCurrent(new_t, net_fd, mysql);
+        return 0;
+    }
+
+    // 到这里说明参数和路径不相等且不以当前路径开头
+    // 且参数是带斜杠的，需特殊处理当前路径不为 / 当参数只有 /
+    // 非法操作
+    if(strlen(para) == 1 && para[0] == '/'){
+        // 错误标志设为4
+        t.error_flag = 4;
+        // TODO 发送错误信息
+
+        send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
+
+        return 0;
+    }
+
+    // 到这里说明参数与路径完全不相同，且以斜杠开头
+    // 直接将参数拼接到路径里，再去查表
+    // 未查到说明拼接目录下无内容，或者当前目录下没有该目录或者文件
+
+    train_t new_t;
+    bzero(&t, sizeof(t));
+
+    // 初始化
+    new_t.command = LS;
+    // 将参数拼接到路径后
+    strncat(path, para, strlen(para));
+    new_t.path_length = strlen(path);
+    new_t.uid = t.uid;
+    strncpy(new_t.control_msg, path, strlen(path));
+
+    // 同样去ls
+    pwdCurrent(new_t, net_fd, mysql);
 
     return 0;
 }
