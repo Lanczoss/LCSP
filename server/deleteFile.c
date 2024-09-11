@@ -52,7 +52,7 @@ int deleteFile(train_t t, char * file_path, MYSQL* mysql){
              "UPDATE files AS f "
              "INNER JOIN (SELECT id FROM files WHERE file_path = '%s' AND uid = %d) AS subquery "
              "ON f.pid = subquery.id "
-             "SET f.delete_flag = 1;",
+             "SET f.delete_flag = -1;",
              file_path, t.uid);
     LOG_INFO(sql);
 
