@@ -59,6 +59,8 @@ int mkdirCommand(train_t t, int socket_fd,MYSQL* mysql) {
         }
         if(insertDir(t,real_path,filename,mysql) == 0){
             LOG_INFO("创建文件夹成功！\n");
+            char str[] = "创建文件夹成功!";
+            send(socket_fd,str,strlen(str),MSG_NOSIGNAL);
         }else{
             char str[] = "创建文件夹失败！\n";
             send(socket_fd,str,strlen(str),MSG_NOSIGNAL);

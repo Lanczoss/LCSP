@@ -9,7 +9,6 @@ int rmCommand(train_t t, int net_fd,MYSQL *mysql)
     //strcat(real_path, "/");
 
     int parma_num = t.parameter_num; 
-    printf("parma_num:%d\n",parma_num);
     for(int i = 0;i < parma_num;i++){
         // 获取服务端path路径
         char real_path[1024] = { 0 };
@@ -20,7 +19,8 @@ int rmCommand(train_t t, int net_fd,MYSQL *mysql)
         splitParameter(t, (i+1), filename);
 
         if(filename[0] == '/'){
-            printf("不能删除根目录文件夹!\n");
+            char str[] = "不能删除根目录文件夹!";
+            send(net_fd,str,strlen(str),MSG_NOSIGNAL);
             return -1;
         }
 
@@ -31,9 +31,12 @@ int rmCommand(train_t t, int net_fd,MYSQL *mysql)
         int ret = deleteFile(t, real_path, mysql);
         printf("ret:%d\n",ret);
         if(ret == 0){
-            printf("删除文件成功\n");
+            char str[] = "删除文件成功！";
+            send(net_fd,str,strlen(str),MSG_NOSIGNAL);
+
         }else{
-            printf("删除文件失败!\n");
+            char str[] = "删除文件失败！";
+            send(net_fd,str,strlen(str),MSG_NOSIGNAL);
         }
     }
 

@@ -17,7 +17,7 @@ int deleteFile(train_t t, char * file_path, MYSQL* mysql){
     snprintf(check_sql, sizeof(check_sql),
              "SELECT id FROM files WHERE uid = %d AND file_path = '%s'AND delete_flag = 1 ",
              t.uid, file_path);
-    printf("check_sql:#%s#\n",check_sql);
+    LOG_INFO(check_sql);
     if (mysql_query(mysql, check_sql)) {
         fprintf(stderr, "检测文件夹存在性失败: %s\n", mysql_error(mysql));
         return -1;
@@ -54,7 +54,7 @@ int deleteFile(train_t t, char * file_path, MYSQL* mysql){
              "ON f.pid = subquery.id "
              "SET f.delete_flag = 1;",
              file_path, t.uid);
-    printf("son_sql:%s\n",sql);
+    LOG_INFO(sql);
 
     if(mysql_query(mysql,sql)){
         printf("%s\n",mysql_error(mysql));
@@ -68,7 +68,7 @@ int deleteFile(train_t t, char * file_path, MYSQL* mysql){
     snprintf(sql,sizeof(sql),
              "UPDATE files set delete_flag = 1 where file_path = '%s'",
              file_path);
-    printf("sql:#%s#\n",sql);
+    LOG_INFO(sql);
 
     if(mysql_query(mysql,sql)){
         printf("%s\n",mysql_error(mysql));
