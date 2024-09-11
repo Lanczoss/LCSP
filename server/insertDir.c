@@ -38,7 +38,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     //检测数据库存不存在此文件夹
     char check_sql[4096] = { 0 };
     snprintf(check_sql, sizeof(check_sql),
-             "SELECT id FROM files WHERE uid = %d AND file_path = '%s'",
+             "SELECT id FROM files WHERE uid = %d AND file_path = '%s' AND delete_flag = 0",
              t.uid, file_path);
     
     if (mysql_query(mysql, check_sql)) {
