@@ -256,7 +256,7 @@ int pathConcat(train_t t, char *real_path);
 int splitParameter(train_t t, int num, char *buf);
 
 //ls的命令
-int lsCommand(train_t t, int net_fd);
+int lsCommand(train_t t, int net_fd, MYSQL *mysql);
 
 //cd的命令
 int cdCommand(train_t t, int net_fd, MYSQL *sql);
