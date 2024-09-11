@@ -33,9 +33,11 @@ int reName(train_t t, int net_fd, MYSQL* mysql){
     printf("check_sql:#%s#\n",check_sql);
     mysql_query(mysql,check_sql);
     res = mysql_store_result(mysql);
+
     //判空
     if(res == NULL){
-        printf("该文件不存在!\n");
+        char str[] = "该文件不存在!\n";
+        send(net_fd,str,strlen(str),MSG_NOSIGNAL);
         return -1;
     }
 
@@ -47,7 +49,8 @@ int reName(train_t t, int net_fd, MYSQL* mysql){
     mysql_query(mysql, check_sql);
     res = mysql_store_result(mysql);
     if(mysql_num_rows(res) > 0){
-        printf("新文件已存在!\n");
+        char str[] = "新文件已存在!\n";
+        send(net_fd,str,strlen(str),MSG_NOSIGNAL);
         return -1;
     }
 
@@ -67,5 +70,8 @@ int reName(train_t t, int net_fd, MYSQL* mysql){
     
     mysql_free_result(res);
 
+    char str[] = "改名成功！\n";
+    send(net_fd,str,strlen(str),MSG_NOSIGNAL);
+    LOG_ERROR("rename_send");
     return 0;
 }

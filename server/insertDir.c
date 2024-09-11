@@ -21,7 +21,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     mysql_set_character_set(mysql, "utf8mb4");
 
     //获取pid
-    char pid[20] = { 0 };
+    int pid = 0;
     char sql_pid[1024] = { 0 };
     snprintf(sql_pid, sizeof(sql_pid), 
               "SELECT id FROM files WHERE file_path = '%s'", real_path);
@@ -31,7 +31,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     
     while((row = mysql_fetch_row(res))){
         for(int i = 0;i < mysql_num_fields(res);i++){        //获取pid
-            strcpy(pid,row[i]);
+            pid = atoi(row[0]);
         }
     }
     
@@ -66,7 +66,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     bzero(sql,sizeof(sql));
     snprintf(sql, sizeof(sql),
              "INSERT INTO files (file_name,uid,pid,file_path,file_type,create_time,update_time)"
-             "VALUES ('%s', %d, %s, '%s', 1, now(),now())",
+             "VALUES ('%s', %d, %d, '%s', 1, now(),now())",
              dirname, t.uid, pid, file_path);
 
     LOG_INFO(sql);
