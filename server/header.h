@@ -243,7 +243,7 @@ int addEpoll(int epoll_fd, int fd);
 int doWorker(MYSQL *mysql, int net_fd);
 
 //分析协议
-int analysisProtocol(train_t t, int net_fd, MYSQL *mysql);
+int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql);
 
 //路径拼接
 int pathConcat(train_t t, char *real_path);
