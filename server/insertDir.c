@@ -3,23 +3,9 @@
 
 int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     
-    //判断路径是否为跟或者目录
-    //以路径结尾是否为"/"区分
-    if(real_path[strlen(real_path) - 1] != '/'){
-       //末尾添加'/' 
-       strcat(real_path, "/");
-    }
-
-    char file_path[1024] = { 0 };
-    strcpy(file_path, real_path);
-    strcat(file_path,dirname);
-    
     MYSQL_RES *res;
     MYSQL_ROW row;
     
-    //设置字符编码
-    mysql_set_character_set(mysql, "utf8mb4");
-
     //获取pid
     int pid = 0;
     char sql_pid[1024] = { 0 };
@@ -35,6 +21,20 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
         }
     }
     printf("%d\n",pid);
+    //判断路径是否为跟或者目录
+    //以路径结尾是否为"/"区分
+    if(real_path[strlen(real_path) - 1] != '/'){
+       //末尾添加'/' 
+       strcat(real_path, "/");
+    }
+
+    char file_path[1024] = { 0 };
+    strcpy(file_path, real_path);
+    strcat(file_path,dirname);
+    
+    //设置字符编码
+    mysql_set_character_set(mysql, "utf8mb4");
+
     //检测数据库存不存在此文件夹
     char check_sql[4096] = { 0 };
     snprintf(check_sql, sizeof(check_sql),
