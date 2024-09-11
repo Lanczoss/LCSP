@@ -145,7 +145,7 @@ int lsCommand(train_t t, int socket_fd){
         printf("进入\n");
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
         if(t.error_flag == 4){
-            printf("非法参数\n");
+            printf("非法参数，参数个数不能大于1！\n");
         }
         return 0;
     }

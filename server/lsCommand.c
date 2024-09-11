@@ -41,7 +41,7 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
 
     char res[256] = { 0 }; // 结果集
     bool isNull;
-    const char *query = "select file_name from files where pid = ?";
+    const char *query = "select file_name from files where pid = ? and delete_flag = 0";
 
 
     // 设置字符编码格式为utf8mb4
