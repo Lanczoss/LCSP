@@ -30,6 +30,17 @@ int splitParameter(train_t t, int num, char *buf){
     return 0;
 }
 
+int removeLineBreak(char *real_path){
+    // 找到换行符的位置
+    size_t len = strcspn(real_path, "\n");
+
+    // 如果找到了换行符，len 小于路径名的长度
+    if (len < strlen(real_path)) {
+        real_path[len] = '\0'; // 将换行符替换为字符串终止符
+    }
+
+    return 0;
+}
 
 
 int lsCommand(train_t t, int socket_fd){
@@ -88,7 +99,13 @@ int lsCommand(train_t t, int socket_fd){
         memmove(para + 1, para, len + 1);
         para[0] = '/';
     }
+    
+    // 去掉para后的换行符
+    removeLineBreak(para);
 
+    printf("当前path#%s#\n", path);
+    printf("当前para#%s#\n", para);
+    
     // 客户端目前路径和参数一样
     // 相当于ls无参
     if(strcmp(path, para) == 0){
@@ -121,6 +138,19 @@ int lsCommand(train_t t, int socket_fd){
         return 0;
 
     }
+    
+    // 进入判读参数合法
+    printf("判断参数\n");
+    if(strlen(para) == 1 && para[0] == '/'){
+        printf("进入\n");
+        recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
+        if(t.error_flag == 4){
+            printf("非法参数\n");
+        }
+        return 0;
+    }
+    printf("没进入\n");
+    
 
     // 检查参数是否是以当前路径开头
     if(strncmp(para, path, t.path_length) == 0){
@@ -160,13 +190,6 @@ int lsCommand(train_t t, int socket_fd){
 
     }
 
-    if(strlen(para) == 1 && para[0] == '/'){
-        recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
-        if(t.error_flag == 4){
-            printf("非法参数\n");
-        }
-        return 0;
-    }
 
 
     // 到这里就是参数不以路径开头，且不相同

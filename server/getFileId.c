@@ -21,6 +21,8 @@ int getFileId(train_t t, MYSQL *mysql){
 
     snprintf(query, sizeof(query),
              "select id from files where uid = %d and file_path = '%s'",uid, file_path);
+    
+    printf("%s\n",query);
     // 执行查询语句以查询根目录
     if(mysql_query(mysql, query)){
         fprintf(stderr, "Query filed : %s \n ", mysql_error(mysql));
@@ -52,7 +54,8 @@ int getFileId(train_t t, MYSQL *mysql){
 
     // 释放查询结果集
     mysql_free_result(result);
-
+    
+    printf("#1#\n");
     // 返回查找到的文件ID或-1(未找到)
     return file_id;
 

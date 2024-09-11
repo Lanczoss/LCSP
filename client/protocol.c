@@ -18,7 +18,7 @@ int analysisProtocol(train_t *t, int socket_fd)
         putsCommand(*t, socket_fd);
         break;
     case GETS:
-        getsCommand(*t, socket_fd);
+        //getsCommand(*t, socket_fd);
         break;
     case REMOVE:
         printf("暂时未完成！\n");
