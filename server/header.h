@@ -126,7 +126,11 @@ typedef struct pool_s
 extern FILE *log_info_file;
 extern FILE *log_error_file;
 // 定义日志级别的宏
-// 使用示例:LOG_INFO("正确信息");  LOG_PERROR("错误信息"); LOG_MYSQL_ERROR(mysql);
+// 使用示例:LOG_INFO("正确信息");打印到info.log
+// 例如打开文件：ERROR_CHECK(file_fd, -1, "open"),  记录到error.log
+// LOG_MYSQL_ERROR(mysql);  检查mysql 记录到error.log
+// CHECK_MYSQL_RESULT(result);  检查 MYSQL_RES 是否为 NULL 并记录错误 记录到error.log
+// CHECK_NUM_ROWS(rows);    检查行数是否为 0 并记录信息 记录到error.log
 // 日志级别宏
 #define LOG_INFO(message) \
     do { \
@@ -174,7 +178,24 @@ extern FILE *log_error_file;
             LOG_ERROR(error_msg); \
         } \
     } while (0)
+// 检查 MYSQL_RES 是否为 NULL 并记录错误  
+#define CHECK_MYSQL_RESULT(result) \
+    do { \
+        if ((result) == NULL) { \
+            LOG_ERROR("mysql_store_result() 返回 NULL"); \
+            LOG_MYSQL_ERROR(mysql); \
+        } \
+    } while (0)  
 
+// 检查行数是否为 0 并记录信息  
+#define CHECK_NUM_ROWS(num_rows) \
+    do { \
+        if ((num_rows) == 0) { \
+            LOG_ERROR("未找到任何行。"); \
+        } else { \
+            printf("行数: %lu\n", (unsigned long)(num_rows)); \
+        } \
+    } while (0)
 
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
