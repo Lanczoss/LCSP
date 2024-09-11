@@ -6,11 +6,7 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
     switch(t->command)
     {
     case LS:
-<<<<<<< HEAD
-        lsCommand(t, net_fd, mysql);
-=======
-        lsCommand(*t, net_fd);
->>>>>>> d01767d28de6e20f063c678006b39895c0dedbb1
+        lsCommand(*t, net_fd, mysql);
         return 0;
     case CD:
         cdCommand(*t, net_fd, mysql);
