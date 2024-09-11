@@ -7,8 +7,10 @@ int checkUserMsg(const char *user_name, MYSQL *mysql)
 {
     //登录行为/注册行为
     //需要从users表中的user_name对比
-    mysql_query(mysql, "select user_name from users");
-    printf("%s\n", mysql_error(mysql));
+    if(mysql_query(mysql, "select user_name from users"))
+    {
+        printf("%s\n", mysql_error(mysql));
+    }
     MYSQL_RES *res = mysql_store_result(mysql);
     if(res == NULL)
     {
@@ -48,12 +50,16 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
 
     //根据用户名获取盐值
     sprintf(tmp, "select salt, passwd from users where user_name='%s'", user_name);
-    mysql_query(mysql, tmp);
-    printf("%s\n", mysql_error(mysql));
+    if(mysql_query(mysql, tmp))
+    {
+        printf("%s\n", mysql_error(mysql));
+        return -1;
+    }
     MYSQL_RES *res = mysql_store_result(mysql);
     if(res == NULL)
     {
         printf("%s\n", mysql_error(mysql));
+        return -1;
     }
     MYSQL_ROW row;
     while((row = mysql_fetch_row(res)) != NULL)
@@ -61,10 +67,7 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
         strcpy(salt, row[0]);
         //根据盐值计算散列
         char *encrypted = crypt(password, salt);
-        if (encrypted == NULL) {
-            perror("计算失败 \n");
-            return 0;
-        }
+        ERROR_CHECK(encrypted, NULL, "Calculate crypt failed");
         strcpy(encrypted_password, encrypted);
 
         //根据用户名获取散列值

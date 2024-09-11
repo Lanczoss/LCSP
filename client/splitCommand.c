@@ -21,6 +21,12 @@ int getEnum(char *str){
         return PWD;
     } else if (strcmp(str, "gets") == 0) {
         return GETS;
+    } else if (strcmp(str, "e") == 0 || strcmp(str, "q") == 0) {
+        return EXIT;
+    } else if (strcmp(str, "quit") == 0 || strcmp(str, "exit") == 0) {
+        return EXIT;
+    }   else if (strcmp(str, "rename") == 0) {
+        return RENAME;
     } else {
         printf("命令输入错误\n");
         return FALSE;
@@ -61,10 +67,16 @@ int splitCommand(train_t *t, char *buf){
     
     //将路径存放到自定义协议
     strncpy(t->control_msg, path, strlen(path));
+<<<<<<< HEAD
     //判断最后一位字符是不是'/'
     //if(t->control_msg[strlen(t->control_msg) - 1] != '/'){
         // 不是则手动添加
         // strcat(t->control_msg, "/");
+=======
+    //if(t->control_msg[strlen(t->control_msg) - 1] != '/'){
+    //    //不是则手动添加
+    //    strcat(t->control_msg, "/");
+>>>>>>> a8ff77d81ffa874e240a36effa25a93c9b31a647
     //}
     t->control_msg[strlen(t->control_msg)] = ' ';
 
@@ -85,7 +97,12 @@ int splitCommand(train_t *t, char *buf){
         strncat(t->control_msg,parma,strlen(parma));
         t->control_msg[strlen(t->control_msg)] = ' ';
     }
+<<<<<<< HEAD
     printf("\n");
+=======
+    
+    printf("#%s#\n", t->control_msg);
+>>>>>>> a8ff77d81ffa874e240a36effa25a93c9b31a647
     return 0;
 }
 

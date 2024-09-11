@@ -18,18 +18,24 @@ int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysq
             salt,
             encrypted_pwd
         );
-    mysql_query(mysql, tmp);
-    printf("%s\n", mysql_error(mysql));
-    printf("%s\n", tmp);
+    if(mysql_query(mysql, tmp))
+    {
+        printf("%s\n", mysql_error(mysql));
+        return -1;
+    }
+    //printf("%s\n", tmp);
 
     bzero(tmp, sizeof(tmp));
     //向files表插入注册信息
     sprintf(tmp, "insert into files (id, file_name, uid, pid, file_path, file_type, hash, create_time, update_time, delete_flag) values (NULL, '/', %d, -1, '/', 1, NULL, now(), now(), 0)",
             getUidMysql(user_name, mysql)
         );
-    mysql_query(mysql, tmp);
-    printf("%s\n", mysql_error(mysql));
-    printf("%s\n", tmp);
-    printf("插入成功\n");
+    if(mysql_query(mysql, tmp))
+    {
+        printf("%s\n", mysql_error(mysql));
+        return -1;
+    }
+    //printf("%s\n", tmp);
+    LOG_INFO("Register Msg insert into MySQL success");
     return 0;
 }

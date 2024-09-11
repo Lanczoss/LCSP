@@ -15,25 +15,21 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
         ERROR_CHECK(rret, -1, "recv");
         if(rret == 0)
         {
-            printf("对端关闭\n"); 
             return -1;
         }
-        
-
         //接收密码
         char password[1024] = {0};
         rret = recv(net_fd, password, t->file_length, MSG_WAITALL);
         ERROR_CHECK(rret, -1, "recv");
         if(rret == 0)
         {
-            printf("对端关闭\n"); 
             return -1;
         }
 
         char user_name[1024] = {0};
         //这里清除如zs/后面的斜杆
         strncpy(user_name, t->control_msg, t->path_length - 1);
-        printf("user_name = %s\n", user_name);
+        //printf("user_name = %s\n", user_name);
 
         //判断是否是注册行为 回复客户端是否登录成功
         if(t->isRegister == 0)
@@ -62,7 +58,12 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
                     //密码正确
                     //获取用户id
                     t->uid = getUidMysql(user_name, mysql);
-                    printf("%s的user_id = %d\n", user_name, t->uid);
+                    if(t->uid == -1)
+                    {
+                        t->isLoginFailed = 1;
+                        return -1;
+                    }
+                    //printf("%s的user_id = %d\n", user_name, t->uid);
                     bzero(t->control_msg, sizeof(t->control_msg));
                     strcpy(t->control_msg, "/");
                     t->path_length = 1;
@@ -79,7 +80,9 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
             if(ret == 0)
             {
                 //开始注册
-                registerInsertMysql(user_name, password, mysql);
+                ret = registerInsertMysql(user_name, password, mysql);
+                ERROR_CHECK(ret, -1, "Register Msg insert into MySQL failed.");
+                LOG_INFO("One client register success");
                 //注册成功
                 t->isLoginFailed = 0;
             }
@@ -92,7 +95,7 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
         //到这里要回复客户端是否登录成功
         //这里如果登录成功自定义协议里存有一个'/'和用户id
         rret = send(net_fd, t, sizeof(train_t), MSG_NOSIGNAL);
-        ERROR_CHECK(rret, -1, "对端关闭");
+        ERROR_CHECK(rret, -1, "send");
         if(t->isLoginFailed == 0 && t->isRegister == 0 && t->uid != 0)
         {
             //登录成功可以退出循环

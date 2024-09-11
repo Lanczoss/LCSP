@@ -44,6 +44,8 @@ enum
     MKDIR,
     ABNORMAL,
     NORMAL,
+    EXIT,
+    RENAME
 };
 
 //自定义协议头部信息
@@ -94,7 +96,11 @@ typedef struct train_s
 extern FILE *log_info_file;
 extern FILE *log_error_file;
 // 定义日志级别的宏
-// 使用示例:LOG_INFO("正确信息");  LOG_PERROR("错误信息");
+// 使用示例:LOG_INFO("正确信息");打印到info.log
+// 例如打开文件：ERROR_CHECK(file_fd, -1, "open"),  记录到error.log
+// LOG_MYSQL_ERROR(mysql);  检查mysql 记录到error.log
+// CHECK_MYSQL_RESULT(result);  检查 MYSQL_RES 是否为 NULL 并记录错误 记录到error.log
+// CHECK_NUM_ROWS(rows);    检查行数是否为 0 并记录信息 记录到error.log
 // 日志级别宏
 #define LOG_INFO(message) \
     do { \
@@ -128,7 +134,38 @@ extern FILE *log_error_file;
         snprintf(error_msg, sizeof(error_msg), "%s: %s", message, strerror(errno)); \
         LOG_ERROR(error_msg); \
     } while(0)
+// 定义LOG_MYSQL_ERROR宏，专门用于检测和记录MySQL的错误
+// 使用strlen(mysql_err) > 0是为了避免日志中出现大量的空字符
+// mysql_error在没有出错时返回空字符
+// 定义LOG_MYSQL_ERROR宏，专门用于检测和记录MySQL的错误
+#define LOG_MYSQL_ERROR(mysql) \
+    do { \
+        const char *mysql_err = mysql_error(mysql); \
+        if (mysql_err && strlen(mysql_err) > 0) { \
+            char error_msg[512]; \
+            snprintf(error_msg, sizeof(error_msg), "MySQL Error: %s", mysql_err); \
+            LOG_ERROR(error_msg); \
+        } \
+    } while (0)
 
+// 检查 MYSQL_RES 是否为 NULL 并记录错误
+#define CHECK_MYSQL_RESULT(result) \
+    do { \
+        if ((result) == NULL) { \
+            LOG_ERROR("mysql_store_result() 返回 NULL"); \
+            LOG_ERROR(mysql_error(&mysql)); \
+        } \
+    } while (0)
+
+// 检查行数是否为 0 并记录信息
+#define CHECK_NUM_ROWS(num_rows) \
+    do { \
+        if ((num_rows) == 0) { \
+            LOG_ERROR("未找到任何行。"); \
+        } else { \
+            printf("行数: %lu\n", (unsigned long)(num_rows)); \
+        } \
+    } while (0)
 // 检查命令行参数数量是否符合预期
 #define ARGS_CHECK(argc, expected) \
     do { \
@@ -190,10 +227,13 @@ int putsCommand(train_t t, int socket_fd);
 int getsCommand(train_t t, int socket_fd);
 
 //rm的命令
-int rmCommand(train_t *t, int socket_fd);
+int rmCommand(train_t t, int socket_fd);
 
 //mkdir的命令
 int mkdirCommand(train_t *t, int socket_fd);
+
+//重命名文件
+int reName(train_t t, int socket_fd);
 
 //客户端的用户操作界面
 //录入用户第一次操作时的自定义协议
