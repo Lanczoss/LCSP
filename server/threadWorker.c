@@ -64,7 +64,7 @@ int doWorker(MYSQL *mysql, int net_fd)
 
     while(1)
     {
-        if(t.isLoginFailed == 1)
+        while(t.isLoginFailed == 1)
         {
             //登录/注册逻辑函数
             int ret = loginRegisterSystem(&t, net_fd, mysql);
@@ -72,8 +72,8 @@ int doWorker(MYSQL *mysql, int net_fd)
             {
                 return -1;
             }
+            LOG_INFO("One client login success.");
         }
-        LOG_INFO("One client login success.");
         //到这里开始用户成功登录
         // 接受一次信息-》区分等下要分发给那个命令：
         ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
