@@ -58,6 +58,11 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
                     //密码正确
                     //获取用户id
                     t->uid = getUidMysql(user_name, mysql);
+                    if(t->uid == -1)
+                    {
+                        t->isLoginFailed = 1;
+                        return -1;
+                    }
                     //printf("%s的user_id = %d\n", user_name, t->uid);
                     bzero(t->control_msg, sizeof(t->control_msg));
                     strcpy(t->control_msg, "/");

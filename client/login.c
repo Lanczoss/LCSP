@@ -46,8 +46,6 @@ int loginSystem(train_t *t, int socket_fd)
     // 恢复原来的终端设置
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 
-
-
     //去除换行符
     password[strlen(password) - 1] = '\0';
     
@@ -65,7 +63,7 @@ int loginSystem(train_t *t, int socket_fd)
     //登录行为 接收服务器回复
     bzero(t, sizeof(train_t));
     rret = recv(socket_fd, t, sizeof(train_t), MSG_WAITALL);
-    ERROR_CHECK(rret, -1, "服务器关闭");
+    ERROR_CHECK(rret, -1, "recv");
     return 0;
 }
 
