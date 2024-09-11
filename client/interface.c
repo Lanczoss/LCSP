@@ -23,6 +23,13 @@ void printInterface(void)
     );
     //打印登录选项
     printf("Welcome to Cloud Storage Service!\n\n");
+    printf("Type 'exit' or 'quit' to sign out. \n\n");
+}
+
+void loginFunc(int num)
+{
+    printf("\n(Y) 登录  (R) 注册  (E)退出 > ");
+    fflush(stdout);
 }
 
 //客户端的用户操作界面
@@ -34,6 +41,7 @@ int interface(train_t *t, int socket_fd)
     //获取选项
     while(1)
     {
+        signal(SIGINT, loginFunc);
         LOG_INFO("Show login options.");
         bzero(t, sizeof(train_t));
         t->isLoginFailed = 1;

@@ -1,6 +1,17 @@
 #include "header.h"
 #include <termios.h>
 
+void enterPassword(int num)
+{
+    printf("\nEnter Password:");
+    fflush(stdout);
+}
+void enterUsername(int num)
+{
+    printf("\nEnter Username:");
+    fflush(stdout);
+}
+
 //登录动作函数
 //第一版第二版
 //将用户名和密码发送至服务器处接收
@@ -12,6 +23,7 @@ int loginSystem(train_t *t, int socket_fd)
     char user_path[1024] = {0};
     while(user_path[0] == '\0' || user_path[0] == '\n')
     {
+        signal(SIGINT, enterUsername);
         printf("Enter Username:");
         fflush(stdout);
         ssize_t rret = read(STDIN_FILENO, user_path, sizeof(user_path) - 1);
@@ -37,6 +49,7 @@ int loginSystem(train_t *t, int socket_fd)
     char password[1024] = {0};
     while(password[0] == '\0' || password[0] == '\n')
     {
+        signal(SIGINT, enterPassword);
         printf("Enter Password:");
         fflush(stdout);
         ssize_t rret = read(STDIN_FILENO, password, sizeof(password) - 1);

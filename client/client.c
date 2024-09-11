@@ -8,8 +8,18 @@ int checkConfig(void)
     return 0;
 }
 
+char user_path[1024] = {0};
+//接收SIGINT的信号处理函数
+void exitFunc(int num)
+{
+    //打印输入框
+    printf("\nCloud %s> ", user_path);
+    fflush(stdout);
+}
+
 int main(void)
 {
+    signal(SIGINT, exitFunc);
     LOG_INFO("Start cloud storage service client.");
     int ret = checkConfig();
     if(ret == -1)
@@ -40,11 +50,11 @@ int main(void)
                 exit(0);
             }
         }
+        signal(SIGINT, exitFunc);
         //到这里开始服务器已经接受了用户的登录
         //此时自定义协议里有路径名及路径名长度
         //printf("登录成功时 t->control_msg = %s\nt->path_length = %d\n", t.control_msg, t.path_length);
         //获取新一轮的路径名
-        char user_path[1024] = {0};
         strncpy(user_path, t.control_msg, t.path_length);
 
         //打印输入框

@@ -1,6 +1,22 @@
 #include "header.h"
 #include <termios.h>
 
+void enPassword(int num)
+{
+    printf("\nEnter Password:");
+    fflush(stdout);
+}
+void retypePassword(int num)
+{
+    printf("\nRetype Password:");
+    fflush(stdout);
+}
+void enUsername(int num)
+{
+    printf("\nEnter Username:");
+    fflush(stdout);
+}
+
 //注册动作函数
 //第一版第二版
 //将用户名和密码发送至服务器处接收
@@ -11,6 +27,7 @@ int registerSystem(train_t *t, int socket_fd)
     char user_path[512] = {0};
     while(user_path[0] == '\0' || user_path[0] == '\n')
     {
+        signal(SIGINT, enUsername);
         printf("Enter Username:");
         fflush(stdout);
         ssize_t rret = read(STDIN_FILENO, user_path, sizeof(user_path) - 1);
@@ -37,6 +54,7 @@ int registerSystem(train_t *t, int socket_fd)
         bzero(password, sizeof(password));
         while(password[0] == '\0' || password[0] == '\n')
         {
+            signal(SIGINT, enPassword);
             //读取两次密码
             printf("Enter Password:");
             fflush(stdout);
@@ -48,6 +66,7 @@ int registerSystem(train_t *t, int socket_fd)
         char compare_password[1024] = {0};
         while(compare_password[0] == '\0' || compare_password[0] == '\n')
         {
+            signal(SIGINT, retypePassword);
             printf("Retype Password:");
             fflush(stdout);
             ssize_t rret = read(STDIN_FILENO, compare_password, sizeof(compare_password));
