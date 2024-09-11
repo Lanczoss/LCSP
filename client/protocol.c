@@ -30,8 +30,9 @@ int analysisProtocol(train_t *t, int socket_fd)
         rmCommand(*t, socket_fd);
         break;
     case EXIT:
-        t->isLoginFailed = 1;
-        printf("\n");
+        //t->isLoginFailed = 1;
+        //printf("\n");
+        return -1;
         break;
     default:
         printf("没有此命令.\n");

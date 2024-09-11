@@ -30,8 +30,7 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
         rmCommand(*t, net_fd,mysql);
         break;
     case EXIT:
-        t->isLoginFailed = 1;
-        break;
+        return -1;
     default:
         LOG_INFO("Wrong command.");
         break;
