@@ -23,7 +23,7 @@ void printInterface(void)
     );
     //打印登录选项
     printf("Welcome to Cloud Storage Service!\n\n");
-    printf("Type 'exit' or 'quit' to sign out. \n\n");
+    printf("Type 'exit'('e') or 'quit'('q') to sign out. \n\n");
 }
 
 void loginFunc(int num)

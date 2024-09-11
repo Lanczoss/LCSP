@@ -21,9 +21,9 @@ int getEnum(char *str){
         return PWD;
     } else if (strcmp(str, "gets") == 0) {
         return GETS;
-    } else if (strcmp(str, "exit") == 0) {
+    } else if (strcmp(str, "e") == 0 || strcmp(str, "q") == 0) {
         return EXIT;
-    } else if (strcmp(str, "quit") == 0) {
+    } else if (strcmp(str, "quit") == 0 || strcmp(str, "exit") == 0) {
         return EXIT;
     }   else if (strcmp(str, "rename") == 0) {
         return RENAME;
