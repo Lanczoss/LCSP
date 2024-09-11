@@ -26,10 +26,7 @@ int getHashValue(char *buf, char *salt, const char *password)
 {
     getSaltValue(salt, SALT_LENGTH);
     char *encrypted = crypt(password, salt);
-    if (encrypted == NULL) {
-      perror("计算失败 \n");
-      return 0;
-    }
+    ERROR_CHECK(encrypted, NULL, "散列计算失败");
     //printf("password = %s\n", password);
     //printf("salt = %s\n", salt);
     //printf("encrypted = %s\n", encrypted);

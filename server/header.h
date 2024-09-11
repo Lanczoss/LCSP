@@ -197,7 +197,7 @@ extern FILE *log_error_file;
 #define THREAD_ERROR_CHECK(ret, msg) \
     do{ \
         if((ret) != 0) { \
-            fprintf(stderr, "%s:%s\n", msg, strerror(ret)); \
+            LOG_PERROR(msg); \
         } \
     } while(0)
 

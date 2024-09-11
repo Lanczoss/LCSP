@@ -28,9 +28,9 @@ int analysisProtocol(train_t t, int net_fd, MYSQL *mysql)
         break;
     case RM:
         rmCommand(t, net_fd,mysql);
-        break;;
+        break;
     default:
-        printf("没有此命令.\n");
+        LOG_INFO("Wrong command.");
         break;
     }
     return 0;

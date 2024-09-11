@@ -61,7 +61,7 @@ int main(void)
         //父进程接收信号
         signal(SIGINT, exit_func);
         //等待子进程退出
-        LOG_INFO("Waiting son exit in fork");
+        LOG_INFO("Waiting for son exit in fork.");
         wait(NULL);
         //子进程已经关闭
         exit(0);
@@ -87,12 +87,11 @@ int main(void)
     ret = addEpoll(epoll_fd, pipefd[0]);
     ERROR_CHECK(ret, -1, "addEpoll");
 
-    LOG_INFO("Waiting for socket_fd or pipefd[0]");
+    LOG_INFO("Waiting for socket_fd or pipefd[0].");
     while(1)
     {
         struct epoll_event event[10];
         //开始监听
-
         int epoll_num = epoll_wait(epoll_fd, event, 10, -1);
         ERROR_CHECK(epoll_num, -1, "epoll_wait");
 
@@ -155,7 +154,7 @@ int main(void)
                 close(epoll_fd);
                 //关闭log文件对象
                 closeLog();
-                printf("log已保存在system.log\n");
+                printf("\n日志已保存在.log文件\n服务已退出\n");
                 //主线程退出
                 pthread_exit(NULL);
             }

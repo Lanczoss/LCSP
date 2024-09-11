@@ -12,7 +12,7 @@ void *threadMain(void *p)
     {
         ret = pthread_mutex_unlock(&pool->lock);
         THREAD_ERROR_CHECK(ret, "unlock");
-        printf("子线程连接数据库失败，请确保config.ini配置正确\n");
+        printf("Can't connect MySQL, please make sure config.ini correct.\n");
         mysql_close(mysql);
         pthread_exit(NULL);
     }
@@ -48,7 +48,8 @@ void *threadMain(void *p)
         THREAD_ERROR_CHECK(ret, "unlock");
 
         //工作
-        doWorker(mysql, net_fd);
+        ret = doWorker(mysql, net_fd);
+        THREAD_ERROR_CHECK(ret, "One client disconnected. Check the log.");
         close(net_fd);
     }
     return NULL;
@@ -64,10 +65,10 @@ int doWorker(MYSQL *mysql, int net_fd)
     int ret = loginRegisterSystem(&t, net_fd, mysql);
     if(ret == -1)
     {
-        printf("对端关闭\n"); 
         return -1;
     }
 
+    LOG_INFO("One client login success.");
     //到这里开始用户成功登录
     while(1)
     {
@@ -76,7 +77,6 @@ int doWorker(MYSQL *mysql, int net_fd)
         ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
         if(rret == 0)
         {
-            printf("对端关闭\n"); 
             return -1;
         }
         //分析协议
@@ -84,7 +84,6 @@ int doWorker(MYSQL *mysql, int net_fd)
         if(ret == -1)
         {
             //用户输入了exit
-            printf("对端关闭\n"); 
             return -1;
         }
     }

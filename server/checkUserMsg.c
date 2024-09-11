@@ -53,11 +53,13 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
     if(mysql_query(mysql, tmp))
     {
         printf("%s\n", mysql_error(mysql));
+        return -1;
     }
     MYSQL_RES *res = mysql_store_result(mysql);
     if(res == NULL)
     {
         printf("%s\n", mysql_error(mysql));
+        return -1;
     }
     MYSQL_ROW row;
     while((row = mysql_fetch_row(res)) != NULL)
@@ -65,10 +67,7 @@ int checkPassword(const char *user_name, const char *password, MYSQL *mysql)
         strcpy(salt, row[0]);
         //根据盐值计算散列
         char *encrypted = crypt(password, salt);
-        if (encrypted == NULL) {
-            perror("计算失败 \n");
-            return -1;
-        }
+        ERROR_CHECK(encrypted, NULL, "Calculate crypt failed");
         strcpy(encrypted_password, encrypted);
 
         //根据用户名获取散列值

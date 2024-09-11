@@ -15,7 +15,6 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
         ERROR_CHECK(rret, -1, "recv");
         if(rret == 0)
         {
-            printf("对端关闭\n"); 
             return -1;
         }
         //接收密码
@@ -24,7 +23,6 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
         ERROR_CHECK(rret, -1, "recv");
         if(rret == 0)
         {
-            printf("对端关闭\n"); 
             return -1;
         }
 
@@ -77,7 +75,9 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
             if(ret == 0)
             {
                 //开始注册
-                registerInsertMysql(user_name, password, mysql);
+                ret = registerInsertMysql(user_name, password, mysql);
+                ERROR_CHECK(ret, -1, "Register Msg insert into MySQL failed.");
+                LOG_INFO("One client register success");
                 //注册成功
                 t->isLoginFailed = 0;
             }
@@ -90,7 +90,7 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
         //到这里要回复客户端是否登录成功
         //这里如果登录成功自定义协议里存有一个'/'和用户id
         rret = send(net_fd, t, sizeof(train_t), MSG_NOSIGNAL);
-        ERROR_CHECK(rret, -1, "对端关闭");
+        ERROR_CHECK(rret, -1, "send");
         if(t->isLoginFailed == 0 && t->isRegister == 0 && t->uid != 0)
         {
             //登录成功可以退出循环

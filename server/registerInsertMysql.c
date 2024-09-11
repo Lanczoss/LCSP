@@ -21,6 +21,7 @@ int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysq
     if(mysql_query(mysql, tmp))
     {
         printf("%s\n", mysql_error(mysql));
+        return -1;
     }
     //printf("%s\n", tmp);
 
@@ -32,8 +33,9 @@ int registerInsertMysql(const char *user_name, const char *password, MYSQL *mysq
     if(mysql_query(mysql, tmp))
     {
         printf("%s\n", mysql_error(mysql));
+        return -1;
     }
     //printf("%s\n", tmp);
-    //printf("插入成功\n");
+    LOG_INFO("Register Msg insert into MySQL success");
     return 0;
 }
