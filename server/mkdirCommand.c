@@ -44,16 +44,24 @@ int mkdirCommand(train_t t, int socket_fd,MYSQL* mysql) {
         // 获取文件夹名称
         char filename[1024] = { 0 };
         splitParameter(t, (i+1), filename);
+        LOG_PERROR("splitParameter");
         // 去掉 filename 中的换行符
         size_t filename_len = strlen(filename);
+        //文件名不能以"/"开头
+        if(filename[0] == '/'){
+            char message[] = "权限不足，文件夹名称不能以'/'开头";
+            send(socket_fd,message,strlen(message),MSG_NOSIGNAL);
+            return 0;
+        }
         
         if (filename_len > 0 && filename[filename_len - 1] == '\n') {
             filename[filename_len - 1] = '\0';
         }
         if(insertDir(t,real_path,filename,mysql) == 0){
-            printf("创建文件成功！\n");
+            LOG_INFO("创建文件夹成功！\n");
         }else{
-            printf("创建文件失败!\n");
+            char str[] = "创建文件夹失败！\n";
+            send(socket_fd,str,strlen(str),MSG_NOSIGNAL);
         }
     }
 

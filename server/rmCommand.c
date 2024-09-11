@@ -19,6 +19,11 @@ int rmCommand(train_t t, int net_fd,MYSQL *mysql)
         char filename[1024] = { 0 };
         splitParameter(t, (i+1), filename);
 
+        if(filename[0] == '/'){
+            printf("不能删除根目录文件夹!\n");
+            return -1;
+        }
+
         //拼接路径path+filename
         strcat(real_path, filename);
         //TODO:去除文件后面的换行符

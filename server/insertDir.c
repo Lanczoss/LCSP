@@ -69,8 +69,8 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
              "VALUES ('%s', %d, %s, '%s', 1, now(),now())",
              dirname, t.uid, pid, file_path);
 
-    printf("sql:#%s#\n",sql);
-
+    LOG_INFO(sql);
+    
     if(mysql_query(mysql,sql)){
         printf("%s\n",mysql_error(mysql));
         return -1;
