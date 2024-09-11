@@ -78,7 +78,9 @@ int lsCommand(train_t t, int socket_fd){
         recv(socket_fd, &file_size, sizeof(int), MSG_WAITALL);
 
         recv(socket_fd, buffer, file_size, MSG_WAITALL);
-
+        
+        // 如果字符数组无内容
+        // TODO
         printf("%s\n",buffer);
 
         return 0;
@@ -103,8 +105,6 @@ int lsCommand(train_t t, int socket_fd){
     // 去掉para后的换行符
     removeLineBreak(para);
 
-    printf("当前path#%s#\n", path);
-    printf("当前para#%s#\n", para);
     
     // 客户端目前路径和参数一样
     // 相当于ls无参
@@ -140,16 +140,13 @@ int lsCommand(train_t t, int socket_fd){
     }
     
     // 进入判读参数合法
-    printf("判断参数\n");
     if(strlen(para) == 1 && para[0] == '/'){
-        printf("进入\n");
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
         if(t.error_flag == 4){
             printf("非法参数，参数个数不能大于1！\n");
         }
         return 0;
     }
-    printf("没进入\n");
     
 
     // 检查参数是否是以当前路径开头
@@ -228,7 +225,6 @@ int lsCommand(train_t t, int socket_fd){
 
     printf("%s\n",buffer);
 
-    return 0;
 
     return 0;
 }

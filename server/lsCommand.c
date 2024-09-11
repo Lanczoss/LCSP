@@ -21,7 +21,6 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
     MYSQL_BIND result[1];
     int id = getFileId(t, mysql); // 参数通过getfileid获得文件的索引id
     
-    printf("id:%d\n", id);
     // 对id做一下错误判断
     // id如果为-1，说明表中没有这条数据
     // 那就更别提以该id为pid的文件或文件夹了
@@ -85,7 +84,6 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
 
     if(row_count == 0){
 
-        printf("未查询到任何数据\n");
         // ls 0参时未查到，说明该目录下无任何文件或文件夹
         // 错误标志设为3
         t.error_flag = 3;
@@ -105,16 +103,13 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
     int blank_space = 0;
     while(mysql_stmt_fetch(stmt) == 0){
 
-        printf("#%ld#", strlen(res));
         res[strlen(res)] = '\0';
-        printf("file_name:%s\n",res);
         strncat(buffer, res, strlen(res));
         len += strlen(res);
         buffer[len + blank_space] = 32;
         blank_space++;
     }
 
-    printf("%s\n", buffer);
     //TODO 发送内容到客户端
 
     int file_size = strlen(buffer);
@@ -164,22 +159,16 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
     // 去掉para后的换行符
     removeLineBreak(para);
 
-    printf("当前path#%s#\n",path);
-    printf("当前para#%s#\n",para);
     // 比较客户端目前路径和参数
     if(strcmp(path, para) == 0){
         //相等说明等价于ls
-        printf("进入pwd\n");
         pwdCurrent(t, net_fd, mysql);
-        printf("退出pwd");
         return 0;
     }
     
     // 参数是带斜杠的，需特殊处理当前路径不为 / 而参数只有 /
     // 非法操作
-    printf("进入判断参数是否合法\n");
     if(strlen(para) == 1 && para[0] == '/'){
-        printf("进入\n");
         // 错误标志设为4
         t.error_flag = 4;
         // TODO 发送错误信息
@@ -188,7 +177,6 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
 
         return 0;
     }
-    printf("未进入\n");
 
     
     // 检查参数是否是以当前路径开头
