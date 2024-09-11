@@ -83,7 +83,7 @@ int registerSystem(train_t *t, int socket_fd)
     //注册行为 接收服务器回复
     bzero(t, sizeof(train_t));
     rret = recv(socket_fd, t, sizeof(train_t), MSG_WAITALL);
-    ERROR_CHECK(rret, -1, "服务器关闭");
+    ERROR_CHECK(rret, -1, "recv");
 
     //将路径长度放入自定义协议中
     t->path_length = strlen(user_path);

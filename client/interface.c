@@ -1,6 +1,6 @@
 #include "header.h"
 
-void printCloud(void)
+void printInterface(void)
 {
     printf(" ________  ___       ________  ___  ___  ________     \n");
     printf("|\\   ____\\|\\  \\     |\\   __  \\|\\  \\|\\  \\|\\   ___ \\    \n");
@@ -10,6 +10,19 @@ void printCloud(void)
     printf("   \\ \\_______\\ \\_______\\ \\_______\\ \\_______\\ \\_______\\\n");
     printf("    \\|_______|\\|_______|\\|_______|\\|_______|\\|_______|\n");
     printf("                                                       \n");
+    
+    //打印系统信息
+    struct utsname sys_msg;
+    uname(&sys_msg);
+    printf("\n\n%s %s %s %s %s\n\n", 
+        sys_msg.sysname,
+        sys_msg.nodename,
+        sys_msg.release,
+        sys_msg.version,
+        sys_msg.machine
+    );
+    //打印登录选项
+    printf("Welcome to Cloud Storage Service!\n\n");
 }
 
 //客户端的用户操作界面
@@ -21,7 +34,7 @@ int interface(train_t *t, int socket_fd)
     //获取选项
     while(1)
     {
-        LOG_INFO("展示登录界面");
+        LOG_INFO("Show login options.");
         bzero(t, sizeof(train_t));
         t->isLoginFailed = 1;
         printf("(Y) 登录  (R) 注册  (E)退出 > ");
@@ -33,7 +46,7 @@ int interface(train_t *t, int socket_fd)
         {
         case 'y':
         case 'Y':
-            LOG_INFO("用户登录");
+            LOG_INFO("Login");
             ret = loginSystem(t, socket_fd);
             if(ret != 0)
             {
@@ -46,25 +59,12 @@ int interface(train_t *t, int socket_fd)
                 continue;
             }
             printf("登录成功\n\n");
-            //打印图案
-            printCloud();
-            //打印系统信息
-            struct utsname sys_msg;
-            ret = uname(&sys_msg);
-            ERROR_CHECK(ret, -1, "uname");
-            printf("\n\n%s %s %s %s %s\n\n", 
-                sys_msg.sysname,
-                sys_msg.nodename,
-                sys_msg.release,
-                sys_msg.version,
-                sys_msg.machine
-            );
-            //打印登录选项
-            printf("Welcome to Cloud Storage Service!\n\n");
+            //打印用户界面
+            printInterface();
             return 0;
         case 'r':
         case 'R':
-            LOG_INFO("用户注册");
+            LOG_INFO("Register");
             ret = registerSystem(t, socket_fd);
             if(ret != 0)
             {
