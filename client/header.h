@@ -42,8 +42,8 @@ enum
     REMOVE,
     RM,
     MKDIR,
-    NORMAL,
     ABNORMAL,
+    NORMAL,
 };
 
 //自定义协议头部信息
@@ -222,4 +222,7 @@ int writeLog(FILE *log_file, const char *level, const char *file, int line, cons
 
 // 日志关闭函数声明，确保在程序结束时关闭日志文件
 void closeLog();
+
+// 分离函数
+int splitParameter(train_t t, int num, char *buf);
 #endif

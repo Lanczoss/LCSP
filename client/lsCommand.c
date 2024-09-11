@@ -39,52 +39,6 @@ int removeLineBreak(char *real_path){
     return 0;
 }
 
-
-int getsCommand(train_t t, int socket_fd){
-
-
-    // 接收是否返回信息，判断文件是否可以下载
-    recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
-
-
-    // TODO 对返回信息判断
-    if(t.error_flag == 1){
-        // 服务端文件不存在
-        printf("文件不存在,下载失败！\n");
-        return -1;
-    }
-    // 到这里可下载
-    // 获取文件名
-    char file_name[1024] = { 0 };
-    getFileName(t.control_msg, file_name);
-    removeLineBreak(file_name);
-
-
-    // 创建文件
-    int file_fd = open(file_name, O_RDWR | O_CREAT, 0666);
-
-    // 接收文件大小
-    off_t file_size = 0;
-    recv(socket_fd, &file_size, sizeof(off_t), MSG_WAITALL);
-
-    // mmap之前修改文件大小
-    ftruncate(file_fd, file_size);
-
-    // 接收数据
-    void *p = mmap(NULL, file_size, PROT_READ | PROT_WRITE, MAP_SHARED, file_fd, 0);
-
-    recv(socket_fd, p, file_size, MSG_WAITALL);
-
-    munmap(p, file_size);
-
-    close(file_fd);
-    
-    printf("文件下载成功\n");
-
-    return 0;
-}
-
-
 int lsCommand(train_t t, int socket_fd){
 
     // 先接收错误信息,错误处理
