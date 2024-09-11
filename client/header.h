@@ -44,6 +44,7 @@ enum
     MKDIR,
     NORMAL,
     ABNORMAL,
+    EXIT
 };
 
 //自定义协议头部信息

@@ -24,22 +24,25 @@ int main(void)
     //自定义协议
     train_t t;
     bzero(&t, sizeof(t));
+    t.isLoginFailed = 1;
     //客户端的用户操作界面
     //录入用户第一次操作时的自定义协议
     //并将初始用户名加入到路径名中
-    ret = interface(&t, socket_fd);
-    if(ret == -1)
-    {
-        //函数出错或者退出
-        close(socket_fd);
-        exit(0);
-    }
-    //到这里开始服务器已经接受了用户的登录
-    //此时自定义协议里有路径名及路径名长度
-    //printf("登录成功时 t->control_msg = %s\nt->path_length = %d\n", t.control_msg, t.path_length);
-
     while(1)
-    {
+    { 
+        if(t.isLoginFailed == 1)
+        {
+            ret = interface(&t, socket_fd);
+            if(ret == -1)
+            {
+                //函数出错或者退出
+                close(socket_fd);
+                exit(0);
+            }
+        }
+        //到这里开始服务器已经接受了用户的登录
+        //此时自定义协议里有路径名及路径名长度
+        //printf("登录成功时 t->control_msg = %s\nt->path_length = %d\n", t.control_msg, t.path_length);
         //获取新一轮的路径名
         char user_path[1024] = {0};
         strncpy(user_path, t.control_msg, t.path_length);
