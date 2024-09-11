@@ -32,6 +32,9 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
     case EXIT:
         t->isLoginFailed = 1;
         break;
+    case RENAME:
+        reName(*t,net_fd,mysql);
+        break;
     default:
         LOG_INFO("Wrong command.");
         break;

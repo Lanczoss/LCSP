@@ -44,7 +44,8 @@ enum
     MKDIR,
     NORMAL,
     ABNORMAL,
-    EXIT
+    EXIT,
+    RENAME
 };
 
 //自定义协议头部信息
@@ -230,6 +231,9 @@ int rmCommand(train_t t, int socket_fd);
 
 //mkdir的命令
 int mkdirCommand(train_t *t, int socket_fd);
+
+//重命名文件
+int reName(train_t t, int socket_fd);
 
 //客户端的用户操作界面
 //录入用户第一次操作时的自定义协议

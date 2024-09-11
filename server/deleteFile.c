@@ -66,7 +66,7 @@ int deleteFile(train_t t, char * file_path, MYSQL* mysql){
     //删除空文件夹
     bzero(sql,sizeof(sql));
     snprintf(sql,sizeof(sql),
-             "UPDATE files set delete_flag = 1 where file_path = '%s'",
+             "UPDATE files set delete_flag = -1 where file_path = '%s'",
              file_path);
     LOG_INFO(sql);
 

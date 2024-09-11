@@ -24,7 +24,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     int pid = 0;
     char sql_pid[1024] = { 0 };
     snprintf(sql_pid, sizeof(sql_pid), 
-              "SELECT id FROM files WHERE file_path = '%s'", real_path);
+              "SELECT id FROM files WHERE file_path = '%s' AND uid = %d", real_path,t.uid);
     mysql_query(mysql,sql_pid);
     
     res = mysql_store_result(mysql);

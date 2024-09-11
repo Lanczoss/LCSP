@@ -25,6 +25,8 @@ int getEnum(char *str){
         return EXIT;
     } else if (strcmp(str, "quit") == 0 || strcmp(str, "exit") == 0) {
         return EXIT;
+    }   else if (strcmp(str, "rename") == 0) {
+        return RENAME;
     } else {
         printf("命令输入错误\n");
         return FALSE;
@@ -65,13 +67,10 @@ int splitCommand(train_t *t, char *buf){
 
     //将路径存放到自定义协议
     strncpy(t->control_msg, path, strlen(path));
-    /*
-    //判断最后一位字符是不是'/'
-    if(t->control_msg[strlen(t->control_msg) - 1] != '/'){
-        //不是则手动添加
-        strcat(t->control_msg, "/");
-    }
-    */
+    //if(t->control_msg[strlen(t->control_msg) - 1] != '/'){
+    //    //不是则手动添加
+    //    strcat(t->control_msg, "/");
+    //}
     t->control_msg[strlen(t->control_msg)] = ' ';
 
     //切割从标准输入输入的命令
