@@ -5,19 +5,26 @@ void printInterface(void)
     int color_code = 160; // 起始颜色代码
     int step = 1;         // 每次颜色变化的步长
 
+    printf("\033[5m");
     // 打印每一行时，颜色代码逐渐增加以形成渐变效果
     printf("\033[38;5;%dm ________  ___       ________  ___  ___  ________     \033[0m\n", color_code);
     color_code += step;
+    printf("\033[5m");
     printf("\033[38;5;%dm|\\   ____\\|\\  \\     |\\   __  \\|\\  \\|\\  \\|\\   ___ \\    \033[0m\n", color_code);
     color_code += step;
+    printf("\033[5m");
     printf("\033[38;5;%dm\\ \\  \\___|\\ \\  \\    \\ \\  \\|\\  \\ \\  \\ \\  \\ \\  \\_\\ \\   \033[0m\n", color_code);
     color_code += step;
+    printf("\033[5m");
     printf("\033[38;5;%dm \\ \\  \\    \\ \\  \\    \\ \\  \\ \\  \\ \\  \\ \\  \\ \\  \\ \\ \\  \033[0m\n", color_code);
     color_code += step;
+    printf("\033[5m");
     printf("\033[38;5;%dm  \\ \\  \\____\\ \\  \\____\\ \\  \\ \\  \\ \\  \\ \\  \\ \\  \\_\\ \\ \033[0m\n", color_code);
     color_code += step;
+    printf("\033[5m");
     printf("\033[38;5;%dm   \\ \\_______\\ \\_______\\ \\_______\\ \\_______\\ \\_______\\\033[0m\n", color_code);
     color_code += step;
+    printf("\033[5m");
     printf("\033[38;5;%dm    \\|_______|\\|_______|\\|_______|\\|_______|\\|_______|\033[0m\n", color_code);
     printf("                                                       \n");
     
