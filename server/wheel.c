@@ -1,87 +1,107 @@
 #include "wheel.h"
+#include "header.h"
 
 // 初始化时间轮
 void initTimeWheel(TimeWheel* wheel) {
     // 将时间轮的每个槽初始化为空
-    for (int i = 0; i < TIME_WHEEL_SIZE; i++) {
+    for (int i = 0; i < TIME_WHEEL_SIZE; i++) 
+    {
         wheel->slots[i] = NULL;
     }
-    // 将当前槽位设置为0
-    wheel->current_slot = 0;
 }
 
 // 插入定时器到时间轮
-void addTimer(TimeWheel* wheel, int fd, time_t expire_time) {
-    // 计算定时器应插入的槽位
-    int slot = (wheel->current_slot + (expire_time - time(NULL)) % TIME_WHEEL_SIZE) % TIME_WHEEL_SIZE;
+int addTimer(TimeWheel* wheel, int fd) {
+    //计算需要插入的下标
+    time_t curr_time = time(NULL);
+    int insert_index = curr_time % TIME_WHEEL_SIZE;
 
-    // 创建一个新的定时器
-    Timer* timer = (Timer*)malloc(sizeof(Timer));
-    timer->fd = fd;
-    timer->expire_time = expire_time;
-    // 将定时器插入到计算出的槽位中，放在链表的开头
-    timer->next = wheel->slots[slot];
-    wheel->slots[slot] = timer;
-}
+    // 创建一个新的结点
+    Timer* new_timer = (Timer*)malloc(sizeof(Timer));
+    ERROR_CHECK(new_timer, NULL, "malloc new_timer");
+    new_timer->fd = fd;
+    new_timer->alive = 1;
+    new_timer->next = NULL;
 
-// 删除定时器
-void removeTimer(TimeWheel* wheel, int fd) {
-    // 遍历所有槽位查找要删除的定时器
-    for (int i = 0; i < TIME_WHEEL_SIZE; i++) {
-        Timer* prev = NULL;
-        Timer* curr = wheel->slots[i];
-        while (curr != NULL) {
-            if (curr->fd == fd) {
-                // 找到定时器，执行删除操作
-                if (prev == NULL) {
-                    wheel->slots[i] = curr->next;  // 删除头节点
-                } else {
-                    prev->next = curr->next;       // 删除中间或尾部节点
-                }
-                free(curr);  // 释放内存
-                return;
-            }
-            prev = curr;
-            curr = curr->next;
-        }
-    }
+    // 头插法
+    new_timer->next = wheel->slots[insert_index];
+    wheel->slots[insert_index] = new_timer;
+    return 0;
 }
 
 // 处理超时事件
 void handleTimeout(TimeWheel* wheel) {
-    // 获取当前槽位中的定时器链表
-    Timer* timer = wheel->slots[wheel->current_slot];
-    while (timer != NULL) {
-        Timer* next = timer->next;  // 保存下一个定时器
-        if (timer->expire_time <= time(NULL)) {
-            // 如果定时器已经超时，关闭文件描述符并释放内存
-            printf("踢出\n");
-            LOG_INFO("Closing fd due to timeout");
-            close(timer->fd);
-            free(timer);
-        } else {
-            // 如果定时器尚未超时，将其重新插入到当前槽位
-            timer->next = wheel->slots[wheel->current_slot];
-            wheel->slots[wheel->current_slot] = timer;
-        }
-        timer = next;  // 处理下一个定时器
+    //计算需要删除的下标
+    time_t curr_time = time(NULL);
+    int notime_index = (curr_time % TIME_WHEEL_SIZE) - 1;
+
+    // 获取超时定时器链表
+    Timer* timer = wheel->slots[notime_index];
+    while (timer != NULL) 
+    {
+        Timer *tmp = timer;
+        timer = timer->next;
+        free(tmp);
     }
 }
 
-// 轮转时间轮
-void rotateTimeWheel(TimeWheel* wheel) {
-    // 更新当前槽位到下一个槽位
-    wheel->current_slot = (wheel->current_slot + 1) % TIME_WHEEL_SIZE;
+// 将循环指针数组预备的net_fd 添加到 net_fd_arr 数组中
+// 并将该下标的链表更新位置
+int addNetFd(TimeWheel* wheel, int *net_fd_arr, int length) 
+{
+    //计算下标
+    time_t curr_time = time(NULL);
+    int end_index = (curr_time % TIME_WHEEL_SIZE) - 2;
+    int start_index = (curr_time % TIME_WHEEL_SIZE) + 1;
+    int i = 0;
+    while(start_index != end_index)
+    {
+        // 获取超时定时器链表
+        Timer *timer = wheel->slots[start_index];
+        while (timer != NULL)
+        {
+            if (i == length)
+            {
+                //满
+                return -1;
+            }
+            if (timer->alive == 1)
+            {
+                net_fd_arr[i] = timer->fd;
+                timer->alive = 0;
+                //更新位置
+                addTimer(wheel, timer->fd);
+                i++;
+            }
+            timer = timer->next;
+        }
+        start_index++;
+    }
+    return 0;
 }
 
-// 将新的 net_fd 添加到 net_fd_arr 数组中
-void addNetFd(int new_fd, int *net_fd_arr, int max_fds) {
-    // 遍历 net_fd_arr 数组寻找空闲位置
-    for (int i = 0; i < max_fds; i++) {
-        if (net_fd_arr[i] == -1) {
-            // 找到空闲位置，将新描述符添加到数组中
-            net_fd_arr[i] = new_fd;
-            break;
+//连接关闭从链表中移除
+int removeTimer(TimeWheel* wheel, int fd)
+{
+    //计算下标
+    time_t curr_time = time(NULL);
+    int end_index = (curr_time % TIME_WHEEL_SIZE) - 2;
+    int start_index = (curr_time % TIME_WHEEL_SIZE) + 1;
+    while(start_index != end_index)
+    {
+        // 获取超时定时器链表
+        Timer *timer = wheel->slots[start_index];
+        while (timer != NULL)
+        {
+            if (timer->alive == 1 && timer->fd == fd)
+            {
+                //标记为不存活
+                timer->alive = 0;
+                return 0;
+            }
+            timer = timer->next;
         }
+        start_index++;
     }
+    return -1;
 }

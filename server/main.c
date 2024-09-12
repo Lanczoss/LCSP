@@ -101,14 +101,9 @@ int main(void)
     ERROR_CHECK(ret, -1, "addEpoll");
 
     // 初始化时间轮
-
     TimeWheel timeWheel; //时间轮
-    int net_fd_arr[NET_FD_NUM];
+    //int net_fd_arr[NET_FD_NUM];
     initTimeWheel(&timeWheel);
-    //创建net_fd循环数组（用于超时踢出）
-    for (int i = 0; i < NET_FD_NUM; i++) {
-        net_fd_arr[i] = -1;  // 初始化为无效fd
-    }
 
     LOG_INFO("Waiting for socket_fd or pipefd[0] or net_fd.");
     //自定义协议
@@ -118,10 +113,8 @@ int main(void)
         bzero(&t, sizeof(t));
         struct epoll_event event[10];
         //开始监听
-        int epoll_num = epoll_wait(epoll_fd, event, 10, -1);
+        int epoll_num = epoll_wait(epoll_fd, event, 10, 1000);
         ERROR_CHECK(epoll_num, -1, "epoll_wait");
-
-        rotateTimeWheel(&timeWheel);  // 轮转时间轮
 
         for(int i = 0; i < epoll_num; i++)
         {
@@ -143,14 +136,10 @@ int main(void)
                 if(t.isLoginFailed == 0 && t.isRegister == 0)
                 {
                     //登录成功
-                    //将net_fd加入数组并加入监听
-                    addNetFd(net_fd, net_fd_arr, NET_FD_NUM);
-
                     //将net_fd加入监听
                     addEpoll(epoll_fd, net_fd);
-
                     // 添加到时间轮中
-                    addTimer(&timeWheel, net_fd, time(NULL) + 60);  // 60秒超时
+                    addTimer(&timeWheel, net_fd);  // 30秒超时
                     LOG_INFO("One client login success.");
                 }
                 else
@@ -190,8 +179,6 @@ int main(void)
                     deQueue(&pool.q, &net_fd);
                     close(net_fd);
                 }
-//                //清理net_fd数组
-//                free(net_fd_arr);
                 //清理存储线程id的链表
                 free(pool.pthread_list);
                 //清理主线程资源
@@ -203,10 +190,15 @@ int main(void)
                 //主线程退出
                 pthread_exit(NULL);
             }
+            //到这里需要遍历所有的未超时指针数组，将就绪fd存到临时数组
+            int net_fd_arr[NET_FD_NUM] = {0};
+            ret = addNetFd(&timeWheel, net_fd_arr, NET_FD_NUM);
+            if(ret == -1)
+            {
+                printf("存net_fd的数组满了\n");
+            }
             for(int j = 0; j < NET_FD_NUM; j++)
             {
-                //有命令传来
-                //TODO:考虑exit的情况
                 if(fd == net_fd_arr[j])
                 {
                     bzero(&t, sizeof(t));
@@ -217,7 +209,6 @@ int main(void)
                         // 连接关闭
                         close(net_fd_arr[j]);
                         removeTimer(&timeWheel, net_fd_arr[j]);
-                        net_fd_arr[j] = -1;
                         break;
                     }
                     //分析协议
