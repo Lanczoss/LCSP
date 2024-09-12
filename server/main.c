@@ -1,5 +1,5 @@
 #include "header.h"
-#define NET_FD_NUM 30
+#define NET_FD_NUM 60
 
 //创建目录files或者判断是否有files
 int createBaseFiles(void)
