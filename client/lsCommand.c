@@ -1,7 +1,5 @@
 #include "header.h"
 
-
-
 int removeLineBreak(char *real_path){
     // 找到换行符的位置
     size_t len = strcspn(real_path, "\n");
@@ -15,6 +13,7 @@ int removeLineBreak(char *real_path){
 }
 
 int lsCommand(train_t t, int socket_fd){
+    
     // 参数大于1，等待服务端发送的错误信息
     if(t.parameter_num > 1){
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
@@ -29,7 +28,7 @@ int lsCommand(train_t t, int socket_fd){
         // 为了兼容下面
         // 服务端多send了一次，多recv一次
         recv(socket_fd, &t, sizeof(t), MSG_WAITALL);
-
+        
         // 先接收是否有错误信息
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
 
@@ -44,10 +43,8 @@ int lsCommand(train_t t, int socket_fd){
         // 查到数据进行打印
         int file_size;
         char buffer[1024] = { 0 };
-
         // 先接文件大小，再接内容
         recv(socket_fd, &file_size, sizeof(int), MSG_WAITALL);
-
         recv(socket_fd, buffer, file_size, MSG_WAITALL);
         
         // 如果字符数组无内容
