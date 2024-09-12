@@ -55,9 +55,6 @@ bool isExistDir(MYSQL *mysql, train_t t, char *virtual_path, char *parameter){
 int cdCommand(train_t t, int net_fd, MYSQL *mysql){
     // 检错返回值
     int ret;
-
-    printf("t.parameter_num = %d\n",t.parameter_num);
-
     // cd参数必须要保证为1个或者0个
     if (!(t.parameter_num == 1 || t.parameter_num == 0)){
         t.error_flag = ABNORMAL;
@@ -74,18 +71,21 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
     // 检测cd参数是否为0个，若为0个直接返回家目录
     char virtual_path[1024] = {0};
     if (t.parameter_num == 0 || (t.parameter_num == 1 && strcmp(parameter,"\n") == 0)){
-        bzero(t.control_msg,sizeof(t.command));
+        bzero(t.control_msg,sizeof(t.control_msg));
         strcpy(t.control_msg,"/");
         t.current_layers = 0;
         t.file_length = strlen(t.control_msg);
         t.error_flag = NORMAL;
+
+        printf("#%s#\n",t.control_msg);
+        
         ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
         ERROR_CHECK(ret,-1,"send");
         return 0;
     }
 
     // 读取虚拟路径
-    memcpy(virtual_path,t.control_msg,t.path_length);
+    splitParameter(t,0,virtual_path);
 
     // 取出虚拟路径中的最后的家目录
     if (virtual_path[strlen(virtual_path) - 1] == '/'){

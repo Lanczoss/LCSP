@@ -42,7 +42,6 @@ int removeLineBreak(char *real_path){
     return 0;
 }
 
-
 int lsCommand(train_t t, int socket_fd){
     // 参数大于1，等待服务端发送的错误信息
     if(t.parameter_num > 1){

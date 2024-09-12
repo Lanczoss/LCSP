@@ -18,7 +18,7 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
         putsCommand(*t, net_fd,mysql);
         return 0;
     case GETS:
-        // getsCommand(t, net_fd);
+        getsCommand(*t, net_fd, mysql);
         return 0;
     case REMOVE:
         printf("函数暂时未完成！\n");
