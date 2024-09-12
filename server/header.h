@@ -32,6 +32,7 @@
 #include <sys/utsname.h>    // uname()需要用到的头文件
 #include <errno.h>
 #include <crypt.h>
+#include "wheel.h"
 #include <l8w8jwt/encode.h>
 #include <l8w8jwt/decode.h>
 enum
@@ -271,7 +272,7 @@ int cdCommand(train_t t, int net_fd, MYSQL *sql);
 int pwdCommand(train_t t, int net_fd);
 
 //puts的命令
-int putsCommand(train_t t, int net_fd, MYSQL *sql);
+int putsCommand(train_t t, int net_fd,MYSQL *mysql);
 
 //gets的命令
 int getsCommand(train_t t, int net_fd, MYSQL *sql);
@@ -339,9 +340,7 @@ int deleteFile(train_t t, char * file_path, MYSQL*mysql);
 
 int getFileId(train_t t, MYSQL * mysql);
 
-//创建net_fd循环数组（用于超时踢出）
-int createNetFdArr(int **net_fd, int length);
+////创建net_fd循环数组（用于超时踢出）
+//int createNetFdArr(int **net_fd, int length);
 
-//将net_fd加入数组
-int addNetFd(int net_fd, int *net_fd_arr, int length);
 #endif

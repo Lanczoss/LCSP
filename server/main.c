@@ -1,5 +1,5 @@
 #include "header.h"
-#define NET_FD_NUM 30
+#define NET_FD_NUM 60
 
 //创建目录files或者判断是否有files
 int createBaseFiles(void)
@@ -69,6 +69,7 @@ int main(void)
         exit(0);
     }
     setpgid(0, 0);
+
     pool_t pool;
     //主线程连接数据库
     //用于登录注册和短命令
@@ -99,11 +100,15 @@ int main(void)
     ret = addEpoll(epoll_fd, pipefd[0]);
     ERROR_CHECK(ret, -1, "addEpoll");
 
+    // 初始化时间轮
+
+    TimeWheel timeWheel; //时间轮
+    int net_fd_arr[NET_FD_NUM];
+    initTimeWheel(&timeWheel);
     //创建net_fd循环数组（用于超时踢出）
-    int *net_fd_arr = NULL;
-    //暂时用malloc
-    ret = createNetFdArr(&net_fd_arr, NET_FD_NUM);
-    ERROR_CHECK(ret, -1, "createNetFdArr");
+    for (int i = 0; i < NET_FD_NUM; i++) {
+        net_fd_arr[i] = -1;  // 初始化为无效fd
+    }
 
     LOG_INFO("Waiting for socket_fd or pipefd[0] or net_fd.");
     //自定义协议
@@ -115,6 +120,9 @@ int main(void)
         //开始监听
         int epoll_num = epoll_wait(epoll_fd, event, 10, -1);
         ERROR_CHECK(epoll_num, -1, "epoll_wait");
+
+        rotateTimeWheel(&timeWheel);  // 轮转时间轮
+
         for(int i = 0; i < epoll_num; i++)
         {
             int fd = event[i].data.fd;
@@ -140,6 +148,9 @@ int main(void)
 
                     //将net_fd加入监听
                     addEpoll(epoll_fd, net_fd);
+
+                    // 添加到时间轮中
+                    addTimer(&timeWheel, net_fd, time(NULL) + 60);  // 60秒超时
                     LOG_INFO("One client login success.");
                 }
                 else
@@ -179,8 +190,8 @@ int main(void)
                     deQueue(&pool.q, &net_fd);
                     close(net_fd);
                 }
-                //清理net_fd数组
-                free(net_fd_arr);
+//                //清理net_fd数组
+//                free(net_fd_arr);
                 //清理存储线程id的链表
                 free(pool.pthread_list);
                 //清理主线程资源
@@ -203,6 +214,10 @@ int main(void)
                     ssize_t rret = recv(net_fd_arr[j], &t, sizeof(t), MSG_WAITALL);
                     if(rret == 0)
                     {
+                        // 连接关闭
+                        close(net_fd_arr[j]);
+                        removeTimer(&timeWheel, net_fd_arr[j]);
+                        net_fd_arr[j] = -1;
                         break;
                     }
                     //分析协议
@@ -223,6 +238,7 @@ int main(void)
                 }
             }
         }
+        handleTimeout(&timeWheel);  // 处理超时事件
     }
     close(socket_fd);
     close(epoll_fd);

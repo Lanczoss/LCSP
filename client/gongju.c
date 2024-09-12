@@ -137,3 +137,39 @@ int extractBasePath(const char *path, char *base_path, int max_len) {
 
     return 0; // 成功
 }
+
+/**
+  ******************************************************************************
+  * 功能:计算文件的哈希值
+  * 参数:filename文件路径，hash哈希值
+  * 返回值:正常返回0
+  ******************************************************************************
+**/
+int getFileHash(const char *filename, char *hash) {
+    // 构造命令
+    char command[256];
+    snprintf(command, sizeof(command), "sha1sum \"%s\"", filename);
+
+    // 使用 popen 执行命令
+    FILE *pipe = popen(command, "r");
+    if (pipe == NULL) {
+        perror("popen");
+        return -1;
+    }
+
+    // 读取命令输出
+    if (fgets(hash,41,pipe) == NULL) {
+        perror("fgets");
+        pclose(pipe);
+        return -1;
+    }
+
+    // `sha1sum` 命令的输出格式为 "<hash> <filename>\n"，需要提取 hash 部分
+    char *space = strchr(hash, ' ');
+    if (space != NULL) {
+        *space = '\0'; // 只保留哈希值部分
+    }
+
+    pclose(pipe);
+    return 0;
+}
