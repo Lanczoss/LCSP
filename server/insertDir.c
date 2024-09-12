@@ -7,7 +7,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     MYSQL_ROW row;
     // 检查路径的最后一个字符是否是 '/'
     size_t len = strlen(real_path);
-    if (len > 0 && real_path[len - 1] == '/') {
+    if (len > 1 && real_path[len - 1] == '/') {
         // 将末尾的 '/' 替换为字符串结束符 '\0'
         real_path[len - 1] = '\0';
     }
@@ -28,6 +28,9 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
         fprintf(stderr, "获取pid查询结果失败: %s\n", mysql_error(mysql));
         return -1;
     }
+    printf("%s\n",sql_pid);
+    printf("pid:%d",pid);
+
     //判断路径是否为跟或者目录
     //以路径结尾是否为"/"区分
     if(real_path[strlen(real_path) - 1] != '/'){
@@ -76,7 +79,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
              "VALUES ('%s', %d, %d, '%s', 1, now(),now())",
              dirname, t.uid, pid, file_path);
 
-    LOG_INFO(sql);
+    printf("sql:%s\n",sql);
 
     if(mysql_query(mysql,sql)){
         printf("%s\n",mysql_error(mysql));

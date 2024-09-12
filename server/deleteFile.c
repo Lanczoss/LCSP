@@ -13,6 +13,9 @@ int deleteFile(train_t t, char *file_path, MYSQL *mysql) {
     MYSQL_RES *res;
     MYSQL_ROW row;
 
+    printf("\n");
+    printf("file_path");
+    printf("\n");
     // 检测数据库中是否存在此文件夹
     char check_sql[4096] = {0};
     snprintf(check_sql, sizeof(check_sql),
