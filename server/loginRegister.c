@@ -57,13 +57,19 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
                 {
                     //密码正确
                     //获取用户id
-                    t->uid = getUidMysql(user_name, mysql);
-                    if(t->uid == -1)
+                    int uid = getUidMysql(user_name, mysql);
+                    if(uid == -1)
                     {
                         t->isLoginFailed = 1;
                         return -1;
                     }
-                    //printf("%s的user_id = %d\n", user_name, t->uid);
+                    printf("%s的user_id = %d\n", user_name, uid);
+
+                    //根据uid获取加密token并保存
+                    bzero(t->token, sizeof(t->token));
+                    enCodeToken(uid, t->token);
+                    printf("%s的token = %s\n", user_name, t->token);
+
                     bzero(t->control_msg, sizeof(t->control_msg));
                     strcpy(t->control_msg, "/");
                     t->path_length = 1;
@@ -96,7 +102,7 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
         //这里如果登录成功自定义协议里存有一个'/'和用户id
         rret = send(net_fd, t, sizeof(train_t), MSG_NOSIGNAL);
         ERROR_CHECK(rret, -1, "send");
-        if(t->isLoginFailed == 0 && t->isRegister == 0 && t->uid != 0)
+        if(t->isLoginFailed == 0 && t->isRegister == 0 && t->token[0] != '\0')
         {
             //登录成功可以退出循环
             return 0;

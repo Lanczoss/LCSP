@@ -66,16 +66,6 @@ int mkdirCommand(train_t t, int socket_fd,MYSQL* mysql) {
             send(socket_fd,str,strlen(str),MSG_NOSIGNAL);
         }
     }
-    
-    //测试Token
-    char buf[4096] = { 0 };
-    int ret = enCodeToken(t,buf);
-    printf("测试加密---------------------------\n");
-    printf("jwt_token:%s\n",buf);
-
-    printf("解密测试---------------------------\n");
-    ret = deCodeToken(buf);
-    printf("uid:%d\n",ret);
 
     return 0;
 }

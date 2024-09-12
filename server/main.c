@@ -211,6 +211,15 @@ int main(void)
                     {
                         break;
                     }
+                    else if(ret == 1)
+                    {
+                        ret = pthread_mutex_lock(&pool.lock);
+                        THREAD_ERROR_CHECK(ret, "lock");
+                        ret = enQueue(&pool.q, net_fd_arr[j]);
+                        THREAD_ERROR_CHECK(ret, "enQueue");
+                        ret = pthread_mutex_unlock(&pool.lock);
+                        THREAD_ERROR_CHECK(ret, "unlock");
+                    }
                 }
             }
         }
