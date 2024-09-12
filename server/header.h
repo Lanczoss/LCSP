@@ -339,4 +339,9 @@ int deleteFile(train_t t, char * file_path, MYSQL*mysql);
 
 int getFileId(train_t t, MYSQL * mysql);
 
+//创建net_fd循环数组（用于超时踢出）
+int createNetFdArr(int **net_fd, int length);
+
+//将net_fd加入数组
+int addNetFd(int net_fd, int *net_fd_arr, int length);
 #endif
