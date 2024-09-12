@@ -39,7 +39,7 @@ int deCodeToken(char *buf){
         for (size_t i = 0; i < claim_count; i++) {
             printf("Claim [%zu]: %s = %s\n", i, claims[i].key, claims[i].value);
             if(strcmp(claims[i].key,"aud") == 0){
-                uid = atoi(claims[i].key);
+                uid = atoi(claims[i].value);
             }
         }
 

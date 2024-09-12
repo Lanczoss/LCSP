@@ -29,7 +29,7 @@ int enCodeToken(train_t t, char *buf){
     params.iat = 0; 
 
     // 设置加密密钥
-    params.secret_key = (unsigned char*)"snow string token key";
+    params.secret_key = (unsigned char*)"Baidu_Cloud string token key";
     params.secret_key_length = strlen((char *)params.secret_key);
 
     // 输出变量
