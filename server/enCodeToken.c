@@ -1,5 +1,5 @@
 #include "header.h"
-int enCodeToken(train_t t, char *buf){
+int enCodeToken(int uid, char *buf){
 
     //生成存储jwt
     char *jwt = NULL;
@@ -21,7 +21,7 @@ int enCodeToken(train_t t, char *buf){
     params.iss = "WuKong";  
     // 接收方
     char uid_str[20] = { 0 };
-    sprintf(uid_str,"%d",t.uid);
+    sprintf(uid_str,"%d",uid);
     params.aud = uid_str;  
     // token过期/有效时间(0x7fffffff:最大值-> 2038年1月19日)
     params.exp = 0x7fffffff;  
