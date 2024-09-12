@@ -444,7 +444,7 @@ int uploadDatabase(MYSQL *mysql, char *filename, int uid, int pid, char *filepat
   ******************************************************************************
 **/
 int queryDeleteMark(MYSQL *mysql, const char *filename, const int uid, const char *filepath, const char *hash,
-                    int *delete) {
+                    int *delete_flag) {
 
     int user_id = uid;
     // 设置字符集
@@ -540,7 +540,7 @@ int queryDeleteMark(MYSQL *mysql, const char *filename, const int uid, const cha
     }
 
     // 设置 delete 标记位的值
-    *delete = delete_mark;
+    *delete_flag = delete_mark;
 
     // 清理
     mysql_stmt_close(stmt);

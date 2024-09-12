@@ -32,7 +32,7 @@ int queryPid(MYSQL *mysql, const char *filepath, int uid, int *pid);
 
 //查询删除标记位
 int queryDeleteMark(MYSQL *mysql, const char *filename, const int uid, const char *filepath, const char *hash,
-                    int *delete);
+                    int *delete_flag);
 
 //修改删除标记位
 int modifyDeleteMark(MYSQL *mysql, const char *filename, const int uid, const char *filepath, const char *hash);

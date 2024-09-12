@@ -157,7 +157,7 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
             queryPid(mysql, user_path, uid, &pid);
 
             //将数据插入数据库
-            uploadDatabase(mysql, file_name, t.uid, pid, file_path, hash);
+            uploadDatabase(mysql, file_name, uid, pid, file_path, hash);
 
             printf("服务器成功收到文件: %s\n", serve_path);
         }
@@ -189,7 +189,7 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
             queryPid(mysql, user_path, uid, &pid);
 
             //将数据插入数据库
-            uploadDatabase(mysql, file_name, t.uid, pid, file_path, hash);
+            uploadDatabase(mysql, file_name, uid, pid, file_path, hash);
             printf("文件上传成功！\n");
         }
 
