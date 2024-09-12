@@ -5,12 +5,15 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     
     MYSQL_RES *res;
     MYSQL_ROW row;
+    
+    //获取uid
+    int uid = deCodeToken(t.token);
 
     //获取pid
     int pid = 0;
     char sql_pid[1024] = { 0 };
     snprintf(sql_pid, sizeof(sql_pid), 
-              "SELECT id FROM files WHERE file_path = '%s' AND uid = %d", real_path,t.uid);
+              "SELECT id FROM files WHERE file_path = '%s' AND uid = %d", real_path,uid);
     mysql_query(mysql,sql_pid);
     
     printf("sql_pid:%s\n",sql_pid);
@@ -41,7 +44,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     char check_sql[4096] = { 0 };
     snprintf(check_sql, sizeof(check_sql),
              "SELECT id FROM files WHERE uid = %d AND file_path = '%s' AND delete_flag = 0",
-             t.uid, file_path);
+             uid, file_path);
     
     if (mysql_query(mysql, check_sql)) {
         fprintf(stderr, "检测文件夹存在性失败: %s\n", mysql_error(mysql));
@@ -69,7 +72,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
     snprintf(sql, sizeof(sql),
              "INSERT INTO files (file_name,uid,pid,file_path,file_type,create_time,update_time)"
              "VALUES ('%s', %d, %d, '%s', 1, now(),now())",
-             dirname, t.uid, pid, file_path);
+             dirname, uid, pid, file_path);
 
     printf("#%s#\n",sql);
     LOG_INFO(sql);

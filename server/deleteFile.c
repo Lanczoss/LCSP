@@ -11,12 +11,12 @@ int deleteFile(train_t t, char * file_path, MYSQL* mysql){
     }
 
     MYSQL_RES *res;
-
+    int uid = deCodeToken(t.token);
     //检测数据库存不存在此文件夹
     char check_sql[4096] = { 0 };
     snprintf(check_sql, sizeof(check_sql),
              "SELECT id FROM files WHERE uid = %d AND file_path = '%s'AND delete_flag = 1 ",
-             t.uid, file_path);
+             uid, file_path);
     LOG_INFO(check_sql);
     if (mysql_query(mysql, check_sql)) {
         fprintf(stderr, "检测文件夹存在性失败: %s\n", mysql_error(mysql));
@@ -53,7 +53,7 @@ int deleteFile(train_t t, char * file_path, MYSQL* mysql){
              "INNER JOIN (SELECT id FROM files WHERE file_path = '%s' AND uid = %d) AS subquery "
              "ON f.pid = subquery.id "
              "SET f.delete_flag = 1;",
-             file_path, t.uid);
+             file_path, uid);
     LOG_INFO(sql);
 
     if(mysql_query(mysql,sql)){
