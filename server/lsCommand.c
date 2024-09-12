@@ -1,4 +1,5 @@
 #include "header.h"
+#include <math.h>
 
 
 
@@ -145,7 +146,7 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
     char para[256] = { 0 };
 
     // 获得客户端目前路径
-    strncpy(path, t.control_msg, t.path_length);
+    splitParameter(t, 0, path);
     // 获得第一个参数
     splitParameter(t, 1, para); 
 
@@ -157,6 +158,7 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
     }
     
     // 去掉para后的换行符
+    removeLineBreak(path);
     removeLineBreak(para);
 
     // 比较客户端目前路径和参数
