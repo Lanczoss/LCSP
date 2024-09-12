@@ -53,6 +53,7 @@ bool isExistDir(MYSQL *mysql, train_t t, char *virtual_path, char *parameter){
 // 第三个参数：mysql数据库连接
 // 返回值：0为正常，-1为异常
 int cdCommand(train_t t, int net_fd, MYSQL *mysql){
+    printf("t.msg = %s\n",t.control_msg);
     // 检错返回值
     int ret;
     // cd参数必须要保证为1个或者0个
