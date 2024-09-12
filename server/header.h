@@ -32,7 +32,8 @@
 #include <sys/utsname.h>    // uname()需要用到的头文件
 #include <errno.h>
 #include <crypt.h>
-
+#include <l8w8jwt/encode.h>
+#include <l8w8jwt/decode.h>
 enum
 {
     FALSE,
@@ -229,6 +230,11 @@ int createBaseFiles(void);
 
 //读配置文件
 int getParameter(void *key, void *value);
+//获取加密Token
+int enCodeToken(train_t t, char * buf);
+
+//获取解密Token后的uid信息
+int deCodeToken(char * buf);
 
 //初始化线程池
 //第一个参数是共用结构体
