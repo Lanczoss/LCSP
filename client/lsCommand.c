@@ -60,7 +60,7 @@ int lsCommand(train_t t, int socket_fd){
     char para[256] = { 0 };
 
     // 获得客户端目前路径
-    strncpy(path, t.control_msg, t.path_length);
+    splitParameter(t, 0, path);
     // 获得参数
     splitParameter(t, 1, para);
 
@@ -72,6 +72,7 @@ int lsCommand(train_t t, int socket_fd){
     }
     
     // 去掉para后的换行符
+    removeLineBreak(path);
     removeLineBreak(para);
 
     

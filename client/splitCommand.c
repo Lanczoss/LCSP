@@ -57,22 +57,30 @@ int getEnum(char *str){
 int splitCommand(train_t *t, char *buf){
 
     bzero(t->control_msg,sizeof(t->control_msg));
-    bzero(&t->parameter_num,sizeof(t->parameter_num));
-    char str[1024] = { 0 };
-    strcpy(str,buf);
 
-    //切割出文件路径
-    char *path;
-    path = strtok(str," ");
-    
-    //将路径存放到自定义协议
-    strncpy(t->control_msg, path, strlen(path));
-    //判断最后一位字符是不是'/'
-    //if(t->control_msg[strlen(t->control_msg) - 1] != '/'){
+    printf("buf:#%s#\n",buf);
+    // 特殊情况处理："/ /\n"
+    if (strcmp(buf, "/ /\n ") == 0 || strcmp(buf,"/ ..\n ") == 0) {
+        strcpy(t->control_msg, "/");
+        return 0;
+    }else{
+
+        bzero(&t->parameter_num,sizeof(t->parameter_num));
+        char str[1024] = { 0 };
+        strcpy(str,buf);
+
+        //切割出文件路径
+        char *path;
+        path = strtok(str," ");
+
+        //将路径存放到自定义协议
+        strncpy(t->control_msg, path, strlen(path));
+        //判断最后一位字符是不是'/'
+        //if(t->control_msg[strlen(t->control_msg) - 1] != '/'){
         // 不是则手动添加
         // strcat(t->control_msg, "/");
-    t->control_msg[strlen(t->control_msg)] = ' ';
-
+        t->control_msg[strlen(t->control_msg)] = ' ';
+    }
     //切割从标准输入输入的命令
     char *parma;
     //将str改成NULL
@@ -93,6 +101,7 @@ int splitCommand(train_t *t, char *buf){
         strncat(t->control_msg,parma,strlen(parma));
         t->control_msg[strlen(t->control_msg)] = ' ';
     }
+    printf("t.control_msg:#%s#\n",t->control_msg);
     return 0;
-}
+    }
 
