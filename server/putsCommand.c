@@ -74,7 +74,11 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
     file_name[strlen(file_name)] = '\0';
     strncat(file_path, file_name, strlen(file_name));
     file_path[strlen(file_path)] = '\0';
-    printf("最后插入数据库的文件路径%s\n", file_path);
+    size_t len = strlen(file_path);
+    if (len > 0 && file_path[len - 1] == '\n') {
+        file_path[len - 1] = '\0'; // 将换行符替换为字符串终止符
+    }
+    printf("最后插入数据库的文件路径:#%s#\n", file_path);
 
     //接收客户端文件的hash值
     int recv_hash = recv(net_fd, hash, sizeof(hash), MSG_WAITALL);
