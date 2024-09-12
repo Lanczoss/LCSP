@@ -86,6 +86,9 @@ int splitCommand(train_t *t, char *buf){
 
     //判断有几个参数
     while((parma = strtok(NULL, " ")) != NULL){
+        if(strcmp(parma,"\n") == 0){
+            break;
+        }
         t->parameter_num++;
         strncat(t->control_msg,parma,strlen(parma));
         t->control_msg[strlen(t->control_msg)] = ' ';

@@ -28,8 +28,6 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
         fprintf(stderr, "获取pid查询结果失败: %s\n", mysql_error(mysql));
         return -1;
     }
-    printf("%s\n",sql_pid);
-    printf("pid:%d",pid);
 
     //判断路径是否为跟或者目录
     //以路径结尾是否为"/"区分
@@ -71,6 +69,7 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
 
 
     bzero(res,sizeof(MYSQL*));
+
     //拼接SQL语句
     char sql[4096] = { 0 };
     bzero(sql,sizeof(sql));
@@ -78,8 +77,6 @@ int insertDir(train_t t, char * real_path, char * dirname,MYSQL*mysql){
              "INSERT INTO files (file_name,uid,pid,file_path,file_type,create_time,update_time)"
              "VALUES ('%s', %d, %d, '%s', 1, now(),now())",
              dirname, t.uid, pid, file_path);
-
-    printf("sql:%s\n",sql);
 
     if(mysql_query(mysql,sql)){
         printf("%s\n",mysql_error(mysql));
