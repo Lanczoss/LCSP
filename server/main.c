@@ -142,6 +142,10 @@ int main(void)
                     addEpoll(epoll_fd, net_fd);
                     LOG_INFO("One client login success.");
                 }
+                else
+                {
+                    close(net_fd);
+                }
                 
             }
             if(fd == pipefd[0])
