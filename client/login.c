@@ -16,7 +16,7 @@ void enterUsername(int num)
 //第一版第二版
 //将用户名和密码发送至服务器处接收
 //这里密码输入什么都能登录成功
-int loginSystem(train_t *t, int socket_fd)
+int loginSystem(train_t *t, int *socket_fd)
 {
 
     //读取用户名
@@ -65,17 +65,22 @@ int loginSystem(train_t *t, int socket_fd)
     //密码正文长度
     t->file_length = strlen(password);
 
+    //建立socket连接
+    int ret = initSocket(socket_fd);
+    ERROR_CHECK(ret, -1, "initSocket");
+
+
     //先发送一次登录信息
-    ssize_t rret = send(socket_fd, t, sizeof(train_t), MSG_NOSIGNAL);
+    ssize_t rret = send(*socket_fd, t, sizeof(train_t), MSG_NOSIGNAL);
     ERROR_CHECK(rret, -1, "send login msg");
 
     //再发送一次密码
-    rret = send(socket_fd, password, t->file_length, MSG_NOSIGNAL);
+    rret = send(*socket_fd, password, t->file_length, MSG_NOSIGNAL);
     ERROR_CHECK(rret, -1, "send password");
 
     //登录行为 接收服务器回复
     bzero(t, sizeof(train_t));
-    rret = recv(socket_fd, t, sizeof(train_t), MSG_WAITALL);
+    rret = recv(*socket_fd, t, sizeof(train_t), MSG_WAITALL);
     ERROR_CHECK(rret, -1, "recv");
     return 0;
 }

@@ -29,14 +29,13 @@ int main(void)
     }
     //建立socket连接
     int socket_fd;
-    ret = initSocket(&socket_fd);
-    ERROR_CHECK(ret, -1, "initSocket");
+    
     //自定义协议
     train_t t;
     bzero(&t, sizeof(t));
     t.isLoginFailed = 1;
     //客户端的用户操作界面
-    ret = interface(&t, socket_fd);
+    ret = interface(&t, &socket_fd);
     if(ret == -1)
     {
         //函数出错或者退出

@@ -238,19 +238,19 @@ int reName(train_t t, int socket_fd);
 //客户端的用户操作界面
 //录入用户第一次操作时的自定义协议
 //并将初始用户名加入到路径名中
-int interface(train_t *t, int socket_fd);
+int interface(train_t *t, int *socket_fd);
 
 //登录动作函数
 //第一版第二版
 //将用户名和密码发送至服务器处接收
 //这里密码输入什么都能登录成功
-int loginSystem(train_t *t, int socket_fd);
+int loginSystem(train_t *t, int *socket_fd);
 
 //注册动作函数
 //第一版第二版
 //将用户名和密码发送至服务器处接收
 //这里密码输入什么都能注册成功
-int registerSystem(train_t *t, int socket_fd);
+int registerSystem(train_t *t, int *socket_fd);
 
 // 日志记录函数
 // 第一个参数：日志文件指针，用于指定日志文件(log_info_file 或 log_error_file)

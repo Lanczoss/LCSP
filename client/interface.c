@@ -35,7 +35,7 @@ void loginFunc(int num)
 //客户端的用户操作界面
 //录入用户第一次操作时的自定义协议
 //并将初始用户名加入到路径名中
-int interface(train_t *t, int socket_fd)
+int interface(train_t *t, int *socket_fd)
 {
     int ret;
     //获取选项
@@ -64,6 +64,7 @@ int interface(train_t *t, int socket_fd)
             {
                 //登录失败再来一次
                 printf("用户名或密码不正确，请重新输入。\n\n");
+                close(*socket_fd);
                 continue;
             }
             printf("登录成功\n\n");
@@ -74,6 +75,7 @@ int interface(train_t *t, int socket_fd)
         case 'R':
             LOG_INFO("Register");
             ret = registerSystem(t, socket_fd);
+            close(*socket_fd);
             if(ret != 0)
             {
                 return -1;

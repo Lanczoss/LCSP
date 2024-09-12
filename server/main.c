@@ -132,12 +132,17 @@ int main(void)
                 {
                     break;
                 }
-                //将net_fd加入数组并加入监听
-                addNetFd(net_fd, net_fd_arr, NET_FD_NUM);
+                if(t.isLoginFailed == 0 && t.isRegister == 0)
+                {
+                    //登录成功
+                    //将net_fd加入数组并加入监听
+                    addNetFd(net_fd, net_fd_arr, NET_FD_NUM);
 
-                //将net_fd加入监听
-                addEpoll(epoll_fd, net_fd);
-                LOG_INFO("One client login success.");
+                    //将net_fd加入监听
+                    addEpoll(epoll_fd, net_fd);
+                    LOG_INFO("One client login success.");
+                }
+                
             }
             if(fd == pipefd[0])
             {
