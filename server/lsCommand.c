@@ -34,7 +34,7 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
 
         return -1;
     }
-
+    
     // 多send一次
     send(net_fd, &t, sizeof(t), MSG_NOSIGNAL);
 
@@ -94,7 +94,7 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
         return 0;
 
     }
-
+    
     // 发送信息,查到数据
     send(net_fd, &t, sizeof(train_t), MSG_NOSIGNAL);
 
