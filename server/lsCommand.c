@@ -21,6 +21,7 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
     MYSQL_BIND result[1];
     int id = getFileId(t, mysql); // 参数通过getfileid获得文件的索引id
     
+    printf("*%d*\n", id);
     // 对id做一下错误判断
     // id如果为-1，说明表中没有这条数据
     // 那就更别提以该id为pid的文件或文件夹了

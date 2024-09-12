@@ -143,7 +143,7 @@ int lsCommand(train_t t, int socket_fd){
     if(strlen(para) == 1 && para[0] == '/'){
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
         if(t.error_flag == 4){
-            printf("非法参数，参数个数不能大于1！\n");
+            printf("非法参数，当前无法查看/！\n");
         }
         return 0;
     }
