@@ -83,8 +83,8 @@ typedef struct train_s
     //默认0登录成功，1代表登录失败
     bool isLoginFailed;
 
-    //用户id
-    int uid;
+    //用户token值
+    char token[512];
 
     //错误标志
     int error_flag;
@@ -232,7 +232,7 @@ int createBaseFiles(void);
 //读配置文件
 int getParameter(void *key, void *value);
 //获取加密Token
-int enCodeToken(train_t t, char * buf);
+int enCodeToken(int uid, char * buf);
 
 //获取解密Token后的uid信息
 int deCodeToken(char * buf);
