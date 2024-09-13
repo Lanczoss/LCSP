@@ -17,6 +17,8 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
         return 0;
     }
 
+    //uid
+    int uid= deCodeToken(t.token);
     //pid
     int pid;
     //文件hash值
@@ -43,9 +45,6 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
     printf("处理之后的文件的路径%s\n",file_path);
 
     printf("处理之前的用户路径%s\n", user_path);
-    //    if (strlen(user_path) != 1) {
-    //        user_path[strlen(user_path)] = '\0';
-    //    }
     user_path[strlen(user_path)] = '\0';
     printf("处理之后的用户路径%s\n", user_path);
 
@@ -78,7 +77,6 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
         }
     }
     file_name[strlen(file_name)] = '\0';
-
     size_t file_name_len = strlen(file_name);
     if (file_name_len > 0 && file_name[file_name_len - 1] == '\n') {
         file_name[file_name_len - 1] = '\0'; // 将换行符替换为字符串终止符                                      
@@ -90,6 +88,11 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
         file_path[len - 1] = '\0'; // 将换行符替换为字符串终止符
     }
     printf("最后插入数据库的文件路径:#%s#\n", file_path);
+
+
+    strncat(file_path, file_name, strlen(file_name));
+    file_path[strlen(file_path)] = '\0';
+    printf("最后插入数据库的文件路径%s\n", file_path);
 
     //接收客户端文件的hash值
     int recv_hash = recv(net_fd, hash, sizeof(hash), MSG_WAITALL);
@@ -160,6 +163,7 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
         }else{
             long offset = -1;
             send(net_fd, &offset, sizeof(offset), MSG_NOSIGNAL);
+
         }
         //计算hash值
         //___________________________________________________
@@ -170,10 +174,10 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
         if (strcmp(sql_hash, hash) == 0) {
             //查询pid
             printf("查询pid的路径%s\n", user_path);
-            queryPid(mysql, user_path, t, &pid);
+            queryPid(mysql, user_path, uid, &pid);
 
             //将数据插入数据库
-            uploadDatabase(mysql, file_name, t.uid, pid, file_path, hash);
+            uploadDatabase(mysql, file_name, uid, pid, file_path, hash);
 
             printf("服务器成功收到文件: %s\n", serve_path);
         }
@@ -190,22 +194,22 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
 
         //查询文件是否删除，删除则修改标记为，如果为查找到则插入新记录
         int delete_flag;
-        int querydeletemark = queryDeleteMark(mysql, file_name, t, file_path, hash, &delete_flag);
+        int querydeletemark = queryDeleteMark(mysql, file_name, uid, file_path, hash, &delete_flag);
         if (querydeletemark == 0) {
             if (delete_flag == 0) {
                 printf("文件已经存在！\n");
             } else {
                 //修改标记位
-                modifyDeleteMark(mysql, file_name, t, file_path, hash);
+                modifyDeleteMark(mysql, file_name, uid, file_path, hash);
                 printf("文件上传成功！\n");
             }
         } else {
             //查询pid
             printf("查询pid的路径%s\n", user_path);
-            queryPid(mysql, user_path, t, &pid);
+            queryPid(mysql, user_path, uid, &pid);
 
             //将数据插入数据库
-            uploadDatabase(mysql, file_name, t.uid, pid, file_path, hash);
+            uploadDatabase(mysql, file_name, uid, pid, file_path, hash);
             printf("文件上传成功！\n");
         }
 

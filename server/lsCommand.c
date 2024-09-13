@@ -188,7 +188,7 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
         // 初始化
         new_t.command = LS;
         new_t.path_length = strlen(para);
-        new_t.uid = t.uid;
+        strcpy(new_t.token, t.token);
         strncpy(new_t.control_msg, para, strlen(para));
 
         // 这时再去ls, 去获得路径的id不一定成功，需错误处理
@@ -209,7 +209,7 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
     // 将参数拼接到路径后
     strncat(path, para, strlen(para));
     new_t.path_length = strlen(path);
-    new_t.uid = t.uid;
+    strcpy(new_t.token, t.token);
     strncpy(new_t.control_msg, path, strlen(path));
 
     // 同样去ls

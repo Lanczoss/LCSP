@@ -254,8 +254,8 @@ int getFileHash(const char *filename, char *hash) {
   * 返回值: 修改成功返回 0，错误返回 -1
   ******************************************************************************
 **/
-int judgeFileHash(MYSQL *mysql, const char *str, train_t t) {
-    int user_uid = t.uid;
+int judgeFileHash(MYSQL *mysql, const char *str, int uid) {
+    int user_uid = uid;
     mysql_set_character_set(mysql, "utf8mb4");
 
     // SQL 查询语句，使用占位符
@@ -337,8 +337,8 @@ int judgeFileHash(MYSQL *mysql, const char *str, train_t t) {
   * 返回值:正常返回0
   ******************************************************************************
 **/
-int queryPid(MYSQL *mysql, const char *filepath, train_t t, int *pid) {
-    int user_id = t.uid;
+int queryPid(MYSQL *mysql, const char *filepath, int uid, int *pid) {
+    int user_id = uid;
     mysql_set_character_set(mysql, "utf8mb4");
 
     // SQL 查询语句，使用占位符
@@ -443,9 +443,10 @@ int uploadDatabase(MYSQL *mysql, char *filename, int uid, int pid, char *filepat
   * 返回值: 查询成功返回 0，错误返回 -1
   ******************************************************************************
 **/
-int queryDeleteMark(MYSQL *mysql, const char *filename, const train_t t, const char *filepath, const char *hash,int *delete_flag) {
+int queryDeleteMark(MYSQL *mysql, const char *filename, const int uid, const char *filepath, const char *hash,
+                    int *delete_flag) {
 
-    int user_id = t.uid;
+    int user_id = uid;
     // 设置字符集
     mysql_set_character_set(mysql, "utf8mb4");
 
@@ -555,7 +556,8 @@ int queryDeleteMark(MYSQL *mysql, const char *filename, const train_t t, const c
   * 返回值: 修改成功返回 0，错误返回 -1
   ******************************************************************************
 **/
-int modifyDeleteMark(MYSQL *mysql, const char *filename, const train_t t, const char *filepath, const char *hash) {
+int modifyDeleteMark(MYSQL *mysql, const char *filename, const int uid, const char *filepath, const char *hash) {
+    int user_uid=uid;
     // 设置字符集
     mysql_set_character_set(mysql, "utf8mb4");
 
@@ -589,7 +591,7 @@ int modifyDeleteMark(MYSQL *mysql, const char *filename, const train_t t, const 
 
     // 绑定 uid
     bind[1].buffer_type = MYSQL_TYPE_LONG;
-    bind[1].buffer = (char *) &t.uid;
+    bind[1].buffer = (char *) &user_uid;
     bind[1].is_null = 0;
     bind[1].length = 0;
 

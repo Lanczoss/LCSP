@@ -23,7 +23,10 @@ int rollbackPath(char *virtual_path){
 bool isExistDir(MYSQL *mysql, train_t t, char *virtual_path, char *parameter){
     char select_statement[1024] = {0};
     char error_statement[1024] = {0};
-    sprintf(select_statement,"select * from files where uid = %d and file_type = %d and file_path = '%s/%s'",t.uid,1,virtual_path,parameter);
+
+    int uid = deCodeToken(t.token);
+    
+    sprintf(select_statement,"select * from files where uid = %d and file_type = %d and file_path = '%s/%s'",uid,1,virtual_path,parameter);
     printf("st: %s\n",select_statement);
     int ret = mysql_query(mysql,select_statement);
     if (ret != 0){
@@ -78,7 +81,7 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
         t.path_length = strlen(t.control_msg);
         t.error_flag = NORMAL;
 
-        printf("cd #%s#\n",t.control_msg);
+        //printf("#%s#\n",t.control_msg);
         
         ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
         ERROR_CHECK(ret,-1,"send");

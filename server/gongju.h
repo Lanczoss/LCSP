@@ -22,19 +22,19 @@ int judgeFileExist(MYSQL *mysql, char *filename, char *hash);
 int getFileHash(const char *filename, char *hash);
 
 //hash是否相等
-int judgeFileHash(MYSQL *mysql, const char *str, train_t t);
+int judgeFileHash(MYSQL *mysql, const char *str, int uid);
 
 //下载文件插入数据库
 int uploadDatabase(MYSQL *mysql, char *filename, int uid, int pid, char *filepath, char *hash);
 
 //查询父目录id
-int queryPid(MYSQL *mysql, const char *filepath, train_t t, int *pid);
+int queryPid(MYSQL *mysql, const char *filepath, int uid, int *pid);
 
 //查询删除标记位
-int queryDeleteMark(MYSQL *mysql, const char *filename, const train_t t, const char *filepath, const char *hash,
+int queryDeleteMark(MYSQL *mysql, const char *filename, const int uid, const char *filepath, const char *hash,
                     int *delete_flag);
 
 //修改删除标记位
-int modifyDeleteMark(MYSQL *mysql, const char *filename, const train_t t, const char *filepath, const char *hash);
+int modifyDeleteMark(MYSQL *mysql, const char *filename, const int uid, const char *filepath, const char *hash);
 
 #endif //BAIDU_GONGJU_H

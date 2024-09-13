@@ -3,26 +3,29 @@
 //分析协议
 int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
 {
+    //短命令返回0
+    //长命令返回1
+    //exit返回-1
     switch(t->command)
     {
     case LS:
         lsCommand(*t, net_fd, mysql);
-        return 0;
+        break;
     case CD:
         cdCommand(*t, net_fd, mysql);
-        return 0;
+        break;
     case PWD:
         //pwdCommand(t, net_fd);
-        return 0;
+        break;
     case PUTS:
-        putsCommand(*t, net_fd,mysql);
-        return 0;
+        //putsCommand(*t, net_fd);
+        return 1;
     case GETS:
-        getsCommand(*t, net_fd, mysql);
-        return 0;
+        // getsCommand(t, net_fd);
+        return 1;
     case REMOVE:
         printf("函数暂时未完成！\n");
-        return 0;
+        break;
     case MKDIR:
         mkdirCommand(*t, net_fd, mysql);
         break;
@@ -30,8 +33,7 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
         rmCommand(*t, net_fd,mysql);
         break;
     case EXIT:
-        t->isLoginFailed = 1;
-        break;
+        return -1;
     case RENAME:
         reName(*t,net_fd,mysql);
         break;

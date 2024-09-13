@@ -49,45 +49,78 @@ void *threadMain(void *p)
 
         //工作
         ret = doWorker(mysql, net_fd);
-        THREAD_ERROR_CHECK(ret, "One client disconnected. Check the log.");
+        THREAD_ERROR_CHECK(ret, "One upload/download done. Check the log.");
         close(net_fd);
     }
     return NULL;
 }
 
+// 判断id是否存在
+bool isExistUid(MYSQL *mysql, char *token){
+    int uid = deCodeToken(token);
+    
+    char select_statement[300] = {0};
+    sprintf(select_statement,"select id from users where id = %d",uid);
+    int ret = mysql_query(mysql,select_statement);
+    if (ret != 0){
+        printf("mysql: %s\n",mysql_error);
+    }
+    MYSQL_RES *res = mysql_store_result(mysql);
+    if (res == NULL){
+        mysql_free_result(res);
+        return false;
+    }
+    else {
+        if (mysql_num_rows(res) == 0){
+            mysql_free_result(res);
+            return false;
+        }
+        else {
+            mysql_free_result(res);
+            return true;
+        }
+    }
+}
+
+// 处理长命令gets puts
 int doWorker(MYSQL *mysql, int net_fd)
 {
-    //自定义协议
+    // 定义协议头部用于接受服务端的信息
     train_t t;
-    bzero(&t, sizeof(t));
-    t.isLoginFailed = 1;
+    
+    // 接收客户端的token信息
+    int ret = recv(net_fd,&t,sizeof(t),MSG_WAITALL);
+    ERROR_CHECK(ret,-1,"recv");
 
-    while(1)
-    {
-        while(t.isLoginFailed == 1)
-        {
-            //登录/注册逻辑函数
-            int ret = loginRegisterSystem(&t, net_fd, mysql);
-            if(ret == -1)
-            {
-                return -1;
-            }
-            LOG_INFO("One client login success.");
-        }
-        //到这里开始用户成功登录
-        // 接受一次信息-》区分等下要分发给那个命令：
-        ssize_t rret = recv(net_fd, &t, sizeof(t), MSG_WAITALL);
-        if(rret == 0)
-        {
+    // 拿到解析出的uid进行查表，观察是否有这个uid
+    bool flag = isExistUid(mysql,t.token);
+    
+    // 根据flag进行判断对方的用户身份
+    if (flag = false){
+        t.error_flag = ABNORMAL;
+        ret = send(net_fd,&t,sizeof(t),MSG_WAITALL);
+        ERROR_CHECK(ret,-1,"send");
+        LOG_INFO("用户身份错误");
+        return -1;
+    }
+    else {
+        t.error_flag = NORMAL;
+        ret = send(net_fd,&t,sizeof(t),MSG_WAITALL);
+        ERROR_CHECK(ret,-1,"send");
+    }
+
+    // 处理长命令
+    switch(t.command){
+        case GETS:
+            ret = getsCommand(t,net_fd,mysql);
+            ERROR_CHECK(ret,-1,"getsCommand");
+        case PUTS:
+            ret = putsCommand(t,net_fd,mysql);
+            ERROR_CHECK(ret,-1,"putsCommand");
+            break;
+        default:
+            LOG_INFO("长命令解析错误");
             return -1;
-        }
-        //分析协议
-        int ret = analysisProtocol(&t, net_fd, mysql);
-        if(ret == -1)
-        {
-            //用户输入了exit
-            return -1;
-        }
     }
     return 0;
 }

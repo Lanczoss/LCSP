@@ -99,7 +99,7 @@ int splitCommand(train_t *t, char *buf){
         t->parameter_num++;
         strncat(t->control_msg,parma,strlen(parma));
         t->control_msg[strlen(t->control_msg)] = ' ';
-    }
+    }  
     return 0;
     }
 

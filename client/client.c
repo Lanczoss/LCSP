@@ -13,7 +13,7 @@ char user_path[1024] = {0};
 void exitFunc(int num)
 {
     //打印输入框
-    printf("\033[38;5;208m[\xF0\x9F\xA5\xB3\xE2\x98\x81  \033[38;5;118m%s\033[38;5;208m]\033[0m ", user_path);
+    printf("\n\033[38;5;208m[\xF0\x9F\xA5\xB3\xE2\x98\x81  \033[38;5;118m%s\033[38;5;208m]\033[0m ", user_path);
     fflush(stdout);
 }
 
@@ -29,27 +29,23 @@ int main(void)
     }
     //建立socket连接
     int socket_fd;
-    ret = initSocket(&socket_fd);
-    ERROR_CHECK(ret, -1, "initSocket");
+    
     //自定义协议
     train_t t;
     bzero(&t, sizeof(t));
     t.isLoginFailed = 1;
     //客户端的用户操作界面
+    ret = interface(&t, &socket_fd);
+    if(ret == -1)
+    {
+        //函数出错或者退出
+        close(socket_fd);
+        exit(0);
+    }
     //录入用户第一次操作时的自定义协议
     //并将初始用户名加入到路径名中
     while(1)
     { 
-        while(t.isLoginFailed == 1)
-        {
-            ret = interface(&t, socket_fd);
-            if(ret == -1)
-            {
-                //函数出错或者退出
-                close(socket_fd);
-                exit(0);
-            }
-        }
         signal(SIGINT, exitFunc);
         //到这里开始服务器已经接受了用户的登录
         //此时自定义协议里有路径名及路径名长度

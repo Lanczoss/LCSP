@@ -12,9 +12,11 @@ bool isExistReg(MYSQL *mysql, train_t t, char *file_name, char *hash){
     char local_path[100] = {0};
     splitParameter(t,0,local_path);
     
+    int uid = deCodeToken(t.token);
+
     sprintf(select_statement,
     "select hash from files where pid = (select id from files where uid = %d and file_path = '%s' and delete_flag = 0 and file_type = 1) and file_name = '%s' and file_type = 2" 
-    ,t.uid,local_path,file_name);
+    ,uid,local_path,file_name);
     
     printf("st : %s\n",select_statement);
     

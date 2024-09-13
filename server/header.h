@@ -32,7 +32,9 @@
 #include <sys/utsname.h>    // uname()需要用到的头文件
 #include <errno.h>
 #include <crypt.h>
-
+#include "wheel.h"
+#include <l8w8jwt/encode.h>
+#include <l8w8jwt/decode.h>
 enum
 {
     FALSE,
@@ -45,8 +47,8 @@ enum
     REMOVE,
     RM,
     MKDIR,
-    ABNORMAL,
     NORMAL,
+    ABNORMAL,
     EXIT,
     RENAME
 };
@@ -81,8 +83,8 @@ typedef struct train_s
     //默认0登录成功，1代表登录失败
     bool isLoginFailed;
 
-    //用户id
-    int uid;
+    //用户token值
+    char token[512];
 
     //错误标志
     int error_flag;
@@ -229,6 +231,11 @@ int createBaseFiles(void);
 
 //读配置文件
 int getParameter(void *key, void *value);
+//获取加密Token
+int enCodeToken(int uid, char * buf);
+
+//获取解密Token后的uid信息
+int deCodeToken(char * buf);
 
 //初始化线程池
 //第一个参数是共用结构体
@@ -332,5 +339,8 @@ int insertDir(train_t t, char * real_path, char* filename,MYSQL*mysql);
 int deleteFile(train_t t, char * file_path, MYSQL*mysql);
 
 int getFileId(train_t t, MYSQL * mysql);
+
+////创建net_fd循环数组（用于超时踢出）
+//int createNetFdArr(int **net_fd, int length);
 
 #endif

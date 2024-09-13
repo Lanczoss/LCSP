@@ -53,7 +53,7 @@ void loginFunc(int num)
 //客户端的用户操作界面
 //录入用户第一次操作时的自定义协议
 //并将初始用户名加入到路径名中
-int interface(train_t *t, int socket_fd)
+int interface(train_t *t, int *socket_fd)
 {
     printf("\xF0\x9F\x91\xBB\xF0\x9F\x91\xBB 欢迎使用 \xF0\x9F\x91\xBB\xF0\x9F\x91\xBB\n");
     int ret;
@@ -83,6 +83,7 @@ int interface(train_t *t, int socket_fd)
             {
                 //登录失败再来一次
                 printf("\033[38;5;208m[\xE2\x98\x81 \033[38;5;208m ] \033[0m用户名或密码不正确，请重新输入。\n\n");
+                close(*socket_fd);
                 continue;
             }
             printf("\033[38;5;208m[\xE2\x98\x81 \033[38;5;208m ] \033[0m登录成功\n\n");
@@ -93,6 +94,7 @@ int interface(train_t *t, int socket_fd)
         case 'R':
             LOG_INFO("Register");
             ret = registerSystem(t, socket_fd);
+            close(*socket_fd);
             if(ret != 0)
             {
                 return -1;
