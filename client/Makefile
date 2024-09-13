@@ -5,7 +5,7 @@ COM_OP:=-Wall -g -pthread
 CC:=gcc
 
 $(OUT):$(OBJS)
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ $(COM_OP)
 %.o:%.c
 	$(CC) -c $< -o $@ $(COM_OP)
 

@@ -11,10 +11,16 @@
 **/
 int putsCommand(train_t t, int socket_fd) {
 
+    //参数出理
+    if(t.parameter_num>=2){
+        printf("请输入正确参数-> (puts 上传文件的路径)\n");
+        return 0;
+    }
+
     // 获取绝对路径
     char client_path[2048] = {0};
     getcwd(client_path, sizeof(client_path));
-    printf("绝对路径%s\n",client_path);
+    printf("绝对路径%s\n", client_path);
 
     // 获取用户路径
     char user_path[256] = {0};
@@ -23,10 +29,6 @@ int putsCommand(train_t t, int socket_fd) {
         return -1;
     }
 
-//    if (user_path[0] != '\0') {
-//        strcat(client_path, "/");
-//        strcat(client_path, user_path);
-//    }
 
     printf("客户端本地路径：%s\n", client_path);
 
@@ -58,6 +60,22 @@ int putsCommand(train_t t, int socket_fd) {
     }
     printf("成功打开%s\n", client_path);
 
+
+    //读取该文件的hash值，并发送给服务端进行对比
+    char hash[256] = {0};
+    int get_file_hash = getFileHash(client_path, hash);
+    if (get_file_hash == -1) {
+        fprintf(stderr, "计算hash失败!\n");
+        return -1;
+    }
+    //发送哈希值
+    ssize_t send_hash = send(socket_fd, hash, sizeof(hash), MSG_NOSIGNAL);
+    if (send_hash == -1) {
+        perror("发送hash值错误！");
+        close(open_file_fd);
+        return -1;
+    }
+
     //获取文件信息
     struct stat file_stat;
     if (fstat(open_file_fd, &file_stat) == -1) {
@@ -66,7 +84,8 @@ int putsCommand(train_t t, int socket_fd) {
         return -1;
     }
     // 发送结构体
-    t.file_length=file_stat.st_size;
+
+    t.file_length = file_stat.st_size;
     ssize_t send_t = send(socket_fd, &t, sizeof(t), MSG_NOSIGNAL);
     if (send_t == -1) {
         perror("send train_t error");
@@ -77,20 +96,24 @@ int putsCommand(train_t t, int socket_fd) {
 
 //等待serve：60行
     //接收偏移量
-    long offset=0;
-    recv(socket_fd,&offset,sizeof(offset),MSG_WAITALL);
-    printf("发送文件偏移量为:%ld\n",offset);
+
+    long offset = 0;
+    recv(socket_fd, &offset, sizeof(offset), MSG_WAITALL);
+    printf("发送文件偏移量为:%ld\n", offset);
+    if (offset == -1) {
+        return 0;
+    }
 
     //lseek(open_file_fd,offset,SEEK_SET);
 
-    ssize_t sendfile_t=sendfile(socket_fd,open_file_fd,&offset,file_stat.st_size-offset);
+    ssize_t sendfile_t = sendfile(socket_fd, open_file_fd, &offset, file_stat.st_size - offset);
     if (sendfile_t == -1) {
         perror("sendfile error");
         close(open_file_fd);
         return -1;
     }
 
-    printf("所发送字节大小%ld\n",sendfile_t);
+    printf("所发送字节大小%ld\n", sendfile_t);
     printf("文件成功发送!\n");
     close(open_file_fd);
 
@@ -105,11 +128,11 @@ int putsCommand(train_t t, int socket_fd) {
   * 返回值:正常返回0
   ******************************************************************************
 **/
-int pwdCommand(train_t t){
+int pwdCommand(train_t t) {
 
-    char path_name[256]={0};
-    memcpy(path_name,t.control_msg,t.path_length);
-    printf("%s\n",path_name);
+    char path_name[256] = {0};
+    memcpy(path_name, t.control_msg, t.path_length);
+    printf("%s\n", path_name);
 
     return 0;
 }
