@@ -66,7 +66,7 @@ int main(void)
         char stdin_buf[1024] = {0};
         ssize_t rret = read(STDIN_FILENO, stdin_buf, 1024);
         ERROR_CHECK(rret, -1, "read stdin");
-        printf("\n");
+        //printf("\n");
         //将路径名 命令 参数以buf送进splitCommand
         char buf[2048] = {0};
         strcpy(buf, user_path);
@@ -92,6 +92,7 @@ int main(void)
             close(socket_fd);
             exit(0);
         }
+        printf("\n");
     }
     close(socket_fd);
 }
