@@ -8,7 +8,7 @@ int cdCommand(train_t *t, int socket_fd){
     train_t tmp_t;
     int ret = recv(socket_fd,&tmp_t,sizeof(tmp_t),MSG_WAITALL);
     ERROR_CHECK(ret,-1,"recv");
-    if (tmp_t.error_flag == NORMAL){
+    if (tmp_t.error_flag == ABNORMAL){
         printf("%s\n",tmp_t.control_msg);
         return 0;
     }

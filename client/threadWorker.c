@@ -53,8 +53,6 @@ void *thread_main(void *args){
         LOG_PERROR("recv");
         return (void *)-1;
     }
-
-    printf("error_flag == %d\n",t.error_flag);
     
     // 检测身份是否有异常
     if (t.error_flag == ABNORMAL){
@@ -69,20 +67,22 @@ void *thread_main(void *args){
             puts("62: getsCommand");
             ret = getsCommand(t, socket_fd);
             if (ret == -1){
-                LOG_PERROR("getsCommand");
+                LOG_INFO("getsCommand");
                 return (void *)-1;
             }
             break;
         case PUTS:
             puts("70: putsCommand");
-            putsCommand(t, socket_fd);
+            ret = putsCommand(t, socket_fd);
             if (ret == -1){
-                LOG_PERROR("putsCommand");
+                LOG_INFO("putsCommand");
                 return (void *)-1;
             }
             break;
         default:
             printf("输入命令错误");
     }
-    return NULL;
+    close(socket_fd);
+    puts("end: 89");
+    return 0;
 }

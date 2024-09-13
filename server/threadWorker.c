@@ -60,15 +60,14 @@ void *threadMain(void *p)
 bool isExistUid(MYSQL *mysql, char *token){
     int uid = deCodeToken(token);
     
-    printf("uid = %d\n",uid);
     char select_statement[300] = {0};
     sprintf(select_statement,"select user_id from users where user_id = %d",uid);
-    printf("%s\n",select_statement);
     
     int ret = mysql_query(mysql,select_statement);
     if (ret != 0){
         printf("mysql: %s\n",mysql_error(mysql));
     }
+
     MYSQL_RES *res = mysql_store_result(mysql);
     if (res == NULL){
         mysql_free_result(res);
@@ -97,8 +96,6 @@ int doWorker(MYSQL *mysql, int net_fd)
     int ret = recv(net_fd,&t,sizeof(t),MSG_WAITALL);
     ERROR_CHECK(ret,-1,"recv");
 
-    printf("token: %s\n",t.token);
-
     // 拿到解析出的uid进行查表，观察是否有这个uid
     bool flag = isExistUid(mysql,t.token);
     
@@ -121,15 +118,23 @@ int doWorker(MYSQL *mysql, int net_fd)
     // 处理长命令
     switch(t.command){
         case GETS:
+            puts("123:getsCommnd");
             ret = getsCommand(t,net_fd,mysql);
-            ERROR_CHECK(ret,-1,"getsCommand");
+            if (ret == -1){
+                LOG_INFO("下载失败");
+            }
+            break;
         case PUTS:
+            puts("123:putsCommand");
             ret = putsCommand(t,net_fd,mysql);
-            ERROR_CHECK(ret,-1,"putsCommand");
+            if (ret == -1){
+                LOG_INFO("下载失败");
+            }
             break;
         default:
             LOG_INFO("长命令解析错误");
             return -1;
     }
+    puts("end: 140");
     return 0;
 }

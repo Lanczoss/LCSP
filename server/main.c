@@ -105,11 +105,11 @@ int main(void)
     TimeWheel timeWheel; //时间轮
     int net_fd_arr[NET_FD_NUM];
     initTimeWheel(&timeWheel);
+    
     //创建net_fd循环数组（用于超时踢出）
     for (int i = 0; i < NET_FD_NUM; i++) {
         net_fd_arr[i] = -1;  // 初始化为无效fd
     }
-
     LOG_INFO("Waiting for socket_fd or pipefd[0] or net_fd.");
     //自定义协议
     train_t t;
@@ -227,7 +227,6 @@ int main(void)
                 //TODO:考虑exit的情况
                 if(fd == net_fd_arr[j])
                 {
-                    sleep(10);
                     bzero(&t, sizeof(t));
                     // 接受一次信息-》区分等下要分发给那个命令：
                     ssize_t rret = recv(net_fd_arr[j], &t, sizeof(t), MSG_WAITALL);

@@ -62,7 +62,6 @@ static uint32_t hash_func(const void* key, int len, uint32_t seed) {
 // 返回值：0为成功，-1为失败
 int mmapRecvFile(int socket_fd, int file_fd, int block_num, int file_size){
         // 计算还需要接受多少次文件映射的次数
-        printf("file_size = %d\n",file_size);
         int mmap_times = (file_size - 4096 * block_num) / 4096;
 
         // 进行mmap的映射续传
@@ -73,15 +72,9 @@ int mmapRecvFile(int socket_fd, int file_fd, int block_num, int file_size){
             char *mmap_file = (char *)mmap(NULL, 4096, PROT_WRITE, MAP_SHARED, file_fd, (i + block_num) * 4096);
             ERROR_CHECK(mmap_file,NULL,"mmap");
 
-            printf("ftruncate = %d\n", (i + 1 + block_num) * 4096);
-            printf("mmap = %d\n",(i + block_num) * 4096);
-
             // 写入磁盘文件
-            puts("76");
             ret = recv(socket_fd,mmap_file,4096,MSG_WAITALL);
-            printf("ret = %d\n",ret);
             ERROR_CHECK(ret,0,"recv");
-            puts("79");
 
             munmap(mmap_file,4096);
         }
@@ -113,7 +106,6 @@ int getsCommand(train_t t, int socket_fd){
     int ret;
 
     // 等待接收服务端进行参数检错
-    puts("client gets getsCommand");
 
     ret = recv(socket_fd,&t,sizeof(t),MSG_WAITALL);
     ERROR_CHECK(ret,-1,"recv");
@@ -166,14 +158,12 @@ int getsCommand(train_t t, int socket_fd){
 
     // 同名文件  NORMAL表示有同名文件， ABNORMAL表示没有同名文件
     if (flag == true){
-        puts("155");
         t.error_flag = NORMAL;
         ret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
         ERROR_CHECK(ret,-1,"send");
     }
     // 无同名文件
     else {
-        puts("162");
         t.error_flag = ABNORMAL;
         ret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
         ERROR_CHECK(ret,-1,"send");
@@ -207,10 +197,6 @@ int getsCommand(train_t t, int socket_fd){
         ret = recv(socket_fd,&stmp_hash_val,sizeof(stmp_hash_val),MSG_WAITALL);
         ERROR_CHECK(ret,0,"recv");
     }
-    printf("shash_val = %x\n",stmp_hash_val);
-    printf("file_path = %s\n",parameter);
-    printf("file_size = %d\n",file_size);
-    printf("shash = %s\n",hash);
 
     // 无同名文件
     if (flag == false){
@@ -221,7 +207,6 @@ int getsCommand(train_t t, int socket_fd){
     }
     // 有同名文件
     else if (flag == true){
-        puts("216");
         // 设置标志位
         // 设置一个int flag标志位
         // 1表示要无需发送
@@ -256,9 +241,6 @@ int getsCommand(train_t t, int socket_fd){
                 local_hash[i] = 0;
             }
         }
-
-        printf("local_file_size = %d\n",local_file_size);
-        printf("local_hash = %s\n",local_hash);
         
         // 判断是否为同一个文件
         if (strcmp(local_hash,hash) == 0){
