@@ -13,7 +13,7 @@ char user_path[1024] = {0};
 void exitFunc(int num)
 {
     //打印输入框
-    printf("\nCloud %s> ", user_path);
+    printf("\n\033[38;5;208m[\xF0\x9F\xA5\xB3\xE2\x98\x81  \033[38;5;118m%s\033[38;5;208m]\033[0m ", user_path);
     fflush(stdout);
 }
 
@@ -49,19 +49,20 @@ int main(void)
         signal(SIGINT, exitFunc);
         //到这里开始服务器已经接受了用户的登录
         //此时自定义协议里有路径名及路径名长度
+        //printf("登录成功时 t->control_msg = %s\nt->path_length = %d\n", t.control_msg, t.path_length);
         //获取新一轮的路径名
         bzero(user_path, sizeof(user_path));
         strncpy(user_path, t.control_msg, t.path_length);
 
         //打印输入框
-        printf("Cloud %s> ", user_path);
+        printf("\033[38;5;208m[\xF0\x9F\xA5\xB3\xE2\x98\x81  \033[38;5;118m%s\033[38;5;208m]\033[0m ", user_path);
         fflush(stdout);
 
         //存储标准输入的缓冲区
         char stdin_buf[1024] = {0};
         ssize_t rret = read(STDIN_FILENO, stdin_buf, 1024);
         ERROR_CHECK(rret, -1, "read stdin");
-
+        //printf("\n");
         //将路径名 命令 参数以buf送进splitCommand
         char buf[2048] = {0};
         strcpy(buf, user_path);
@@ -108,6 +109,7 @@ int main(void)
             close(socket_fd);
             exit(0);
         }
+        printf("\n");
     }
     close(socket_fd);
 }

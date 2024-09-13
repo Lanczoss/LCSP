@@ -1,4 +1,5 @@
 #include "header.h"
+#include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <ftw.h>
@@ -25,18 +26,26 @@ int rmCommand(train_t t, int net_fd,MYSQL *mysql)
         }
 
         //拼接路径path+filename
-        strcat(real_path, filename);
+        // 检查路径的最后一个字符是否是 '/'
+        size_t len = strlen(real_path);
+        if (len > 1 && real_path[len - 1] != '/') {
+            strcat(real_path,"/");
+        }
+        strcat(real_path,filename);
         //TODO:去除文件后面的换行符
 
         int ret = deleteFile(t, real_path, mysql);
-        printf("ret:%d\n",ret);
         if(ret == 0){
+            char buf[1024] = { 0 };
             char str[] = "删除文件成功！";
-            send(net_fd,str,strlen(str),MSG_NOSIGNAL);
+            strcpy(buf,str);
+            send(net_fd,buf,sizeof(buf),MSG_NOSIGNAL);
 
         }else{
+            char buf[1024] = { 0 };
             char str[] = "删除文件失败！";
-            send(net_fd,str,strlen(str),MSG_NOSIGNAL);
+            strcpy(buf,str);
+            send(net_fd,buf,sizeof(buf),MSG_NOSIGNAL);
         }
     }
 

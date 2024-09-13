@@ -47,8 +47,8 @@ enum
     REMOVE,
     RM,
     MKDIR,
-    ABNORMAL,
     NORMAL,
+    ABNORMAL,
     EXIT,
     RENAME
 };

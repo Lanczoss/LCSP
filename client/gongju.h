@@ -1,7 +1,6 @@
 #ifndef BAIDU_GONGJU_H
 #define BAIDU_GONGJU_H
 
-#include <mysql/mysql.h>
 #include "header.h"
 
 //提取一个字符串最后的文件名 eg: /a/b/c.txt -> c.txt

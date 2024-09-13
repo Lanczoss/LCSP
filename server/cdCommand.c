@@ -78,10 +78,10 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
         bzero(t.control_msg,sizeof(t.control_msg));
         strcpy(t.control_msg,"/");
         t.current_layers = 0;
-        t.file_length = strlen(t.control_msg);
+        t.path_length = strlen(t.control_msg);
         t.error_flag = NORMAL;
 
-        printf("#%s#\n",t.control_msg);
+        //printf("#%s#\n",t.control_msg);
         
         ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
         ERROR_CHECK(ret,-1,"send");

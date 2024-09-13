@@ -11,6 +11,12 @@
 **/
 int putsCommand(train_t t, int socket_fd) {
 
+    //参数出理
+    if(t.parameter_num>=2){
+        printf("请输入正确参数-> (puts 上传文件的路径)\n");
+        return 0;
+    }
+
     // 获取绝对路径
     char client_path[2048] = {0};
     getcwd(client_path, sizeof(client_path));
