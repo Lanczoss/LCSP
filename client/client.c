@@ -79,8 +79,29 @@ int main(void)
         //处理接收的消息
         //发送命令
         rret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
-        ERROR_CHECK(rret, -1, "send");
-
+        if(rret == -1)
+        {
+            close(socket_fd);
+            printf("重连\n");
+            //对端关闭
+            //重新socket连接
+            int ret = initSocket(&socket_fd);
+            ERROR_CHECK(ret, -1, "initSocket");
+            send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+            continue;
+        }
+        rret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+        if(rret == -1)
+        {
+            close(socket_fd);
+            printf("重连\n");
+            //对端关闭
+            //重新socket连接
+            int ret = initSocket(&socket_fd);
+            ERROR_CHECK(ret, -1, "initSocket");
+            send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+            continue;
+        }
         ret = analysisProtocol(&t, socket_fd);
         if(ret == -1)
         {

@@ -24,12 +24,12 @@ void initTimeWheel(TimeWheel* wheel);
 int addTimer(TimeWheel* wheel, int fd);
 
 //连接关闭从链表中移除
-int removeTimer(TimeWheel* wheel, int fd);
+int removeTimer(TimeWheel* wheel, int fd, int epoll_fd);
 
 // 处理超时事件
-void handleTimeout(TimeWheel* wheel);
+void handleTimeout(TimeWheel* wheel, int epoll_fd);
 
 // 将新的 net_fd 添加到 net_fd_arr 数组中
-int addNetFd(TimeWheel* wheel, int *net_fd_arr, int length);
+int checkNetFd(int fd, TimeWheel* wheel);
 
 #endif //WHEEL_H

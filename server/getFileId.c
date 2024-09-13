@@ -9,7 +9,7 @@ int getFileId(train_t t, MYSQL *mysql){
     int file_id = -1;     // 最终找到的文件或目录的ID
 
     // 从train_t 获取pid和file_path
-    uid = t.uid;
+    uid = deCodeToken(t.token);
 
     // 拼接真实路径
 

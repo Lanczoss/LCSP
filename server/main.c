@@ -1,5 +1,18 @@
 #include "header.h"
-#define NET_FD_NUM 60
+#define NET_FD_NUM 30
+
+void print_arr(TimeWheel* wheel)
+{
+    for(int i =0; i < TIME_WHEEL_SIZE; i++)
+    {
+        Timer *curr = wheel->slots[i];
+        while(curr != NULL)
+        {
+            printf("netfd = %d, index = %d\n", curr->fd, i);
+            curr = curr->next;
+        }
+    }
+}
 
 //创建目录files或者判断是否有files
 int createBaseFiles(void)
@@ -82,8 +95,8 @@ int main(void)
         pthread_exit(NULL);
     }
     //线程池用于长命令
-    ret = initThreads(&pool);
-    ERROR_CHECK(ret, -1, "init thread pools");
+    /* ret = initThreads(&pool); */
+    /* ERROR_CHECK(ret, -1, "init thread pools"); */
 
     //初始化socket
     int socket_fd;
@@ -112,13 +125,17 @@ int main(void)
     {
         bzero(&t, sizeof(t));
         struct epoll_event event[10];
+        memset(event, 0, sizeof(event));
         //开始监听
-        int epoll_num = epoll_wait(epoll_fd, event, 10, 1000);
-        ERROR_CHECK(epoll_num, -1, "epoll_wait");
+        int epoll_num = epoll_wait(epoll_fd, event, 
+        10, 1000);
+        printf("epoll_wait = \n");
 
+        ERROR_CHECK(epoll_num, -1, "epoll_wait");
         for(int i = 0; i < epoll_num; i++)
         {
             int fd = event[i].data.fd;
+            //printf("fd = %d\n", fd);
             if(fd == socket_fd)
             {
                 //新连接
@@ -131,22 +148,24 @@ int main(void)
                 ret = loginRegisterSystem(&t, net_fd, mysql);
                 if(ret == -1)
                 {
-                    break;
+                    continue;
                 }
-                if(t.isLoginFailed == 0 && t.isRegister == 0)
+                if(ret == 2 ||(t.isLoginFailed == 0 && t.isRegister == 0))
                 {
                     //登录成功
                     //将net_fd加入监听
                     addEpoll(epoll_fd, net_fd);
+                    printf("net_fd = %d\n", net_fd);
                     // 添加到时间轮中
                     addTimer(&timeWheel, net_fd);  // 30秒超时
                     LOG_INFO("One client login success.");
+                    print_arr(&timeWheel);
                 }
                 else
                 {
                     close(net_fd);
                 }
-                
+                continue;
             }
             if(fd == pipefd[0])
             {
@@ -190,46 +209,63 @@ int main(void)
                 //主线程退出
                 pthread_exit(NULL);
             }
-            //到这里需要遍历所有的未超时指针数组，将就绪fd存到临时数组
-            int net_fd_arr[NET_FD_NUM] = {0};
-            ret = addNetFd(&timeWheel, net_fd_arr, NET_FD_NUM);
-            if(ret == -1)
+            //到这里需要遍历所有的未超时指针数组
+            //若fd就绪返回0
+            ret = checkNetFd(fd, &timeWheel);
+            printf("ret = %d\n", ret);
+            //sleep(10);
+            print_arr(&timeWheel);
+            if(ret == 0)
             {
-                printf("存net_fd的数组满了\n");
-            }
-            for(int j = 0; j < NET_FD_NUM; j++)
-            {
-                if(fd == net_fd_arr[j])
+                printf("net_fd = %d\n", fd);
+                //sleep(10);
+                bzero(&t, sizeof(t));
+                // 接受一次信息-》区分等下要分发给那个命令：
+                ssize_t rret = recv(fd, &t, sizeof(t), MSG_WAITALL);
+                if (rret == 0)
                 {
-                    bzero(&t, sizeof(t));
-                    // 接受一次信息-》区分等下要分发给那个命令：
-                    ssize_t rret = recv(net_fd_arr[j], &t, sizeof(t), MSG_WAITALL);
-                    if(rret == 0)
-                    {
-                        // 连接关闭
-                        close(net_fd_arr[j]);
-                        removeTimer(&timeWheel, net_fd_arr[j]);
-                        break;
-                    }
-                    //分析协议
-                    int ret = analysisProtocol(&t, net_fd_arr[j], mysql);
-                    if(ret == -1)
-                    {
-                        break;
-                    }
-                    else if(ret == 1)
-                    {
-                        ret = pthread_mutex_lock(&pool.lock);
-                        THREAD_ERROR_CHECK(ret, "lock");
-                        ret = enQueue(&pool.q, net_fd_arr[j]);
-                        THREAD_ERROR_CHECK(ret, "enQueue");
-                        ret = pthread_mutex_unlock(&pool.lock);
-                        THREAD_ERROR_CHECK(ret, "unlock");
-                    }
+                    // 连接关闭
+                    removeTimer(&timeWheel, fd, epoll_fd);
+                    continue;
+                }
+                rret = recv(fd, &t, sizeof(t), MSG_WAITALL);
+                if (rret == 0)
+                {
+                    // 连接关闭
+                    removeTimer(&timeWheel, fd, epoll_fd);
+                    continue;
+                }
+                //sleep(10);
+                //分析协议
+                int ret = analysisProtocol(&t, fd, mysql);
+                //sleep(10);
+                if (ret == -1)
+                {
+                    //sleep(1);
+                    printf("--ret = -1\n");
+                    removeTimer(&timeWheel, fd, epoll_fd);
+                    
+                    continue;
+                }
+                else if (ret == 1)
+                {
+                    ret = pthread_mutex_lock(&pool.lock);
+                    THREAD_ERROR_CHECK(ret, "lock");
+                    ret = enQueue(&pool.q, fd);
+                    THREAD_ERROR_CHECK(ret, "enQueue");
+                    ret = pthread_mutex_unlock(&pool.lock);
+                    THREAD_ERROR_CHECK(ret, "unlock");
+                    continue;
                 }
             }
+            else
+            {
+                //  epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                continue;
+            }
         }
-        handleTimeout(&timeWheel);  // 处理超时事件
+        handleTimeout(&timeWheel, epoll_fd);  // 处理超时事件
+        print_arr(&timeWheel);
     }
     close(socket_fd);
     close(epoll_fd);

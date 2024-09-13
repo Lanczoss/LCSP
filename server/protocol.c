@@ -9,10 +9,10 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
     switch(t->command)
     {
     case LS:
-        lsCommand(*t, net_fd, mysql);
+        /* lsCommand(*t, net_fd, mysql); */
         break;
     case CD:
-        cdCommand(*t, net_fd, mysql);
+        /* cdCommand(*t, net_fd, mysql); */
         break;
     case PWD:
         //pwdCommand(t, net_fd);
@@ -27,15 +27,15 @@ int analysisProtocol(train_t *t, int net_fd, MYSQL *mysql)
         printf("函数暂时未完成！\n");
         break;
     case MKDIR:
-        mkdirCommand(*t, net_fd, mysql);
+        /* mkdirCommand(*t, net_fd, mysql); */
         break;
     case RM:
-        rmCommand(*t, net_fd,mysql);
+        /* rmCommand(*t, net_fd,mysql); */
         break;
     case EXIT:
         return -1;
     case RENAME:
-        reName(*t,net_fd,mysql);
+        /* reName(*t,net_fd,mysql); */
         break;
     default:
         LOG_INFO("Wrong command.");
