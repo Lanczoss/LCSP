@@ -75,17 +75,26 @@ int main(void)
         //控制字符数组（命令参数）
         ret = splitCommand(&t, buf);
         ERROR_CHECK(ret, -1, "splitCommand");
+
         //这里出来的自定义协议有基本的控制信息
         //处理接收的消息
-        //发送命令
-        rret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
-        ERROR_CHECK(rret, -1, "send");
-
-        ret = analysisProtocol(&t, socket_fd);
-        if(ret == -1)
-        {
-            close(socket_fd);
-            exit(0);
+        //区分长短命令
+        switch (t.command){
+            case PUTS:
+            case GETS:  
+                pthread_t id;
+                int ret = pthread_create(&id,NULL,thread_main,(void *)&t);
+                ERROR_CHECK(ret,-1,"pthread_create");
+                break;
+            default:
+                rret = send(socket_fd,&t,sizeof(t),MSG_NOSIGNAL);
+                ERROR_CHECK(rret, -1, "send");
+                ret = analysisProtocol(&t, socket_fd);
+                if(ret == -1)
+                {
+                    close(socket_fd);
+                    exit(0);
+                }
         }
     }
     close(socket_fd);

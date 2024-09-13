@@ -81,6 +81,7 @@ void addNetFd(int new_fd, int *net_fd_arr, int max_fds) {
         if (net_fd_arr[i] == -1) {
             // 找到空闲位置，将新描述符添加到数组中
             net_fd_arr[i] = new_fd;
+            printf("net[%d] = %d\n",i,new_fd);
             break;
         }
     }

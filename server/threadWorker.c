@@ -18,6 +18,7 @@ void *threadMain(void *p)
     }
     ret = pthread_mutex_unlock(&pool->lock);
     THREAD_ERROR_CHECK(ret, "unlock");
+    
     //子线程主函数
     while(1)
     {
@@ -59,11 +60,14 @@ void *threadMain(void *p)
 bool isExistUid(MYSQL *mysql, char *token){
     int uid = deCodeToken(token);
     
+    printf("uid = %d\n",uid);
     char select_statement[300] = {0};
-    sprintf(select_statement,"select id from users where id = %d",uid);
+    sprintf(select_statement,"select user_id from users where user_id = %d",uid);
+    printf("%s\n",select_statement);
+    
     int ret = mysql_query(mysql,select_statement);
     if (ret != 0){
-        printf("mysql: %s\n",mysql_error);
+        printf("mysql: %s\n",mysql_error(mysql));
     }
     MYSQL_RES *res = mysql_store_result(mysql);
     if (res == NULL){
@@ -85,18 +89,21 @@ bool isExistUid(MYSQL *mysql, char *token){
 // 处理长命令gets puts
 int doWorker(MYSQL *mysql, int net_fd)
 {
+    puts("thread_work.c: 89\n");
     // 定义协议头部用于接受服务端的信息
     train_t t;
-    
+
     // 接收客户端的token信息
     int ret = recv(net_fd,&t,sizeof(t),MSG_WAITALL);
     ERROR_CHECK(ret,-1,"recv");
+
+    printf("token: %s\n",t.token);
 
     // 拿到解析出的uid进行查表，观察是否有这个uid
     bool flag = isExistUid(mysql,t.token);
     
     // 根据flag进行判断对方的用户身份
-    if (flag = false){
+    if (flag == false){
         t.error_flag = ABNORMAL;
         ret = send(net_fd,&t,sizeof(t),MSG_WAITALL);
         ERROR_CHECK(ret,-1,"send");
@@ -104,7 +111,9 @@ int doWorker(MYSQL *mysql, int net_fd)
         return -1;
     }
     else {
+        puts("113");
         t.error_flag = NORMAL;
+        printf("flag = %d\n",t.error_flag);
         ret = send(net_fd,&t,sizeof(t),MSG_WAITALL);
         ERROR_CHECK(ret,-1,"send");
     }

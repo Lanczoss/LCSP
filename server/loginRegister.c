@@ -11,11 +11,17 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
     {
         bzero(t, sizeof(train_t));
         //先接收一次的登录信息或者注册信息;
+        printf("net_fd = %d\n",net_fd);
         ssize_t rret = recv(net_fd, t, sizeof(train_t), MSG_WAITALL);
         ERROR_CHECK(rret, -1, "recv");
         if(rret == 0)
         {
             return -1;
+        }
+        
+        if(t->token[0] != '\0' && t->isDownloadOrUpload == true)
+        {
+            return 5;
         }
         //接收密码
         char password[1024] = {0};

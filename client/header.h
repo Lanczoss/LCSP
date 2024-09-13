@@ -29,6 +29,7 @@
 #include <sys/sendfile.h>
 #include <sys/utsname.h>
 #include <errno.h>
+#include <pthread.h>
 
 enum
 {
@@ -42,8 +43,8 @@ enum
     REMOVE,
     RM,
     MKDIR,
-    NORMAL,
     ABNORMAL,
+    NORMAL,
     EXIT,
     RENAME
 };
@@ -79,6 +80,10 @@ typedef struct train_s
     //用于标记用户是否登录失败
     //默认0登录成功，1代表登录失败
     bool isLoginFailed;
+
+    // true表示是长指令
+    // false表示短指令
+    bool isDownloadOrUpload; 
 
     //用户token值
     char token[512];
@@ -262,4 +267,10 @@ int writeLog(FILE *log_file, const char *level, const char *file, int line, cons
 
 // 日志关闭函数声明，确保在程序结束时关闭日志文件
 void closeLog();
+
+// 函数
+int splitParameter(train_t t, int num, char *buf);
+
+// 子线程的入口函数
+void *thread_main(void *args);
 #endif

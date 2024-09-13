@@ -132,14 +132,30 @@ int main(void)
                 //获取net_fd
                 int net_fd = accept(socket_fd, NULL, NULL);
                 ERROR_CHECK(net_fd, -1, "accept");
+                puts("main.c:133");
+
                 //登录注册
                 t.isLoginFailed = 1;
+
                 //登录/注册逻辑函数
                 ret = loginRegisterSystem(&t, net_fd, mysql);
                 if(ret == -1)
                 {
                     break;
                 }
+
+                if (ret == 5){
+                    puts("main: 148");
+                    ret = pthread_mutex_lock(&pool.lock);
+                    THREAD_ERROR_CHECK(ret, "lock");
+                    ret = enQueue(&pool.q, net_fd);
+                    THREAD_ERROR_CHECK(ret, "enQueue");
+                    ret = pthread_cond_broadcast(&pool.cond);
+                    ret = pthread_mutex_unlock(&pool.lock);
+                    THREAD_ERROR_CHECK(ret, "unlock");
+                    continue;
+                }
+
                 if(t.isLoginFailed == 0 && t.isRegister == 0)
                 {
                     //登录成功
@@ -152,6 +168,7 @@ int main(void)
                     // 添加到时间轮中
                     addTimer(&timeWheel, net_fd, time(NULL) + 60);  // 60秒超时
                     LOG_INFO("One client login success.");
+                    continue;
                 }
                 else
                 {
@@ -190,7 +207,7 @@ int main(void)
                     deQueue(&pool.q, &net_fd);
                     close(net_fd);
                 }
-//                //清理net_fd数组
+//               //清理net_fd数组
 //                free(net_fd_arr);
                 //清理存储线程id的链表
                 free(pool.pthread_list);
@@ -204,11 +221,13 @@ int main(void)
                 pthread_exit(NULL);
             }
             for(int j = 0; j < NET_FD_NUM; j++)
-            {
+            {   
+             
                 //有命令传来
                 //TODO:考虑exit的情况
                 if(fd == net_fd_arr[j])
                 {
+                    sleep(10);
                     bzero(&t, sizeof(t));
                     // 接受一次信息-》区分等下要分发给那个命令：
                     ssize_t rret = recv(net_fd_arr[j], &t, sizeof(t), MSG_WAITALL);
@@ -228,12 +247,7 @@ int main(void)
                     }
                     else if(ret == 1)
                     {
-                        ret = pthread_mutex_lock(&pool.lock);
-                        THREAD_ERROR_CHECK(ret, "lock");
-                        ret = enQueue(&pool.q, net_fd_arr[j]);
-                        THREAD_ERROR_CHECK(ret, "enQueue");
-                        ret = pthread_mutex_unlock(&pool.lock);
-                        THREAD_ERROR_CHECK(ret, "unlock");
+                        continue;
                     }
                 }
             }

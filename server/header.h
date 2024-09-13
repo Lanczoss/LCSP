@@ -83,6 +83,8 @@ typedef struct train_s
     //默认0登录成功，1代表登录失败
     bool isLoginFailed;
 
+    bool isDownloadOrUpload;
+
     //用户token值
     char token[512];
 
