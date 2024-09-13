@@ -58,7 +58,6 @@ int splitCommand(train_t *t, char *buf){
 
     bzero(t->control_msg,sizeof(t->control_msg));
 
-    printf("buf:#%s#\n",buf);
     // 特殊情况处理："/ /\n"
     if (strcmp(buf, "/ /\n ") == 0 || strcmp(buf,"/ ..\n ") == 0) {
         strcpy(t->control_msg, "/");
@@ -101,7 +100,6 @@ int splitCommand(train_t *t, char *buf){
         strncat(t->control_msg,parma,strlen(parma));
         t->control_msg[strlen(t->control_msg)] = ' ';
     }
-    printf("t.control_msg:#%s#\n",t->control_msg);
     return 0;
     }
 
