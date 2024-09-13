@@ -11,6 +11,12 @@
  **/
 int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
 
+    //参数处理
+    if(t.parameter_num>=2){
+        printf("参数个数错误！\n");
+        return 0;
+    }
+
     //pid
     int pid;
     //文件hash值
@@ -37,9 +43,9 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
     printf("处理之后的文件的路径%s\n",file_path);
 
     printf("处理之前的用户路径%s\n", user_path);
-//    if (strlen(user_path) != 1) {
-//        user_path[strlen(user_path)] = '\0';
-//    }
+    //    if (strlen(user_path) != 1) {
+    //        user_path[strlen(user_path)] = '\0';
+    //    }
     user_path[strlen(user_path)] = '\0';
     printf("处理之后的用户路径%s\n", user_path);
 
@@ -72,6 +78,11 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
         }
     }
     file_name[strlen(file_name)] = '\0';
+
+    size_t file_name_len = strlen(file_name);
+    if (file_name_len > 0 && file_name[file_name_len - 1] == '\n') {
+        file_name[file_name_len - 1] = '\0'; // 将换行符替换为字符串终止符                                      
+    }
     strncat(file_path, file_name, strlen(file_name));
     file_path[strlen(file_path)] = '\0';
     size_t len = strlen(file_path);
@@ -146,6 +157,9 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
                     count += recv_num;
                 }
             }
+        }else{
+            long offset = -1;
+            send(net_fd, &offset, sizeof(offset), MSG_NOSIGNAL);
         }
         //计算hash值
         //___________________________________________________
@@ -160,7 +174,7 @@ int putsCommand(train_t t, int net_fd, MYSQL *mysql) {
 
             //将数据插入数据库
             uploadDatabase(mysql, file_name, t.uid, pid, file_path, hash);
-            
+
             printf("服务器成功收到文件: %s\n", serve_path);
         }
 

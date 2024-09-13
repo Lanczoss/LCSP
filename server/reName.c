@@ -56,6 +56,11 @@ int reName(train_t t, int net_fd, MYSQL* mysql){
 
     //开始正式改名
     char sql[4096] = { 0 };
+    size_t len = strlen(file_old_path);
+    // 如果字符串长度大于0且最后一个字符是换行符'\n'
+    if(len > 0 && file_old_path[len - 1] == '\n'){
+        file_old_path[len - 1] = '\0';
+    }
     snprintf(sql,sizeof(sql),
             "UPDATE files SET file_name = '%s', file_path = '%s' where file_path = '%s'",
              file_new_name,file_new_path,file_old_path);

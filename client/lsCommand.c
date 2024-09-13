@@ -14,6 +14,7 @@ int removeLineBreak(char *real_path){
 
 int lsCommand(train_t t, int socket_fd){
     
+    printf("ls进入#%s#\n",t.control_msg);
     // 参数大于1，等待服务端发送的错误信息
     if(t.parameter_num > 1){
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
@@ -59,7 +60,7 @@ int lsCommand(train_t t, int socket_fd){
     char para[256] = { 0 };
 
     // 获得客户端目前路径
-    strncpy(path, t.control_msg, t.path_length);
+    splitParameter(t, 0, path);
     // 获得参数
     splitParameter(t, 1, para);
 
@@ -71,6 +72,7 @@ int lsCommand(train_t t, int socket_fd){
     }
     
     // 去掉para后的换行符
+    removeLineBreak(path);
     removeLineBreak(para);
 
     
@@ -102,9 +104,9 @@ int lsCommand(train_t t, int socket_fd){
         recv(socket_fd, buffer, file_size, MSG_WAITALL);
 
         printf("%s\n",buffer);
-
+        printf("ls退出#%s#\n", t.control_msg);
         return 0;
-
+        
     }
     
     // 进入判读参数合法
