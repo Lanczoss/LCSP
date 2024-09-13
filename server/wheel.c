@@ -1,4 +1,5 @@
 #include "wheel.h"
+#include "header.h"
 
 // 初始化时间轮
 void initTimeWheel(TimeWheel* wheel) {

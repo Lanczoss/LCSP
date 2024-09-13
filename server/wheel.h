@@ -1,7 +1,7 @@
 #ifndef WHEEL_H
 #define WHEEL_H
 
-#include "header.h"
+#include <time.h>
 // 时间轮的槽大小，表示每个槽代表的时间（秒）
 #define TIME_WHEEL_SIZE 60
 
