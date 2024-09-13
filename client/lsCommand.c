@@ -14,12 +14,11 @@ int removeLineBreak(char *real_path){
 
 int lsCommand(train_t t, int socket_fd){
     
-    printf("ls进入#%s#\n",t.control_msg);
     // 参数大于1，等待服务端发送的错误信息
     if(t.parameter_num > 1){
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
         if(t.error_flag == 1){
-            printf("参数个数不合法，请输入合法参数\n");
+            printf("参数个数不合法，参数个数不能大于1，请输入合法参数\n");
         }
         return 0;
     }
@@ -104,7 +103,6 @@ int lsCommand(train_t t, int socket_fd){
         recv(socket_fd, buffer, file_size, MSG_WAITALL);
 
         printf("%s\n",buffer);
-        printf("ls退出#%s#\n", t.control_msg);
         return 0;
         
     }
@@ -113,7 +111,7 @@ int lsCommand(train_t t, int socket_fd){
     if(strlen(para) == 1 && para[0] == '/'){
         recv(socket_fd, &t, sizeof(train_t), MSG_WAITALL);
         if(t.error_flag == 4){
-            printf("非法参数，当前无法查看/！\n");
+            printf("非法参数，当前无法查看/目录下的内容！\n");
         }
         return 0;
     }

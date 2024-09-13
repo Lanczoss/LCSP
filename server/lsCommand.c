@@ -1,4 +1,5 @@
 #include "header.h"
+#include <math.h>
 
 
 
@@ -21,7 +22,6 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
     MYSQL_BIND result[1];
     int id = getFileId(t, mysql); // 参数通过getfileid获得文件的索引id
     
-    printf("id :*%d*\n", id);
     // 对id做一下错误判断
     // id如果为-1，说明表中没有这条数据
     // 那就更别提以该id为pid的文件或文件夹了
@@ -34,7 +34,6 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
 
         return -1;
     }
-    printf("ls 37:id=%d\n", id);
     // 多send一次
     send(net_fd, &t, sizeof(t), MSG_NOSIGNAL);
 
@@ -125,7 +124,6 @@ int pwdCurrent(train_t t, int net_fd, MYSQL *mysql){
 
 int lsCommand(train_t t, int net_fd, MYSQL *mysql){
     
-    printf("127:ls:%s\n", t.control_msg);
     // 参数大于1，修改错误标志返回给客户端
     if(t.parameter_num > 1){
         // 错误标志设为1
@@ -160,13 +158,10 @@ int lsCommand(train_t t, int net_fd, MYSQL *mysql){
     // 去掉para后的换行符
     removeLineBreak(path);
     removeLineBreak(para);
-    printf("ls:161 path #%s#\n",path);
-    printf("ls:162 para #%s#\n",para);
     // 比较客户端目前路径和参数
     if(strcmp(path, para) == 0){
         //相等说明等价于ls
     
-        printf("ls:166%s\n", t.control_msg);
         pwdCurrent(t, net_fd, mysql);
         return 0;
     }

@@ -13,16 +13,12 @@ int deleteFile(train_t t, char *file_path, MYSQL *mysql) {
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    printf("\n");
-    printf("file_path");
-    printf("\n");
     // 检测数据库中是否存在此文件夹
     char check_sql[4096] = {0};
     snprintf(check_sql, sizeof(check_sql),
              "SELECT id FROM files WHERE uid = %d AND file_path = '%s' AND delete_flag = 0",
              t.uid, file_path);
     LOG_INFO(check_sql);
-    printf("sql:%s\n",check_sql);
     if (mysql_query(mysql, check_sql)) {
         fprintf(stderr, "检测文件夹存在性失败: %s\n", mysql_error(mysql));
         return -1;
@@ -48,7 +44,6 @@ int deleteFile(train_t t, char *file_path, MYSQL *mysql) {
              "SELECT id FROM files WHERE file_path = '%s' AND delete_flag = 0 AND uid = %d",
              file_path, t.uid);
     LOG_INFO(sql);
-    printf("sql:%s\n",sql);
     if (mysql_query(mysql, sql)) {
         fprintf(stderr, "查询子文件 ID 失败: %s\n", mysql_error(mysql));
         return -1;
@@ -70,7 +65,6 @@ int deleteFile(train_t t, char *file_path, MYSQL *mysql) {
         printf("无法获取子文件 ID。\n");
         return -1;
     }
-    printf("file_path:id = %d\n", id);
 
     // 更新子文件的 delete_flag
     bzero(sql, sizeof(sql));
@@ -81,7 +75,6 @@ int deleteFile(train_t t, char *file_path, MYSQL *mysql) {
              "SET f.delete_flag = -1;",
              file_path, t.uid);
     LOG_INFO(sql);
-    printf("sql:%s\n",sql);
     if (mysql_query(mysql, sql)) {
         printf("更新子文件失败: %s\n", mysql_error(mysql));
         return -1;

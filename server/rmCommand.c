@@ -32,11 +32,9 @@ int rmCommand(train_t t, int net_fd,MYSQL *mysql)
             strcat(real_path,"/");
         }
         strcat(real_path,filename);
-        printf("delete_path:%s\n",real_path);
         //TODO:去除文件后面的换行符
 
         int ret = deleteFile(t, real_path, mysql);
-        printf("ret:%d\n",ret);
         if(ret == 0){
             char buf[1024] = { 0 };
             char str[] = "删除文件成功！";
@@ -49,7 +47,6 @@ int rmCommand(train_t t, int net_fd,MYSQL *mysql)
             strcpy(buf,str);
             send(net_fd,buf,sizeof(buf),MSG_NOSIGNAL);
         }
-        printf("sleep over \n");
     }
 
     //拼接控制命令
