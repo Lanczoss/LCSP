@@ -2,6 +2,7 @@
 
 void *threadMain(void *p)
 {
+    puts("server: thread_main:5");
     pool_t *pool = (pool_t*)p;
     int ret = pthread_mutex_lock(&pool->lock);
     THREAD_ERROR_CHECK(ret, "lock");

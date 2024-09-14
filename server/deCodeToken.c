@@ -17,7 +17,6 @@ int deCodeToken(char *buf){
     params.jwt = (char*)str;
     params.jwt_length = strlen(str);
 
-    printf("加密密文:%s\n",str);
     // 设置密钥
     char *key="Baidu_Cloud string token key";
     params.verification_key = (unsigned char*)key;

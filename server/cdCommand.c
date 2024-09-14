@@ -57,6 +57,8 @@ bool isExistDir(MYSQL *mysql, train_t t, char *virtual_path, char *parameter){
 // 返回值：0为正常，-1为异常
 int cdCommand(train_t t, int net_fd, MYSQL *mysql){
     printf("t.msg = %s\n",t.control_msg);
+    printf("t.path_len = %d\n",t.path_length);
+    printf("t.curr_laryers = %d\n",t.current_layers);
     // 检错返回值
     int ret;
     // cd参数必须要保证为1个或者0个
@@ -78,10 +80,10 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
         bzero(t.control_msg,sizeof(t.control_msg));
         strcpy(t.control_msg,"/");
         t.current_layers = 0;
-        t.file_length = strlen(t.control_msg);
+        t.path_length = strlen(t.control_msg);
         t.error_flag = NORMAL;
 
-        printf("#%s#\n",t.control_msg);
+        //printf("#%s#\n",t.control_msg);
         
         ret = send(net_fd,&t,sizeof(t),MSG_NOSIGNAL);
         ERROR_CHECK(ret,-1,"send");
@@ -196,6 +198,7 @@ int cdCommand(train_t t, int net_fd, MYSQL *mysql){
     // 将拼接好的路径发送给客户端
     bzero(t.control_msg,sizeof(t.control_msg));
     memcpy(t.control_msg, virtual_path, sizeof(virtual_path));
+    puts("cd :199");
     if (current_layers == 0){
         strcat(t.control_msg,"/");
     }

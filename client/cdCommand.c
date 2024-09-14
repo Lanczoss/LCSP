@@ -12,7 +12,10 @@ int cdCommand(train_t *t, int socket_fd){
         printf("%s\n",tmp_t.control_msg);
         return 0;
     }
+    puts("client cd :15");
     memcpy(t,&tmp_t,sizeof(tmp_t));
+    printf("msg = %s\n",t->control_msg);
+     printf("path_length= %d\n",t->path_length);
     return 0;
 }
 

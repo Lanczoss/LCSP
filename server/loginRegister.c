@@ -19,9 +19,15 @@ int loginRegisterSystem(train_t *t, int net_fd, MYSQL *mysql)
             return -1;
         }
         
-        if(t->token[0] != '\0' && t->isDownloadOrUpload == true)
+        if(t->isDownloadOrUpload == true)
         {
+            t->isDownloadOrUpload = false;
             return 5;
+        }
+        
+        if(t->token[0] != '\0')
+        {
+            return 2;
         }
         //接收密码
         char password[1024] = {0};
